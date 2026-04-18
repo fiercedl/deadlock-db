@@ -526,198 +526,37 @@
 
 
   /* ═══════════════════════ COACH TAB ═══════════════════════ */
-  .coach-layout {
-    display: flex;
-    height: calc(100vh - 90px);
-    background: var(--bg);
-    overflow: hidden;
-  }
-  .coach-sidebar {
-    width: 286px;
-    flex-shrink: 0;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    scrollbar-width: thin;
-  }
-  .coach-section {
-    padding: 14px;
-    border-bottom: 1px solid var(--border);
-  }
-  .coach-input-section { flex: 1; display: flex; flex-direction: column; }
-  .coach-section-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 9px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--text3); margin-bottom: 9px;
-  }
-  /* API key */
-  .coach-key-wrap { display: flex; gap: 6px; }
-  .coach-key-wrap input {
-    flex: 1; background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 11px;
-    padding: 6px 8px; border-radius: 3px; outline: none;
-  }
-  .coach-key-wrap input:focus { border-color: var(--accent2); }
-  .coach-key-wrap button {
-    padding: 6px 10px; background: var(--bg4); border: 1px solid var(--border);
-    color: var(--text2); font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 3px;
-    white-space: nowrap;
-  }
-  .coach-key-wrap button:hover { color: var(--text); border-color: var(--border2); }
-  .coach-key-hint { margin-top: 6px; font-size: 10px; color: var(--text3); line-height: 1.4; }
-  .coach-key-saved { color: var(--vitality) !important; }
-  /* Upload */
-  .coach-upload-area {
-    border: 1px dashed var(--border2); border-radius: 4px;
-    padding: 16px 10px; text-align: center; cursor: pointer;
-    background: var(--bg3); transition: border-color 0.15s, background 0.15s;
-  }
-  .coach-upload-area:hover, .coach-upload-area.drag-over {
-    border-color: var(--accent); background: rgba(74,158,255,0.05);
-  }
-  .coach-upload-icon { font-size: 16px; color: var(--text3); margin-bottom: 5px; }
-  .coach-upload-text {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
-    color: var(--text2); line-height: 1.4;
-  }
-  .coach-upload-text span { font-size: 11px; color: var(--text3); }
-  .coach-text-btn {
-    margin-top: 7px; width: 100%; padding: 5px; background: none;
-    border: 1px solid var(--border); color: var(--text3);
-    font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
-    letter-spacing: 1px; cursor: pointer; border-radius: 3px;
-  }
-  .coach-text-btn:hover { color: var(--text); border-color: var(--border2); }
-  /* Quick prompts */
-  .coach-quick-grid { display: flex; flex-wrap: wrap; gap: 4px; }
-  .coach-quick-btn {
-    padding: 4px 8px; background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text2); font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 600; cursor: pointer; border-radius: 3px;
-    transition: color 0.12s, border-color 0.12s;
-  }
-  .coach-quick-btn:hover { color: var(--accent); border-color: var(--accent); }
-  /* Input */
-  #coach-input {
-    width: 100%; background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text); font-family: 'Barlow', sans-serif; font-size: 12px;
-    padding: 8px 10px; border-radius: 4px; resize: vertical; outline: none;
-    box-sizing: border-box; min-height: 72px;
-  }
-  #coach-input:focus { border-color: var(--accent2); }
-  #coach-input::placeholder { color: var(--text3); }
-  #coach-send-btn {
-    margin-top: 8px; width: 100%; padding: 8px; background: var(--accent);
-    border: none; color: #000; font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; border-radius: 3px; transition: opacity 0.15s;
-  }
-  #coach-send-btn:hover { opacity: 0.85; }
-  #coach-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  /* Main response area */
-  .coach-main { flex: 1; overflow-y: auto; scrollbar-width: thin; }
-  #coach-response-area { padding: 28px 32px; display: flex; flex-direction: column; min-height: 100%; }
-  .coach-empty {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; text-align: center; padding: 48px 24px;
-    min-height: calc(100vh - 200px);
-  }
-  .coach-empty-icon { font-size: 36px; opacity: 0.18; margin-bottom: 14px; }
-  .coach-empty-title {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 20px;
-    font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--text2); margin-bottom: 10px;
-  }
-  .coach-empty-sub { font-size: 13px; color: var(--text3); line-height: 1.7; max-width: 320px; }
-  /* Messages */
-  .coach-msg { margin-bottom: 24px; }
-  .coach-msg-role {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 7px;
-  }
-  .coach-msg.user .coach-msg-role { color: var(--text3); }
-  .coach-msg.assistant .coach-msg-role { color: var(--accent); }
-  .coach-msg.user .coach-msg-body { color: var(--text2); font-style: italic; font-size: 13px; }
-  .coach-msg.assistant .coach-msg-body { color: var(--text); font-size: 13px; line-height: 1.75; }
-  .coach-msg-body h3 {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase; color: var(--text);
-    margin: 16px 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border);
-  }
-  .coach-msg-body h3:first-child { margin-top: 0; }
-  .coach-msg-body strong { color: #fff; }
-  .coach-msg-body p { margin: 0 0 8px; }
-  .coach-msg-body p:last-child { margin-bottom: 0; }
-  .coach-msg-body ul { margin: 4px 0 8px 16px; }
-  .coach-msg-body li { margin-bottom: 3px; }
-  .coach-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
-  .coach-thinking {
-    display: flex; gap: 5px; align-items: center; padding: 8px 0;
-    font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text3);
-  }
-  @keyframes coachDot { 0%,60%,100%{opacity:0.15} 30%{opacity:1} }
-  .coach-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
-    animation: coachDot 1.3s infinite; }
-  .coach-dot:nth-child(2) { animation-delay: 0.2s; }
-  .coach-dot:nth-child(3) { animation-delay: 0.4s; }
-
-
-  /* ═══════════════════════ COACH TAB ═══════════════════════ */
-  .coach-layout { display:flex; height:calc(100vh - 90px); background:var(--bg); overflow:hidden; }
-  .coach-sidebar { width:286px; flex-shrink:0; background:var(--bg2); border-right:1px solid var(--border); overflow-y:auto; display:flex; flex-direction:column; scrollbar-width:thin; }
-  .coach-section { padding:14px; border-bottom:1px solid var(--border); }
-  .coach-input-section { flex:1; display:flex; flex-direction:column; }
-  .coach-section-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin-bottom:9px; }
-  .coach-key-wrap { display:flex; gap:6px; }
-  .coach-key-wrap input { flex:1; background:var(--bg3); border:1px solid var(--border); color:var(--text); font-family:'Share Tech Mono',monospace; font-size:11px; padding:6px 8px; border-radius:3px; outline:none; }
-  .coach-key-wrap input:focus { border-color:var(--accent2); }
-  .coach-key-wrap button { padding:6px 10px; background:var(--bg4); border:1px solid var(--border); color:var(--text2); font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; cursor:pointer; border-radius:3px; white-space:nowrap; }
-  .coach-key-wrap button:hover { color:var(--text); border-color:var(--border2); }
-  .coach-key-hint { margin-top:6px; font-size:10px; color:var(--text3); line-height:1.4; }
-  .coach-upload-area { border:1px dashed var(--border2); border-radius:4px; padding:16px 10px; text-align:center; cursor:pointer; background:var(--bg3); transition:border-color 0.15s; }
+  .coach-layout { display:flex; height:calc(100vh - 90px); overflow:hidden; }
+  .coach-sidebar { width:272px; flex-shrink:0; background:var(--bg2); border-right:1px solid var(--border); padding:14px; display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
+  .coach-section { display:flex; flex-direction:column; gap:8px; }
+  .coach-section-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text3); }
+  .coach-upload-area { border:1px dashed var(--border2); border-radius:4px; padding:20px 10px; text-align:center; cursor:pointer; background:var(--bg3); transition:border-color 0.15s; }
   .coach-upload-area:hover, .coach-upload-area.drag-over { border-color:var(--accent); background:rgba(74,158,255,0.05); }
-  .coach-upload-icon { font-size:16px; color:var(--text3); margin-bottom:5px; }
+  .coach-upload-icon { font-size:18px; color:var(--text3); margin-bottom:6px; }
   .coach-upload-text { font-family:'Barlow Condensed',sans-serif; font-size:12px; color:var(--text2); line-height:1.4; }
-  .coach-upload-text span { font-size:11px; color:var(--text3); }
-  .coach-text-btn { margin-top:7px; width:100%; padding:5px; background:none; border:1px solid var(--border); color:var(--text3); font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1px; cursor:pointer; border-radius:3px; }
+  .coach-upload-text span { font-size:10px; color:var(--text3); font-family:'Share Tech Mono',monospace; }
+  #coach-analyse-btn { padding:10px; background:var(--accent); border:none; color:#000; font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; cursor:pointer; border-radius:4px; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; }
+  #coach-analyse-btn:disabled { opacity:0.45; cursor:not-allowed; }
+  .coach-text-btn { padding:6px; background:none; border:1px solid var(--border); color:var(--text3); font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1px; cursor:pointer; border-radius:3px; width:100%; }
   .coach-text-btn:hover { color:var(--text); border-color:var(--border2); }
-  .coach-quick-grid { display:flex; flex-wrap:wrap; gap:4px; }
-  .coach-quick-btn { padding:4px 8px; background:var(--bg3); border:1px solid var(--border); color:var(--text2); font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:600; cursor:pointer; border-radius:3px; }
-  .coach-quick-btn:hover { color:var(--accent); border-color:var(--accent); }
-  #coach-input { width:100%; background:var(--bg3); border:1px solid var(--border); color:var(--text); font-family:'Barlow',sans-serif; font-size:12px; padding:8px 10px; border-radius:4px; resize:vertical; outline:none; box-sizing:border-box; min-height:72px; }
-  #coach-input:focus { border-color:var(--accent2); }
-  #coach-input::placeholder { color:var(--text3); }
-  #coach-send-btn { margin-top:8px; width:100%; padding:8px; background:var(--accent); border:none; color:#000; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; cursor:pointer; border-radius:3px; transition:opacity 0.15s; }
-  #coach-send-btn:hover { opacity:0.85; }
-  #coach-send-btn:disabled { opacity:0.4; cursor:not-allowed; }
-  .coach-main { flex:1; overflow-y:auto; scrollbar-width:thin; }
-  #coach-response-area { padding:28px 32px; display:flex; flex-direction:column; min-height:100%; }
-  .coach-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:48px 24px; min-height:calc(100vh - 200px); }
-  .coach-empty-icon { font-size:36px; opacity:0.18; margin-bottom:14px; }
-  .coach-empty-title { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--text2); margin-bottom:10px; }
-  .coach-empty-sub { font-size:13px; color:var(--text3); line-height:1.7; max-width:320px; }
-  .coach-msg { margin-bottom:24px; }
-  .coach-msg-role { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:7px; }
-  .coach-msg.user .coach-msg-role { color:var(--text3); }
-  .coach-msg.assistant .coach-msg-role { color:var(--accent); }
-  .coach-msg.user .coach-msg-body { color:var(--text2); font-style:italic; font-size:13px; }
-  .coach-msg.assistant .coach-msg-body { color:var(--text); font-size:13px; line-height:1.75; }
-  .coach-msg-body h3 { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text); margin:16px 0 6px; padding-bottom:4px; border-bottom:1px solid var(--border); }
-  .coach-msg-body h3:first-child { margin-top:0; }
-  .coach-msg-body strong { color:#fff; }
-  .coach-msg-body p { margin:0 0 8px; }
-  .coach-msg-body p:last-child { margin-bottom:0; }
-  .coach-msg-body ul { margin:4px 0 8px 16px; }
-  .coach-msg-body li { margin-bottom:3px; }
-  .coach-divider { border:none; border-top:1px solid var(--border); margin:16px 0; }
-  .coach-thinking { display:flex; gap:5px; align-items:center; padding:8px 0; font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text3); }
+  .coach-main { flex:1; overflow-y:auto; }
+  #coach-response-area { padding:24px 28px; }
+  .coach-empty { min-height:50vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:12px; }
+  .coach-empty-icon { font-size:32px; opacity:0.15; }
+  .coach-empty-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--text2); }
+  .coach-empty-sub { font-size:12px; color:var(--text3); line-height:1.7; max-width:280px; }
+  .coach-thinking-msg { padding:16px 0; font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--text3); display:flex; align-items:center; gap:10px; }
   @keyframes coachDot { 0%,60%,100%{opacity:0.15} 30%{opacity:1} }
-  .coach-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:coachDot 1.3s infinite; display:inline-block; }
-  .coach-dot:nth-child(2) { animation-delay:0.2s; }
-  .coach-dot:nth-child(3) { animation-delay:0.4s; }
+  .coach-dot { width:5px; height:5px; border-radius:50%; background:#000; animation:coachDot 1.3s infinite; display:inline-block; }
+  .coach-dot:nth-child(2){ animation-delay:0.2s; }
+  .coach-dot:nth-child(3){ animation-delay:0.4s; }
+  @keyframes coachFade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .coach-results { display:flex; flex-direction:column; gap:14px; animation:coachFade 0.3s ease; }
+  .coach-result-section { border-left:3px solid; padding-left:14px; }
+  .coach-result-title { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+  .coach-result-line { font-size:13px; color:var(--text); line-height:1.65; margin-bottom:2px; }
+  .coach-result-line strong { color:#fff; }
+
 
   /* GRID */
   .grid {
@@ -1037,47 +876,24 @@
 <div class="tab-panel" id="tab-coach">
   <div class="coach-layout">
     <div class="coach-sidebar">
-      <div class="coach-section" id="coach-key-section">
-        <div class="coach-section-label">Anthropic API Key</div>
-        <div class="coach-key-wrap">
-          <input type="password" id="coach-api-key" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
-          <button id="coach-key-save">Save</button>
-        </div>
-        <div class="coach-key-hint">Memory only — never persisted or sent anywhere except api.anthropic.com</div>
-      </div>
       <div class="coach-section">
-        <div class="coach-section-label">Screenshot</div>
+        <div class="coach-section-label">Draft Screenshot</div>
         <div class="coach-upload-area" id="coach-upload-area">
           <input type="file" id="coach-file-input" accept="image/*" style="display:none">
           <div class="coach-upload-icon">⬆</div>
-          <div class="coach-upload-text">Drop screenshot here<br><span>or click to browse</span></div>
+          <div class="coach-upload-text">Drop screenshot here<br><span>click · Ctrl+V to paste</span></div>
         </div>
         <img id="coach-preview" style="display:none;width:100%;border-radius:4px;border:1px solid var(--border);margin-top:8px" alt="">
-        <button class="coach-text-btn" id="coach-clear-img" style="display:none">✕ Clear image</button>
-      </div>
-      <div class="coach-section">
-        <div class="coach-section-label">Quick Analysis</div>
-        <div class="coach-quick-grid">
-          <button class="coach-quick-btn" data-q="Analyse this draft. What are each team's win conditions and who has the overall edge?">Draft Analysis</button>
-          <button class="coach-quick-btn" data-q="What item counters should I prioritise in this matchup?">Item Counters</button>
-          <button class="coach-quick-btn" data-q="Break down the laning matchups. Who wins lane and what should each player prioritise?">Lane Matchups</button>
-          <button class="coach-quick-btn" data-q="What are the team fight patterns and win conditions for each team?">Team Fight</button>
-          <button class="coach-quick-btn" data-q="What are the biggest threats to my team and how do I play around them?">Threats</button>
-          <button class="coach-quick-btn" data-q="When does each team power spike and how should the game pace be played?">Power Spikes</button>
-        </div>
-      </div>
-      <div class="coach-section coach-input-section">
-        <div class="coach-section-label">Ask the Coach</div>
-        <textarea id="coach-input" placeholder="Ask about the draft, matchups, items…&#10;Ctrl+Enter to send" rows="4"></textarea>
-        <button id="coach-send-btn">Analyse →</button>
+        <button id="coach-analyse-btn" style="display:none">⚡  Analyse Draft</button>
+        <button class="coach-text-btn" id="coach-clear-img" style="display:none">✕  New screenshot</button>
       </div>
     </div>
     <div class="coach-main">
       <div id="coach-response-area">
         <div class="coach-empty">
           <div class="coach-empty-icon">◈</div>
-          <div class="coach-empty-title">Deadlock Coach</div>
-          <div class="coach-empty-sub">Upload a draft screenshot or ask a question.<br>Full knowledge of all 38 heroes and 154 items.<br><br>Add your Anthropic API key in the sidebar to get started.</div>
+          <div class="coach-empty-title">Pre-Game Brief</div>
+          <div class="coach-empty-sub">Drop your draft screenshot and hit Analyse.<br>Win conditions, threats, key items — in ~5 seconds.</div>
         </div>
       </div>
     </div>
@@ -2558,71 +2374,84 @@ filterAndRender();
 // ═══════════════════════════════════════════════
 // COACH
 // ═══════════════════════════════════════════════
-let coachApiKey = '';
-let coachImage = null;
-let coachHistory = [];
-let coachBusy = false;
+const COACH_SYSTEM = `You are a Deadlock coach giving a pre-game brief. The player is Ascendant 1.
 
-const coachKeyInput   = document.getElementById('coach-api-key');
-const coachKeySave    = document.getElementById('coach-key-save');
-const coachUpload     = document.getElementById('coach-upload-area');
-const coachFileInput  = document.getElementById('coach-file-input');
-const coachPreview    = document.getElementById('coach-preview');
-const coachClearImg   = document.getElementById('coach-clear-img');
-const coachMsgInput   = document.getElementById('coach-input');
-const coachSendBtn    = document.getElementById('coach-send-btn');
-const coachArea       = document.getElementById('coach-response-area');
+Analyse the draft screenshot and output a TIGHT pre-game brief. Be direct — no filler.
 
-// Key save
-coachKeySave.addEventListener('click', () => {
-  const val = coachKeyInput.value.trim();
-  if (!val) return;
-  coachApiKey = val;
-  coachKeyInput.value = '';
-  coachKeyInput.placeholder = 'Key saved ✓';
-  coachKeyInput.style.color = 'var(--vitality)';
-  coachKeySave.textContent = 'Saved ✓';
-  coachKeySave.style.color = 'var(--vitality)';
-  // Update empty state hint
-  const sub = coachArea.querySelector('.coach-empty-sub');
-  if (sub) sub.innerHTML = 'Upload a draft screenshot or ask a question.<br>Full knowledge of all 38 heroes and 154 items.';
+Format your response EXACTLY like this (use these exact headers):
+
+### WIN CONDITIONS
+One sentence per team. My team first, enemy second.
+
+### BIGGEST THREATS
+2-3 enemy heroes I must respect. One line each: who, why, what they do to me.
+
+### KEY ITEMS
+3-5 items I should prioritise and why in one line each. Specific to this matchup.
+
+### LANING
+Who am I laning against, who wins, and my gameplan in 1-2 sentences.
+
+### WATCH OUT FOR
+1-3 specific things that could lose me the game if I ignore them.
+
+Keep every section SHORT. This is a 30-second pre-game read.`;
+
+let coachImg = null;
+
+const coachUploadArea  = document.getElementById('coach-upload-area');
+const coachFileInput   = document.getElementById('coach-file-input');
+const coachPreviewEl   = document.getElementById('coach-preview');
+const coachAnalyseBtn  = document.getElementById('coach-analyse-btn');
+const coachClearImgBtn = document.getElementById('coach-clear-img');
+const coachResponseArea = document.getElementById('coach-response-area');
+
+// Upload handlers
+coachUploadArea.addEventListener('click', () => coachFileInput.click());
+coachUploadArea.addEventListener('dragover', e => { e.preventDefault(); coachUploadArea.classList.add('drag-over'); });
+coachUploadArea.addEventListener('dragleave', () => coachUploadArea.classList.remove('drag-over'));
+coachUploadArea.addEventListener('drop', e => { e.preventDefault(); coachUploadArea.classList.remove('drag-over'); coachLoadFile(e.dataTransfer.files[0]); });
+coachFileInput.addEventListener('change', () => { if (coachFileInput.files[0]) coachLoadFile(coachFileInput.files[0]); });
+
+// Paste support
+window.addEventListener('paste', e => {
+  // Only if coach tab is active
+  if (!document.getElementById('tab-coach').classList.contains('active')) return;
+  const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+  if (item) coachLoadFile(item.getAsFile());
 });
 
-// Upload
-coachUpload.addEventListener('click', () => coachFileInput.click());
-coachUpload.addEventListener('dragover', e => { e.preventDefault(); coachUpload.classList.add('drag-over'); });
-coachUpload.addEventListener('dragleave', () => coachUpload.classList.remove('drag-over'));
-coachUpload.addEventListener('drop', e => { e.preventDefault(); coachUpload.classList.remove('drag-over'); loadCoachImg(e.dataTransfer.files[0]); });
-coachFileInput.addEventListener('change', () => { if (coachFileInput.files[0]) loadCoachImg(coachFileInput.files[0]); });
-coachClearImg.addEventListener('click', () => {
-  coachImage = null;
-  coachPreview.style.display = 'none';
-  coachClearImg.style.display = 'none';
-  coachUpload.style.display = '';
+coachClearImgBtn.addEventListener('click', () => {
+  coachImg = null;
+  coachPreviewEl.style.display = 'none';
+  coachPreviewEl.src = '';
+  coachAnalyseBtn.style.display = 'none';
+  coachClearImgBtn.style.display = 'none';
+  coachUploadArea.style.display = '';
   coachFileInput.value = '';
+  coachResponseArea.innerHTML = `<div class="coach-empty">
+    <div class="coach-empty-icon">◈</div>
+    <div class="coach-empty-title">Pre-Game Brief</div>
+    <div class="coach-empty-sub">Drop your draft screenshot and hit Analyse.<br>Win conditions, threats, key items — in ~5 seconds.</div>
+  </div>`;
 });
 
-function loadCoachImg(file) {
-  if (!file || !file.type.startsWith('image/')) return;
+coachAnalyseBtn.addEventListener('click', coachAnalyse);
+
+function coachLoadFile(file) {
+  if (!file?.type.startsWith('image/')) return;
   const reader = new FileReader();
   reader.onload = e => {
-    coachPreview.src = e.target.result;
-    coachPreview.style.display = 'block';
-    coachClearImg.style.display = 'block';
-    coachUpload.style.display = 'none';
-    coachImage = { base64: e.target.result.split(',')[1], mediaType: file.type };
+    const dataUrl = e.target.result;
+    coachImg = { base64: dataUrl.split(',')[1], mediaType: file.type };
+    coachPreviewEl.src = dataUrl;
+    coachPreviewEl.style.display = 'block';
+    coachAnalyseBtn.style.display = 'flex';
+    coachClearImgBtn.style.display = 'block';
+    coachUploadArea.style.display = 'none';
   };
   reader.readAsDataURL(file);
 }
-
-// Quick prompts
-document.querySelectorAll('.coach-quick-btn').forEach(btn => {
-  btn.addEventListener('click', () => { coachMsgInput.value = btn.dataset.q; coachMsgInput.focus(); });
-});
-
-// Send
-coachMsgInput.addEventListener('keydown', e => { if (e.key==='Enter' && (e.ctrlKey||e.metaKey)) { e.preventDefault(); coachSend(); } });
-coachSendBtn.addEventListener('click', coachSend);
 
 function coachMd(text) {
   return text
@@ -2633,88 +2462,78 @@ function coachMd(text) {
     .map(p => {
       p = p.trim();
       if (!p) return '';
-      if (/^<(h3|ul|li)/.test(p)) return p.includes('<li>') ? `<ul>${p}</ul>` : p;
-      return `<p>${p.replace(/\n/g,'<br>')}</p>`;
+      if (/^<(h3|li)/.test(p)) return p.includes('<li>') ? `<ul>${p}</ul>` : p;
+      return `<p>${p.replace(/\n/g, '<br>')}</p>`;
     }).join('');
 }
 
-function coachAddMsg(role, html, displayText) {
-  document.querySelector('.coach-empty')?.remove();
-  const d = document.createElement('div');
-  d.className = `coach-msg ${role}`;
-  d.innerHTML = `<div class="coach-msg-role">${role==='user'?'You':'⬡ Coach'}</div>
-    <div class="coach-msg-body">${role==='user' ? `<p>${(displayText||'').replace(/</g,'&lt;')}</p>` : html}</div>`;
-  coachArea.appendChild(d);
-  d.scrollIntoView({behavior:'smooth',block:'end'});
-}
+async function coachAnalyse() {
+  if (!coachImg) return;
 
-function coachShowThinking() {
-  const d = document.createElement('div');
-  d.id = 'coach-thinking'; d.className = 'coach-thinking';
-  d.innerHTML = 'Analysing<span class="coach-dot"></span><span class="coach-dot"></span><span class="coach-dot"></span>';
-  coachArea.appendChild(d);
-  d.scrollIntoView({behavior:'smooth',block:'end'});
-}
+  coachAnalyseBtn.disabled = true;
+  coachAnalyseBtn.innerHTML = '<div class="coach-dot"></div><div class="coach-dot"></div><div class="coach-dot"></div>';
+  coachResponseArea.innerHTML = `<div class="coach-thinking-msg">Reading the draft…</div>`;
 
-async function coachSend() {
-  if (coachBusy) return;
-  if (!coachApiKey) { alert('Please enter your Anthropic API key first.'); return; }
-  const q = coachMsgInput.value.trim();
-  if (!q && !coachImage) return;
-
-  coachBusy = true;
-  coachSendBtn.disabled = true;
-  coachMsgInput.value = '';
-
-  const userContent = [];
-  if (coachImage) userContent.push({type:'image',source:{type:'base64',media_type:coachImage.mediaType,data:coachImage.base64}});
-  userContent.push({type:'text',text:q||'Please analyse this screenshot.'});
-
-  coachAddMsg('user', null, q || '📷 Screenshot uploaded');
-  coachShowThinking();
-  coachHistory.push({role:'user',content:userContent});
-
-  const heroNames = HEROES.map(h=>h.name).join(', ');
-  const systemPrompt = `You are an expert Deadlock coach. The player is Ascendant 1 and prioritises skill development.
-
-Hero roster (38): ${heroNames}
-Items: ${ITEMS.weapon.length} Weapon, ${ITEMS.vitality.length} Vitality, ${ITEMS.spirit.length} Spirit across T1–T4.
-
-When analysing drafts or screenshots: identify compositions, state win conditions for each team, note item counters and power spikes, give direct actionable advice.
-Format with ### headers, **bold** for hero/item names, bullet points for lists.`;
+  const heroNames = HEROES.map(h => h.name).join(', ');
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': coachApiKey,
-        'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true',
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: coachHistory,
-      }),
+        max_tokens: 600,
+        system: COACH_SYSTEM,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: coachImg.mediaType, data: coachImg.base64 } },
+            { type: 'text', text: `Analyse this Deadlock draft. Hero roster: ${heroNames}.` }
+          ]
+        }]
+      })
     });
+
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
-    const text = data.content?.map(b=>b.text||'').join('') || 'No response.';
-    coachHistory.push({role:'assistant',content:text});
-    document.getElementById('coach-thinking')?.remove();
-    coachAddMsg('assistant', coachMd(text));
-    const hr = document.createElement('hr'); hr.className='coach-divider'; coachArea.appendChild(hr);
-  } catch(err) {
-    document.getElementById('coach-thinking')?.remove();
-    coachAddMsg('assistant', `<p style="color:#f66">Error: ${err.message}</p>`);
+    const text = data.content?.[0]?.text || '';
+    coachRenderResults(text);
+
+  } catch (err) {
+    coachResponseArea.innerHTML = `<div style="color:#f66;padding:16px;font-size:13px"><strong>Error:</strong> ${err.message}</div>`;
   }
 
-  coachBusy = false;
-  coachSendBtn.disabled = false;
+  coachAnalyseBtn.disabled = false;
+  coachAnalyseBtn.innerHTML = '⚡  Analyse Again';
 }
 
+function coachRenderResults(text) {
+  const sections = [
+    { key: 'WIN CONDITIONS',   color: 'var(--accent)'   },
+    { key: 'BIGGEST THREATS',  color: '#f05050'         },
+    { key: 'KEY ITEMS',        color: 'var(--weapon)'   },
+    { key: 'LANING',           color: 'var(--vitality)' },
+    { key: 'WATCH OUT FOR',    color: 'var(--spirit)'   },
+  ];
+
+  let html = '<div class="coach-results">';
+  sections.forEach(({ key, color }) => {
+    const m = text.match(new RegExp(`### ${key}\\n([\\s\\S]*?)(?=###|$)`));
+    if (!m) return;
+    const lines = m[1].trim().split('\n').filter(l => l.trim())
+      .map(l => `<div class="coach-result-line">${l.replace(/^[•\-\*]\s*/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</div>`)
+      .join('');
+    html += `<div class="coach-result-section" style="border-left-color:${color}">
+      <div class="coach-result-title" style="color:${color}">${key}</div>
+      ${lines}
+    </div>`;
+  });
+  html += '</div>';
+  coachResponseArea.innerHTML = html;
+}
 </script>
 </body>
 </html>
