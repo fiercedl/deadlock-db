@@ -2675,7 +2675,7 @@ function buildProStats() {
 // TRENDS — API fetch + render
 // ═══════════════════════════════════════════════════════════
 const TRENDS_API = 'https://api.deadlock-api.com/v1/analytics';
-const BADGE_MIN = 90; // Ascendant+Eternus
+const BADGE_MIN = 100; // Ascendant+Eternus
 
 // hero_id → name mapping (built from HEROES array)
 const HERO_ID_MAP = {
@@ -2737,7 +2737,7 @@ async function loadTrends(force = false) {
 
     // Two weeks of data bucketed by week
     const now = Math.floor(Date.now() / 1000);
-    const twoWeeksAgo = now - 14 * 86400;
+    const twoWeeksAgo = now - 28 * 86400;
 
     const [heroRes, itemRes] = await Promise.all([
       fetch(`${TRENDS_API}/hero-stats?min_average_badge=${BADGE_MIN}&bucket=start_time_week&min_unix_timestamp=${twoWeeksAgo}`),
@@ -2792,8 +2792,8 @@ function processHeroTrends(heroData) {
     rows.sort((a, b) => a.bucket - b.bucket);
     if (rows.length < 2) return;
 
-    const prev = rows[rows.length - 2];
-    const curr = rows[rows.length - 1];
+    const prev = rows[0]; // oldest week in window
+    const curr = rows[rows.length - 1]; // most recent week
 
     const prevTotal = bucketTotals[prev.bucket] || 1;
     const currTotal = bucketTotals[curr.bucket] || 1;
@@ -2826,11 +2826,6 @@ function processItemTrends(itemData) {
     byItem[row.item_id].push(row);
   });
 
-  // Items don't have matches_per_bucket — use hero bucket totals (same game pool)
-  // matches_per_bucket from heroes = total player slots = total heroes * avg pick rate denominator
-  // For items: matches = number of times purchased. Divide by (matches_per_bucket / 6)
-  // since each 6-player team buys items. Actually simplest: use matches_per_bucket directly
-  // as the total player count in that bucket.
   const bucketTotals = window.__heroBucketTotals__ || {};
 
   const results = [];
@@ -2838,13 +2833,12 @@ function processItemTrends(itemData) {
     rows.sort((a, b) => a.bucket - b.bucket);
     if (rows.length < 2) return;
 
-    const prev = rows[rows.length - 2];
-    const curr = rows[rows.length - 1];
+    const prev = rows[0]; // oldest week in window
+    const curr = rows[rows.length - 1]; // most recent week
 
     const prevTotal = bucketTotals[prev.bucket] || 1;
     const currTotal = bucketTotals[curr.bucket] || 1;
 
-    // Item pick rate = purchases / total player slots in that bucket
     const prevPick = prev.matches / prevTotal;
     const currPick = curr.matches / currTotal;
     const prevWin  = prev.wins / Math.max(prev.matches, 1);
