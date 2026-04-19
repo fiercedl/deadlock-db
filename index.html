@@ -2953,6 +2953,73 @@ const totalAll = ITEMS.weapon.length + ITEMS.vitality.length + ITEMS.spirit.leng
 filterAndRender();
 
 // ═══════════════════════════════════════════════════════════
+// LIVE DATA — merge assets API into hardcoded data on load
+// ═══════════════════════════════════════════════════════════
+async function mergeLiveData() {
+  try {
+    const [heroRes, itemRes] = await Promise.all([
+      fetch('https://assets.deadlock-api.com/v2/heroes?only_active=true'),
+      fetch('https://assets.deadlock-api.com/v2/items?only_active=true')
+    ]);
+    if (!heroRes.ok || !itemRes.ok) return;
+    const [liveHeroes, liveItems] = await Promise.all([heroRes.json(), itemRes.json()]);
+
+    // ── Hero base stats ──────────────────────────────────────
+    const heroApiMap = {};
+    liveHeroes.forEach(h => { if (h.name) heroApiMap[h.name] = h; });
+
+    HEROES.forEach(hero => {
+      const live = heroApiMap[hero.name];
+      if (!live?.starting_stats) return;
+      const s = live.starting_stats;
+      if (s.max_health?.value)      hero.stats.hp  = Math.round(s.max_health.value).toString();
+      if (s.max_move_speed?.value)  hero.stats.ms  = s.max_move_speed.value.toFixed(2);
+      if (s.stamina?.value != null) hero.stats.stamina = s.stamina.value.toString();
+    });
+
+    // ── Item costs and tiers ─────────────────────────────────
+    const itemApiMap = {};
+    liveItems.forEach(i => { if (i.name) itemApiMap[i.name] = i; });
+
+    ['weapon','vitality','spirit'].forEach(cat => {
+      ITEMS[cat].forEach(item => {
+        const live = itemApiMap[item.name];
+        if (!live) return;
+        if (live.cost)      item.cost = live.cost;
+        if (live.item_tier) item.tier = live.item_tier;
+
+        // Update stat values from properties
+        const p = live.properties || {};
+        const upd = {};
+        if (p.BonusHealth?.value)                  upd['+Health']        = p.BonusHealth.value;
+        if (p.WeaponPower?.value)                  upd['+Weapon Power']  = `${p.WeaponPower.value}%`;
+        if (p.TechPower?.value)                    upd['+Spirit Power']  = p.TechPower.value;
+        if (p.AbilityCooldown?.value)              upd['Cooldown']       = `${p.AbilityCooldown.value}s`;
+        if (p.BonusMoveSpeed?.value)               upd['+Move Speed']    = p.BonusMoveSpeed.value;
+        if (p.BaseAttackDamagePercent?.value)      upd['+Damage']        = `${p.BaseAttackDamagePercent.value}%`;
+        if (p.BulletArmorDamageReduction?.value)   upd['+Bullet Shield'] = `${p.BulletArmorDamageReduction.value}%`;
+        if (p.TechArmorDamageReduction?.value)     upd['+Spirit Shield'] = `${p.TechArmorDamageReduction.value}%`;
+        if (p.LifeStealPercent?.value)             upd['+Lifesteal']     = `${p.LifeStealPercent.value}%`;
+        if (Object.keys(upd).length > 0) {
+          if (!item.stats) item.stats = {};
+          Object.assign(item.stats, upd);
+        }
+      });
+    });
+
+    // Re-render with fresh data
+    filterAndRender();
+    renderItemGrid(activeItemCategory || 'all');
+    console.log('[DB] Live data merged — assets API');
+
+  } catch(e) {
+    console.warn('[DB] Live merge failed (offline or local file):', e.message);
+  }
+}
+
+mergeLiveData();
+
+// ═══════════════════════════════════════════════════════════
 // PRO DATA — fill in after each Night Shift episode
 // ═══════════════════════════════════════════════════════════
 const PRO_DATA = [
@@ -3489,12 +3556,24 @@ function generateSummary() {
 
   if (hotItems.length >= 1) {
     const getCat = name => { for (const cat of ['weapon','vitality','spirit']) { if (ITEMS[cat].find(i=>i.name===name)) return cat; } return ''; };
-    const rising2 = hotItems.slice(0,2);
-    const cats = rising2.map(r => getCat(r.name));
-    const allWeapon = cats.every(c => c === 'weapon');
-    const allSpirit = cats.every(c => c === 'spirit');
-    const metaNote = allWeapon ? warn('weapon-heavy') : allSpirit ? `<span class="up">spirit-heavy</span>` : `mixed`;
-    sentences.push(`${rising2.map(r => item(r.name)).join(' and ')} spiking — ${metaNote} item meta this week.`);
+    const cats = hotItems.slice(0,3).map(r => getCat(r.name));
+    const weaponCount = cats.filter(c => c==='weapon').length;
+    const vitalityCount = cats.filter(c => c==='vitality').length;
+    const spiritCount = cats.filter(c => c==='spirit').length;
+    const dominant = weaponCount >= vitalityCount && weaponCount >= spiritCount ? 'Gun' : vitalityCount >= spiritCount ? 'Survival' : 'Spirit';
+    const catColor = dominant === 'Gun' ? 'var(--weapon)' : dominant === 'Survival' ? 'var(--vitality)' : 'var(--spirit)';
+
+    function itemWithIcon(name) {
+      const cat = getCat(name);
+      const color = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text2)';
+      const iconUrl = cat ? itemIconUrl(name, cat) : '';
+      const icon = iconUrl ? `<img src="${iconUrl}" style="width:16px;height:20px;object-fit:contain;vertical-align:middle;margin-right:3px;border-radius:2px;opacity:0.9" onerror="this.style.display='none'">` : '';
+      return `${icon}<span style="color:${color};font-weight:700">${name}</span>`;
+    }
+
+    const i1 = itemWithIcon(hotItems[0].name);
+    const i2 = hotItems[1] ? itemWithIcon(hotItems[1].name) : null;
+    sentences.push(`${i1}${i2 ? ` and ${i2}` : ''} rising — <span style="color:${catColor};font-weight:700">${dominant}</span> items trending this week.`);
   }
 
   output.innerHTML = sentences.map(s => `<div class="summary-sentence">${s}</div>`).join('');
