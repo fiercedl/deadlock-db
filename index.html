@@ -928,6 +928,24 @@
     flex-shrink: 0;
     background: var(--bg4);
   }
+  .brief-hero-icon {
+    width: 28px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+  }
+  .brief-hero-icon img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 160%;
+    object-fit: cover;
+    object-position: top center;
+  }
   .brief-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 14px;
@@ -3209,22 +3227,21 @@ function processHeroTrends(heroData) {
   });
 
   // matches_per_bucket = total player-slots in that bucket across all heroes
-  // Use the max value per bucket (all heroes share same total)
   const bucketTotals = {};
   heroData.forEach(row => {
     const b = row.bucket;
     if (!bucketTotals[b] || row.matches_per_bucket > bucketTotals[b])
       bucketTotals[b] = row.matches_per_bucket;
   });
-  window.__heroBucketTotals__ = bucketTotals; // share with item processing
+  window.__heroBucketTotals__ = bucketTotals;
 
   const results = [];
   Object.entries(byHero).forEach(([heroId, rows]) => {
     rows.sort((a, b) => a.bucket - b.bucket);
     if (rows.length < 2) return;
 
-    const prev = rows[0]; // oldest week in window
-    const curr = rows[rows.length - 1]; // most recent week
+    const prev = rows[0];
+    const curr = rows[rows.length - 1];
 
     const prevTotal = bucketTotals[prev.bucket] || 1;
     const currTotal = bucketTotals[curr.bucket] || 1;
@@ -3245,8 +3262,22 @@ function processHeroTrends(heroData) {
       win_rate: currWin,
       win_delta: currWin - prevWin,
       matches: curr.matches,
+      _prevPick: prevPick, // used for rank change calculation
     });
   });
+
+  // Compute rank change: rank by current pick vs rank by previous pick
+  const currRanked = [...results].sort((a,b) => b.pick_rate - a.pick_rate);
+  const prevRanked = [...results].sort((a,b) => b._prevPick - a._prevPick);
+  const prevRankMap = {};
+  prevRanked.forEach((r,i) => { prevRankMap[r.id] = i + 1; });
+  currRanked.forEach((r,i) => {
+    const currRank = i + 1;
+    const prevRank = prevRankMap[r.id] || currRank;
+    r.rank_change = prevRank - currRank; // positive = moved up, negative = moved down
+    r.curr_rank = currRank;
+  });
+
   return results;
 }
 
@@ -3323,9 +3354,10 @@ function renderTrends() {
     rows = rows.slice(0, 38);
 
     let html = `<table class="trends-table">
-      <colgroup><col><col><col><col><col><col></colgroup>
+      <colgroup><col><col style="width:60px"><col><col><col><col><col></colgroup>
       <thead><tr>
         <th>Hero</th>
+        <th class="num" style="width:60px">Pos</th>
         <th class="num sorted${trendSortAsc ? ' asc':''}" data-col="pick_delta">Pick Δ</th>
         <th class="num" data-col="pick_rate">Pick %</th>
         <th class="num" data-col="win_rate">Win %</th>
@@ -3345,11 +3377,18 @@ function renderTrends() {
         const topItems = Object.entries(ps.items).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]).join(', ');
         proHtml = `<span class="pro-badge">PRO</span><span class="pro-note">${presence}% presence${wr ? ' · ' + wr : ''}${topItems ? '<br><span style="font-size:10px;color:var(--text3)">' + topItems + '</span>' : ''}</span>`;
       }
+      const rc = r.rank_change || 0;
+      const rcHtml = rc === 0
+        ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
+        : rc > 0
+          ? `<span style="color:#40e870;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▲${rc}</span>`
+          : `<span style="color:#ff5555;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▼${Math.abs(rc)}</span>`;
       html += `<tr>
         <td><div class="trend-name-cell">
           ${portrait ? `<img class="trend-portrait" src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
           <div><div class="trend-name">${r.name}</div><div class="trend-tags">${tags}</div></div>
         </div></td>
+        <td class="num">${rcHtml}</td>
         <td class="num">${fmtDelta(r.pick_delta)}</td>
         <td class="num">${fmtPct(r.pick_rate)}</td>
         <td class="num">${fmtPct(r.win_rate)}</td>
@@ -3452,9 +3491,15 @@ function generateBrief() {
 
   function heroRowHTML(r, valHtml) {
     const portrait = PORTRAITS[r.name] || '';
+    const rc = r.rank_change || 0;
+    const rcHtml = rc === 0 ? '' : rc > 0
+      ? `<span style="color:#40e870;font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;margin-right:2px">▲${rc}</span>`
+      : `<span style="color:#ff5555;font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;margin-right:2px">▼${Math.abs(rc)}</span>`;
     return `<div class="brief-row">
-      ${portrait ? `<img class="brief-portrait" src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
-      <span class="brief-name">${r.name}</span>
+      <div class="brief-hero-icon">
+        ${portrait ? `<img src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
+      </div>
+      <span class="brief-name">${rcHtml}${r.name}</span>
       ${valHtml}
     </div>`;
   }
