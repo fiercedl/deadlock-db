@@ -753,34 +753,25 @@
     display: flex;
     overflow: hidden;
   }
-  .trends-body {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border2) transparent;
-  }
 
-  /* ── Meta Brief Sidebar ── */
+  /* ── Meta Brief Sidebar — LEFT, DOMINANT ── */
   .trends-sidebar {
-    width: 380px;
+    width: 420px;
     flex-shrink: 0;
-    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border2);
     background: var(--bg2);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border2) transparent;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
   .sidebar-header {
-    padding: 12px 16px 8px;
+    padding: 16px 20px 10px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
   .sidebar-title {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -793,56 +784,37 @@
     margin-top: 2px;
   }
 
-  /* Summary — the main event */
+  /* Summary — big, readable, dominant */
   .sidebar-summary-wrap {
-    padding: 16px;
+    padding: 16px 20px;
     flex-shrink: 0;
     border-bottom: 2px solid var(--border2);
+    max-height: 44%;
+    overflow: hidden;
   }
   .summary-placeholder {
     color: var(--text3);
     font-family: 'Share Tech Mono', monospace;
     font-size: 11px;
-    text-align: center;
-    padding: 8px 0 4px;
   }
-  .summary-btn {
-    display: block;
-    width: 100%;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 8px 12px;
-    border: 1px solid var(--border2);
-    border-radius: 3px;
-    background: var(--bg4);
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.15s;
-    margin-top: 12px;
-  }
-  .summary-btn:hover { color: var(--text); border-color: var(--accent2); background: var(--bg3); }
-  .summary-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .summary-output { display: none; }
   .summary-output.visible { display: block; }
   .summary-sentence {
-    font-size: 16px;
+    font-size: 17px;
     color: var(--text);
-    line-height: 1.7;
-    padding: 10px 0;
+    line-height: 1.75;
+    padding: 12px 0;
     border-bottom: 1px solid var(--border);
   }
   .summary-sentence:first-child { padding-top: 0; }
   .summary-sentence:last-child { border-bottom: none; padding-bottom: 0; }
-  .summary-sentence strong { color: #e8f0fa; font-weight: 700; }
-  .summary-sentence .up   { color: #40e870; font-weight: 600; }
-  .summary-sentence .down { color: #ff5555; font-weight: 600; }
-  .summary-sentence .warn { color: var(--weapon); font-weight: 600; }
+  .summary-sentence strong { color: #fff; font-weight: 700; }
+  .summary-sentence .up   { color: #40e870; font-weight: 700; }
+  .summary-sentence .down { color: #ff5555; font-weight: 700; }
+  .summary-sentence .warn { color: var(--weapon); font-weight: 700; }
   .summary-refresh {
     display: none;
-    margin-top: 10px;
+    margin-top: 12px;
     text-align: right;
   }
   .summary-refresh.visible { display: block; }
@@ -853,28 +825,31 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 2px 4px;
     transition: color 0.15s;
   }
   .summary-refresh button:hover { color: var(--text2); }
 
-  /* Data sections — compact supporting evidence */
+  /* Data sections — no scroll, 2-col grid */
   .sidebar-body {
-    padding: 10px 16px;
+    padding: 10px 20px;
     flex: 1;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border2) transparent;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    row-gap: 0;
+    align-content: start;
+    min-height: 0;
   }
-  .brief-section { margin-bottom: 14px; }
+  .brief-section { margin-bottom: 8px; }
   .brief-section-label {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
+    margin-bottom: 4px;
+    padding-bottom: 2px;
     border-bottom: 1px solid var(--border);
   }
   .brief-section-label.rising   { color: #40e870; }
@@ -886,12 +861,12 @@
   .brief-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 4px 0;
+    gap: 6px;
+    padding: 3px 0;
   }
   .brief-portrait {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     border-radius: 2px;
     object-fit: cover;
     object-position: top center;
@@ -900,7 +875,7 @@
   }
   .brief-name {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text);
     flex: 1;
@@ -910,7 +885,7 @@
   }
   .brief-val {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 13px;
+    font-size: 11px;
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -923,13 +898,11 @@
     color: var(--text3);
     font-family: 'Share Tech Mono', monospace;
     font-size: 11px;
-    padding: 16px 0;
-    text-align: center;
+    padding: 12px 0;
   }
-
   .brief-item-icon {
-    width: 20px;
-    height: 26px;
+    width: 18px;
+    height: 22px;
     border-radius: 2px;
     overflow: hidden;
     position: relative;
@@ -941,6 +914,16 @@
     object-fit: contain; padding: 1px;
   }
 
+  /* Table — RIGHT side, secondary */
+  .trends-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  /* Summary — the main event */
   .trends-toolbar {
     display: flex;
     align-items: center;
@@ -1026,17 +1009,17 @@
   }
   .trends-table th:first-child,
   .trends-table td:first-child {
-    width: 220px;
+    width: 180px;
   }
   .trends-table th:nth-child(2), .trends-table td:nth-child(2),
   .trends-table th:nth-child(3), .trends-table td:nth-child(3),
   .trends-table th:nth-child(4), .trends-table td:nth-child(4),
   .trends-table th:nth-child(5), .trends-table td:nth-child(5) {
-    width: 120px;
+    width: 100px;
   }
   .trends-table th:last-child,
   .trends-table td:last-child {
-    width: 140px;
+    width: 100px;
   }
   .trends-table thead th {
     position: sticky;
@@ -1125,16 +1108,22 @@
   }
   .trend-name {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.5px;
     color: #e8f0fa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .trend-tags {
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px;
     color: var(--text2);
     margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Delta chips */
@@ -1312,12 +1301,6 @@
       <button class="trends-refresh-btn" id="trends-refresh-btn">⟳ Refresh</button>
     </div>
     <div class="trends-content">
-      <div class="trends-body" id="trends-body">
-        <div class="trends-placeholder">
-          <div class="big">◈</div>
-          <div>Switch to Trends to load data</div>
-        </div>
-      </div>
       <div class="trends-sidebar" id="trends-sidebar">
         <div class="sidebar-header">
           <div class="sidebar-title">Meta Brief</div>
@@ -1333,6 +1316,12 @@
         </div>
         <div class="sidebar-body" id="sidebar-body">
           <div class="brief-placeholder">—</div>
+        </div>
+      </div>
+      <div class="trends-body" id="trends-body">
+        <div class="trends-placeholder">
+          <div class="big">◈</div>
+          <div>Switch to Trends to load data</div>
         </div>
       </div>
     </div>
@@ -3397,32 +3386,29 @@ function generateBrief() {
     </div>`;
   }
 
-  // Rising heroes — biggest positive pick delta
-  const rising = [...heroRows].sort((a,b) => b.pick_delta - a.pick_delta).slice(0,4);
+  // Rising heroes — biggest positive pick delta, max 3
+  const rising = [...heroRows].sort((a,b) => b.pick_delta - a.pick_delta).slice(0,3);
 
-  // Falling heroes — biggest negative pick delta
-  const falling = [...heroRows].sort((a,b) => a.pick_delta - b.pick_delta).slice(0,4);
+  // Falling heroes — biggest negative pick delta, max 3
+  const falling = [...heroRows].sort((a,b) => a.pick_delta - b.pick_delta).slice(0,3);
 
-  // Dominant — highest win rate, pick rate above 2%
+  // Dominant — highest win rate, pick rate above 2%, max 3
   const dominant = [...heroRows]
     .filter(r => r.pick_rate >= 0.02)
     .sort((a,b) => b.win_rate - a.win_rate)
-    .slice(0,4);
-
-  // Contested & underperforming — high pick, low WR (top half pick rate, bottom third WR)
-  const sortedByPick = [...heroRows].sort((a,b) => b.pick_rate - a.pick_rate);
-  const medianPick = sortedByPick[Math.floor(sortedByPick.length/2)]?.pick_rate || 0;
-  const sortedByWR = [...heroRows].sort((a,b) => a.win_rate - b.win_rate);
-  const lowWRThreshold = sortedByWR[Math.floor(sortedByWR.length/3)]?.win_rate || 0;
-  const contested = heroRows
-    .filter(r => r.pick_rate >= medianPick && r.win_rate <= lowWRThreshold)
-    .sort((a,b) => b.pick_rate - a.pick_rate)
     .slice(0,3);
 
-  // Hot items — rising pick delta
-  const hotItems = [...itemRows].sort((a,b) => b.pick_delta - a.pick_delta).slice(0,5);
+  // Contested — high pick + low WR, sorted worst WR first
+  const contested = [...heroRows]
+    .sort((a,b) => (b.pick_rate / Math.max(b.win_rate, 0.01)) - (a.pick_rate / Math.max(a.win_rate, 0.01)))
+    .filter(r => r.win_rate < 0.51)
+    .slice(0,3)
+    .sort((a,b) => a.win_rate - b.win_rate);
 
-  // Cooling items — falling
+  // Hot items — rising pick delta, max 3
+  const hotItems = [...itemRows].sort((a,b) => b.pick_delta - a.pick_delta).slice(0,3);
+
+  // Cooling items — falling, max 3
   const coolingItems = [...itemRows].sort((a,b) => a.pick_delta - b.pick_delta).slice(0,3);
 
   function fmtDeltaVal(v, cls) {
@@ -3433,19 +3419,19 @@ function generateBrief() {
 
   bodyEl.innerHTML = `
     <div class="brief-section">
-      <div class="brief-section-label rising">↑ Pick Rate Rising</div>
+      <div class="brief-section-label rising">↑ Pick Rising</div>
       ${rising.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'up'))).join('')}
     </div>
     <div class="brief-section">
-      <div class="brief-section-label falling">↓ Pick Rate Falling</div>
+      <div class="brief-section-label falling">↓ Pick Falling</div>
       ${falling.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'down'))).join('')}
     </div>
     <div class="brief-section">
-      <div class="brief-section-label dominant">👑 Highest Win Rate</div>
-      ${dominant.map(r => heroRowHTML(r, `<span class="brief-val neutral">${Math.round(r.win_rate*100)}% WR</span>`)).join('')}
+      <div class="brief-section-label dominant">👑 Highest WR</div>
+      ${dominant.map(r => heroRowHTML(r, `<span class="brief-val neutral">${Math.round(r.win_rate*100)}%</span>`)).join('')}
     </div>
     ${contested.length ? `<div class="brief-section">
-      <div class="brief-section-label contested">⚠ High Pick, Low WR</div>
+      <div class="brief-section-label contested">⚠ High Pick / Low WR</div>
       ${contested.map(r => heroRowHTML(r, `<span class="brief-val warn">${Math.round(r.win_rate*100)}%</span>`)).join('')}
     </div>` : ''}
     <div class="brief-section">
