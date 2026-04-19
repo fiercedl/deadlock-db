@@ -528,12 +528,17 @@
   /* ═══════════════════════════════════════
      HERO PORTRAIT GRID
   ═══════════════════════════════════════ */
+  #tab-heroes {
+    height: calc(100vh - 90px);
+    overflow-y: auto;
+    background: var(--bg);
+  }
   .hero-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    max-width: 1400px;
     gap: 6px;
     padding: 16px;
-    background: var(--bg);
   }
   .hero-tile {
     position: relative;
@@ -743,6 +748,199 @@
     height: calc(100vh - 90px);
     background: var(--bg);
   }
+  .trends-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+  .trends-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  /* ── Meta Brief Sidebar ── */
+  .trends-sidebar {
+    width: 380px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border);
+    background: var(--bg2);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-header {
+    padding: 12px 16px 8px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .sidebar-date {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  /* Summary — the main event */
+  .sidebar-summary-wrap {
+    padding: 16px;
+    flex-shrink: 0;
+    border-bottom: 2px solid var(--border2);
+  }
+  .summary-placeholder {
+    color: var(--text3);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    text-align: center;
+    padding: 8px 0 4px;
+  }
+  .summary-btn {
+    display: block;
+    width: 100%;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    background: var(--bg4);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 12px;
+  }
+  .summary-btn:hover { color: var(--text); border-color: var(--accent2); background: var(--bg3); }
+  .summary-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .summary-output { display: none; }
+  .summary-output.visible { display: block; }
+  .summary-sentence {
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.7;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-sentence:first-child { padding-top: 0; }
+  .summary-sentence:last-child { border-bottom: none; padding-bottom: 0; }
+  .summary-sentence strong { color: #e8f0fa; font-weight: 700; }
+  .summary-sentence .up   { color: #40e870; font-weight: 600; }
+  .summary-sentence .down { color: #ff5555; font-weight: 600; }
+  .summary-sentence .warn { color: var(--weapon); font-weight: 600; }
+  .summary-refresh {
+    display: none;
+    margin-top: 10px;
+    text-align: right;
+  }
+  .summary-refresh.visible { display: block; }
+  .summary-refresh button {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 4px;
+    transition: color 0.15s;
+  }
+  .summary-refresh button:hover { color: var(--text2); }
+
+  /* Data sections — compact supporting evidence */
+  .sidebar-body {
+    padding: 10px 16px;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+  .brief-section { margin-bottom: 14px; }
+  .brief-section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brief-section-label.rising   { color: #40e870; }
+  .brief-section-label.falling  { color: #ff5555; }
+  .brief-section-label.dominant { color: var(--accent); }
+  .brief-section-label.contested{ color: var(--weapon); }
+  .brief-section-label.items    { color: var(--spirit); }
+
+  .brief-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+  }
+  .brief-portrait {
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+    object-fit: cover;
+    object-position: top center;
+    flex-shrink: 0;
+    background: var(--bg4);
+  }
+  .brief-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .brief-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .brief-val.up      { color: #40e870; }
+  .brief-val.down    { color: #ff5555; }
+  .brief-val.neutral { color: var(--text2); }
+  .brief-val.warn    { color: var(--weapon); }
+
+  .brief-placeholder {
+    color: var(--text3);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 16px 0;
+    text-align: center;
+  }
+
+  .brief-item-icon {
+    width: 20px;
+    height: 26px;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    background: var(--bg4);
+  }
+  .brief-item-icon img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain; padding: 1px;
+  }
+
   .trends-toolbar {
     display: flex;
     align-items: center;
@@ -822,24 +1020,23 @@
 
   /* Table */
   .trends-table {
-    width: auto;
-    min-width: 100%;
+    width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
   }
   .trends-table th:first-child,
   .trends-table td:first-child {
-    width: 280px;
-    min-width: 200px;
+    width: 220px;
   }
   .trends-table th:nth-child(2), .trends-table td:nth-child(2),
   .trends-table th:nth-child(3), .trends-table td:nth-child(3),
   .trends-table th:nth-child(4), .trends-table td:nth-child(4),
   .trends-table th:nth-child(5), .trends-table td:nth-child(5) {
-    width: 140px;
+    width: 120px;
   }
   .trends-table th:last-child,
   .trends-table td:last-child {
-    width: 160px;
+    width: 140px;
   }
   .trends-table thead th {
     position: sticky;
@@ -872,9 +1069,11 @@
   .trends-table tbody tr:hover { background: var(--bg3); }
 
   .trends-table td {
-    padding: 12px 16px;
+    padding: 8px 16px;
     font-size: 14px;
     vertical-align: middle;
+    height: 54px;
+    box-sizing: border-box;
   }
   .trends-table td.num {
     font-family: 'Share Tech Mono', monospace;
@@ -900,8 +1099,8 @@
     border: 1px solid var(--border);
   }
   .trend-item-icon-wrap {
-    width: 36px;
-    height: 44px;
+    width: 29px;
+    height: 36px;
     flex-shrink: 0;
     border-radius: 3px;
     overflow: hidden;
@@ -1099,8 +1298,8 @@
   <div class="trends-layout">
     <div class="trends-toolbar">
       <div class="trends-sub-tabs">
-        <button class="trends-sub-btn active" data-trend="heroes">Heroes</button>
-        <button class="trends-sub-btn" data-trend="items">Items</button>
+        <button class="trends-sub-btn active" data-trend="heroes">Hero</button>
+        <button class="trends-sub-btn" data-trend="items">Item</button>
       </div>
       <div class="trends-sort-wrap">
         <span class="trends-sort-label">Sort</span>
@@ -1112,10 +1311,29 @@
       <span class="trends-status" id="trends-status">—</span>
       <button class="trends-refresh-btn" id="trends-refresh-btn">⟳ Refresh</button>
     </div>
-    <div class="trends-body" id="trends-body">
-      <div class="trends-placeholder">
-        <div class="big">◈</div>
-        <div>Switch to Trends to load data</div>
+    <div class="trends-content">
+      <div class="trends-body" id="trends-body">
+        <div class="trends-placeholder">
+          <div class="big">◈</div>
+          <div>Switch to Trends to load data</div>
+        </div>
+      </div>
+      <div class="trends-sidebar" id="trends-sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title">Meta Brief</div>
+          <div class="sidebar-date" id="sidebar-date">—</div>
+        </div>
+        <div class="sidebar-summary-wrap">
+          <div class="summary-output" id="summary-output">
+            <div class="summary-placeholder">Loading…</div>
+          </div>
+          <div class="summary-refresh" id="summary-refresh">
+            <button id="summary-btn">↺ refresh summary</button>
+          </div>
+        </div>
+        <div class="sidebar-body" id="sidebar-body">
+          <div class="brief-placeholder">—</div>
+        </div>
       </div>
     </div>
   </div>
@@ -2099,21 +2317,15 @@ function openHeroOverlay(hero) {
       <div id="ov-order-content"><div class="ov-loading">Loading…</div></div>
     </div>
 
-    <!-- Synergies -->
-    <div class="ov-section" id="ov-syn-section">
-      <div class="ov-section-title">Top Synergies (Asc+)</div>
-      <div id="ov-syn-content"><div class="ov-loading">Loading…</div></div>
-    </div>
-
-    <!-- Counters -->
-    <div class="ov-section" id="ov-ctr-section">
-      <div class="ov-section-title">Top Counters (Asc+)</div>
-      <div id="ov-ctr-content"><div class="ov-loading">Loading…</div></div>
+    <!-- Most purchased items -->
+    <div class="ov-section" id="ov-build-section">
+      <div class="ov-section-title">Most Purchased Items (Asc+)</div>
+      <div id="ov-build-content"><div class="ov-loading">Loading…</div></div>
     </div>
 
     <!-- Item combos -->
     <div class="ov-section" id="ov-items-section">
-      <div class="ov-section-title">Top Item Combos (Asc+)</div>
+      <div class="ov-section-title">Highest Win Rate Item Pairs (Asc+)</div>
       <div id="ov-items-content"><div class="ov-loading">Loading…</div></div>
     </div>
   `;
@@ -2156,7 +2368,7 @@ function getHeroIdByName(name) {
 
 async function renderOverlayApiSections(hero, heroId) {
   if (!heroId) {
-    ['order','syn','ctr','items'].forEach(k => {
+    ['order','build','items'].forEach(k => {
       const el = document.getElementById(`ov-${k}-content`);
       if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Hero ID not found</span>';
     });
@@ -2164,147 +2376,130 @@ async function renderOverlayApiSections(hero, heroId) {
   }
 
   const badge = 100;
+  const itemCatMap = {};
+  ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = { cat, tier: item.tier }; }));
 
+  function itemChipHTML(name, extraLabel) {
+    const meta = itemCatMap[name];
+    const iconUrl = meta ? itemIconUrl(name, meta.cat) : '';
+    const catColor = meta ? (meta.cat === 'weapon' ? 'var(--weapon)' : meta.cat === 'vitality' ? 'var(--vitality)' : 'var(--spirit)') : 'var(--text3)';
+    return `<div class="ov-item-chip">
+      <div class="ov-item-chip-icon">${iconUrl ? `<img src="${iconUrl}" alt="${name}" onerror="this.style.display='none'">` : ''}</div>
+      <div>
+        <div class="ov-item-chip-name">${name}</div>
+        ${meta ? `<div style="font-size:9px;color:${catColor};font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:1px">${meta.cat} T${meta.tier}</div>` : ''}
+      </div>
+      ${extraLabel ? `<span class="ov-item-chip-wr">${extraLabel}</span>` : ''}
+    </div>`;
+  }
+
+  // ── Ability order ──────────────────────────────
   try {
-    const [orderRes, synRes, ctrRes] = await Promise.all([
-      fetch(`https://api.deadlock-api.com/v1/analytics/ability-order-stats?hero_ids=${heroId}&min_average_badge=${badge}`),
-      fetch(`https://api.deadlock-api.com/v1/analytics/hero-synergies-stats?hero_ids=${heroId}&min_average_badge=${badge}`),
-      fetch(`https://api.deadlock-api.com/v1/analytics/hero-counters-stats?hero_ids=${heroId}&min_average_badge=${badge}`),
-    ]);
-
-    const [orderData, synData, ctrData] = await Promise.all([
-      orderRes.ok ? orderRes.json() : [],
-      synRes.ok ? synRes.json() : [],
-      ctrRes.ok ? ctrRes.json() : [],
-    ]);
-
-    // Ability order
+    const orderRes = await fetch(`https://api.deadlock-api.com/v1/analytics/ability-order-stats?hero_id=${heroId}&min_average_badge=${badge}`);
+    const orderData = orderRes.ok ? await orderRes.json() : [];
     const orderEl = document.getElementById('ov-order-content');
     if (orderEl) {
       if (orderData && orderData.length) {
-        // Sort by frequency, take top result
-        const sorted = [...orderData].sort((a,b) => (b.matches||0) - (a.matches||0));
-        const top = sorted[0];
-        // ability_order is array of ability slot numbers
-        const order = top.ability_order || top.order || [];
-        const slotColors = {1:'slot-1', 2:'slot-2', 3:'slot-3', 4:'slot-4'};
-        const abilityNames = {1: hero.abilities[0]?.name||'1', 2: hero.abilities[1]?.name||'2', 3: hero.abilities[2]?.name||'3', 4: hero.abilities[3]?.name||'4'};
-        orderEl.innerHTML = `<div class="ov-ability-order">` +
-          order.map((slot, i) => `
-            <div class="ov-order-step">
+        // Pick order with best win rate (min 50 matches)
+        const best = [...orderData]
+          .filter(o => o.matches >= 50)
+          .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)))[0]
+          || orderData.sort((a,b) => b.matches - a.matches)[0];
+
+        const seq = best.abilities || [];
+
+        // Map ability IDs → slot index by order of first appearance
+        const idToSlot = {};
+        let slotIdx = 1;
+        for (const id of seq) {
+          if (!(id in idToSlot)) {
+            idToSlot[id] = slotIdx++;
+            if (slotIdx > 4) break;
+          }
+        }
+
+        const slotColors = ['','slot-1','slot-2','slot-3','slot-4'];
+        const abilityNames = hero.abilities.map(a => a.name);
+        const wr = Math.round(best.wins / Math.max(best.matches,1) * 100);
+
+        // Compress sequence: show each "level up" for each ability slot
+        // seq is 14 entries (one per upgrade point), show first 14
+        orderEl.innerHTML = `
+          <div class="ov-ability-order">` +
+          seq.slice(0, 14).map((id, i) => {
+            const slot = idToSlot[id] || 1;
+            const abName = abilityNames[slot-1] || slot;
+            return `<div class="ov-order-step" title="${abName}">
               <div class="ov-order-num">${i+1}</div>
-              <div class="ov-order-ability ${slotColors[slot]||''}">${slot}</div>
-            </div>
-            ${i < order.length-1 ? '<div class="ov-order-sep">›</div>' : ''}
-          `).join('') +
-          `</div><div style="font-size:11px;color:var(--text3);margin-top:8px">${Math.round((top.matches||0))} matches tracked</div>`;
+              <div class="ov-order-ability ${slotColors[slot]}">${slot}</div>
+            </div>${i < 13 ? '<div class="ov-order-sep">›</div>' : ''}`;
+          }).join('') +
+          `</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:10px;font-family:'Share Tech Mono',monospace">
+            ${wr}% WR · ${best.matches.toLocaleString()} matches
+          </div>`;
       } else {
         orderEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
       }
     }
-
-    // Synergies
-    const synEl = document.getElementById('ov-syn-content');
-    if (synEl) {
-      if (synData && synData.length) {
-        const top5 = [...synData]
-          .filter(r => r.matches > 20)
-          .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)))
-          .slice(0, 5);
-        synEl.innerHTML = `<div class="ov-hero-row">` + top5.map(r => {
-          const alliedId = r.hero_id2 || r.allied_hero_id || (r.hero_id === heroId ? r.hero_id2 : r.hero_id);
-          const name = HERO_ID_MAP[alliedId] || `Hero ${alliedId}`;
-          const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
-          const portrait = PORTRAITS[name] || '';
-          return `<div class="ov-hero-chip" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${name}')||HEROES[0])">
-            ${portrait ? `<img src="${portrait}" alt="${name}" onerror="this.style.display='none'">` : ''}
-            <span class="ov-hero-chip-name">${name}</span>
-            <span class="ov-hero-chip-wr good">${wr}%</span>
-          </div>`;
-        }).join('') + '</div>';
-      } else {
-        synEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
-      }
-    }
-
-    // Counters
-    const ctrEl = document.getElementById('ov-ctr-content');
-    if (ctrEl) {
-      if (ctrData && ctrData.length) {
-        const sorted = [...ctrData].filter(r => r.matches > 20)
-          .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)));
-        // Counters = enemies with highest win rate AGAINST our hero
-        // win rate here means the enemy wins more
-        const top5 = sorted.slice(0, 5);
-        const bot5 = sorted.slice(-5).reverse(); // heroes our hero beats
-        ctrEl.innerHTML = `
-          <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700">Beats ${hero.name.split(' ')[0]}</div>
-          <div class="ov-hero-row" style="margin-bottom:12px">` + top5.map(r => {
-          const enemyId = r.hero_id2 || (r.hero_id === heroId ? r.hero_id2 : r.hero_id);
-          const name = HERO_ID_MAP[enemyId] || `Hero ${enemyId}`;
-          const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
-          const portrait = PORTRAITS[name] || '';
-          return `<div class="ov-hero-chip">
-            ${portrait ? `<img src="${portrait}" alt="${name}" onerror="this.style.display='none'">` : ''}
-            <span class="ov-hero-chip-name">${name}</span>
-            <span class="ov-hero-chip-wr bad">${wr}% WR</span>
-          </div>`;
-        }).join('') + `</div>
-          <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700">${hero.name.split(' ')[0]} beats</div>
-          <div class="ov-hero-row">` + bot5.map(r => {
-          const enemyId = r.hero_id2 || (r.hero_id === heroId ? r.hero_id2 : r.hero_id);
-          const name = HERO_ID_MAP[enemyId] || `Hero ${enemyId}`;
-          const wr = Math.round((1 - r.wins/Math.max(r.matches,1)) * 100);
-          const portrait = PORTRAITS[name] || '';
-          return `<div class="ov-hero-chip">
-            ${portrait ? `<img src="${portrait}" alt="${name}" onerror="this.style.display='none'">` : ''}
-            <span class="ov-hero-chip-name">${name}</span>
-            <span class="ov-hero-chip-wr good">${wr}% WR</span>
-          </div>`;
-        }).join('') + '</div>';
-      } else {
-        ctrEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
-      }
-    }
-
   } catch(e) {
-    ['order','syn','ctr'].forEach(k => {
-      const el = document.getElementById(`ov-${k}-content`);
-      if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Failed to load (needs HTTPS)</span>';
-    });
+    const el = document.getElementById('ov-order-content');
+    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Needs HTTPS (use GitHub Pages)</span>';
   }
 
-  // Item permutations — separate fetch as it may take longer
+  // ── Most purchased items ───────────────────────
   try {
-    const itemRes = await fetch(`https://api.deadlock-api.com/v1/analytics/build-item-stats?hero_ids=${heroId}&min_average_badge=${badge}`);
-    const itemData = itemRes.ok ? await itemRes.json() : [];
+    const buildRes = await fetch(`https://api.deadlock-api.com/v1/analytics/build-item-stats?hero_ids=${heroId}&min_average_badge=${badge}`);
+    const buildData = buildRes.ok ? await buildRes.json() : [];
+    const buildEl = document.getElementById('ov-build-content');
+    if (buildEl) {
+      if (buildData && buildData.length) {
+        const top10 = [...buildData]
+          .sort((a,b) => (b.builds||0) - (a.builds||0))
+          .slice(0, 10);
+        buildEl.innerHTML = `<div class="ov-item-row">` +
+          top10.map(r => {
+            const name = ITEM_ID_MAP[r.item_id] || null;
+            if (!name) return '';
+            const pct = top10[0].builds > 0 ? Math.round(r.builds / top10[0].builds * 100) : 0;
+            return itemChipHTML(name, `${r.builds.toLocaleString()}`);
+          }).filter(Boolean).join('') + '</div>';
+      } else {
+        buildEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
+      }
+    }
+  } catch(e) {
+    const el = document.getElementById('ov-build-content');
+    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Needs HTTPS</span>';
+  }
+
+  // ── Highest win rate item pairs ────────────────
+  try {
+    const permRes = await fetch(`https://api.deadlock-api.com/v1/analytics/item-permutation-stats?hero_ids=${heroId}&min_average_badge=${badge}&comb_size=2`);
+    const permData = permRes.ok ? await permRes.json() : [];
     const itemsEl = document.getElementById('ov-items-content');
     if (itemsEl) {
-      if (itemData && itemData.length) {
-        const top8 = [...itemData]
-          .filter(r => r.matches > 20)
+      if (permData && permData.length) {
+        const top6 = [...permData]
+          .filter(r => r.matches >= 50)
           .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)))
-          .slice(0, 8);
-        const itemCatMap = {};
-        ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = { cat, tier: item.tier }; }));
-        itemsEl.innerHTML = `<div class="ov-item-row">` + top8.map(r => {
-          const name = ITEM_ID_MAP[r.item_id] || `Item ${r.item_id}`;
+          .slice(0, 6);
+        itemsEl.innerHTML = top6.map(r => {
+          const names = (r.item_ids || []).map(id => ITEM_ID_MAP[id]).filter(Boolean);
+          if (names.length < 2) return '';
           const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
-          const meta = itemCatMap[name];
-          const iconUrl = meta ? itemIconUrl(name, meta.cat) : '';
-          return `<div class="ov-item-chip">
-            <div class="ov-item-chip-icon">${iconUrl ? `<img src="${iconUrl}" alt="${name}" onerror="this.style.display='none'">` : ''}</div>
-            <span class="ov-item-chip-name">${name}</span>
-            <span class="ov-item-chip-wr">${wr}%</span>
+          return `<div style="margin-bottom:10px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:6px">${wr}% WR · ${r.matches.toLocaleString()} matches</div>
+            <div class="ov-item-row">${names.map(n => itemChipHTML(n, '')).join('')}</div>
           </div>`;
-        }).join('') + '</div>';
+        }).filter(Boolean).join('') || '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
       } else {
         itemsEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
       }
     }
   } catch(e) {
     const el = document.getElementById('ov-items-content');
-    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Failed to load (needs HTTPS)</span>';
+    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Needs HTTPS</span>';
   }
 }
 
@@ -2881,7 +3076,7 @@ async function fetchItemIds() {
 
 async function loadTrends(force = false) {
   if (trendsLoading) return;
-  if (trendsCache && !force) { renderTrends(); return; }
+  if (trendsCache && !force) { renderTrends(); generateBrief(); return; }
 
   trendsLoading = true;
   const statusEl = document.getElementById('trends-status');
@@ -2927,6 +3122,7 @@ async function loadTrends(force = false) {
   trendsLoading = false;
   document.getElementById('trends-refresh-btn').disabled = false;
   renderTrends();
+  generateBrief();
 }
 
 function processHeroTrends(heroData) {
@@ -3166,6 +3362,159 @@ function renderTrends() {
     });
   });
 }
+
+// META BRIEF
+function generateBrief() {
+  if (!trendsCache) return;
+  const { heroData, itemData } = trendsCache;
+  const heroRows = processHeroTrends(heroData).filter(r => r.matches >= 20);
+  const itemRows = processItemTrends(itemData).filter(r => r.matches >= 30);
+
+  const dateEl = document.getElementById('sidebar-date');
+  const bodyEl = document.getElementById('sidebar-body');
+  if (!dateEl || !bodyEl) return;
+
+  const now = new Date();
+  dateEl.textContent = `Asc+ · ${now.toLocaleDateString('en-GB', {day:'numeric',month:'short'})}`;
+
+  function heroRowHTML(r, valHtml) {
+    const portrait = PORTRAITS[r.name] || '';
+    return `<div class="brief-row">
+      ${portrait ? `<img class="brief-portrait" src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
+      <span class="brief-name">${r.name}</span>
+      ${valHtml}
+    </div>`;
+  }
+
+  function itemRowHTML(r, valHtml) {
+    const hero = null;
+    const cat = (() => { for (const c of ['weapon','vitality','spirit']) { if (ITEMS[c].find(i=>i.name===r.name)) return c; } return ''; })();
+    const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
+    return `<div class="brief-row">
+      <div class="brief-item-icon">${iconUrl ? `<img src="${iconUrl}" alt="">` : ''}</div>
+      <span class="brief-name">${r.name}</span>
+      ${valHtml}
+    </div>`;
+  }
+
+  // Rising heroes — biggest positive pick delta
+  const rising = [...heroRows].sort((a,b) => b.pick_delta - a.pick_delta).slice(0,4);
+
+  // Falling heroes — biggest negative pick delta
+  const falling = [...heroRows].sort((a,b) => a.pick_delta - b.pick_delta).slice(0,4);
+
+  // Dominant — highest win rate, pick rate above 2%
+  const dominant = [...heroRows]
+    .filter(r => r.pick_rate >= 0.02)
+    .sort((a,b) => b.win_rate - a.win_rate)
+    .slice(0,4);
+
+  // Contested & underperforming — high pick, low WR (top half pick rate, bottom third WR)
+  const sortedByPick = [...heroRows].sort((a,b) => b.pick_rate - a.pick_rate);
+  const medianPick = sortedByPick[Math.floor(sortedByPick.length/2)]?.pick_rate || 0;
+  const sortedByWR = [...heroRows].sort((a,b) => a.win_rate - b.win_rate);
+  const lowWRThreshold = sortedByWR[Math.floor(sortedByWR.length/3)]?.win_rate || 0;
+  const contested = heroRows
+    .filter(r => r.pick_rate >= medianPick && r.win_rate <= lowWRThreshold)
+    .sort((a,b) => b.pick_rate - a.pick_rate)
+    .slice(0,3);
+
+  // Hot items — rising pick delta
+  const hotItems = [...itemRows].sort((a,b) => b.pick_delta - a.pick_delta).slice(0,5);
+
+  // Cooling items — falling
+  const coolingItems = [...itemRows].sort((a,b) => a.pick_delta - b.pick_delta).slice(0,3);
+
+  function fmtDeltaVal(v, cls) {
+    const sign = v > 0 ? '+' : '';
+    const str = Math.abs(v*100) < 1 ? (v*100).toFixed(1) : Math.round(v*100).toString();
+    return `<span class="brief-val ${cls}">${sign}${str}%</span>`;
+  }
+
+  bodyEl.innerHTML = `
+    <div class="brief-section">
+      <div class="brief-section-label rising">↑ Pick Rate Rising</div>
+      ${rising.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'up'))).join('')}
+    </div>
+    <div class="brief-section">
+      <div class="brief-section-label falling">↓ Pick Rate Falling</div>
+      ${falling.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'down'))).join('')}
+    </div>
+    <div class="brief-section">
+      <div class="brief-section-label dominant">👑 Highest Win Rate</div>
+      ${dominant.map(r => heroRowHTML(r, `<span class="brief-val neutral">${Math.round(r.win_rate*100)}% WR</span>`)).join('')}
+    </div>
+    ${contested.length ? `<div class="brief-section">
+      <div class="brief-section-label contested">⚠ High Pick, Low WR</div>
+      ${contested.map(r => heroRowHTML(r, `<span class="brief-val warn">${Math.round(r.win_rate*100)}%</span>`)).join('')}
+    </div>` : ''}
+    <div class="brief-section">
+      <div class="brief-section-label items">🔥 Items Rising</div>
+      ${hotItems.map(r => itemRowHTML(r, fmtDeltaVal(r.pick_delta,'up'))).join('')}
+    </div>
+    <div class="brief-section">
+      <div class="brief-section-label falling">❄ Items Falling</div>
+      ${coolingItems.map(r => itemRowHTML(r, fmtDeltaVal(r.pick_delta,'down'))).join('')}
+    </div>
+  `;
+
+  // Auto-generate summary and store snapshot
+  window.__briefSnapshot__ = { rising, falling, dominant, contested, hotItems, coolingItems };
+  generateSummary();
+}
+
+function generateSummary() {
+  const snap = window.__briefSnapshot__;
+  if (!snap) return;
+  const output = document.getElementById('summary-output');
+  const refresh = document.getElementById('summary-refresh');
+  if (!output) return;
+
+  const { rising, falling, dominant, contested, hotItems, coolingItems } = snap;
+  const sentences = [];
+
+  function hero(name) { return `<strong>${name}</strong>`; }
+  function item(name) { return `<strong>${name}</strong>`; }
+  function up(s) { return `<span class="up">${s}</span>`; }
+  function dn(s) { return `<span class="down">${s}</span>`; }
+  function warn(s) { return `<span class="warn">${s}</span>`; }
+  function pct(v) { return Math.round(v * 100) + '%'; }
+  function dpct(v) { return Math.round(Math.abs(v*100)) + '%'; }
+
+  const r1 = rising[0], f1 = falling[0];
+  if (r1 && f1) {
+    const rWR = Math.round(r1.win_rate * 100);
+    const wrTag = rWR >= 52 ? up(`${rWR}% WR`) : rWR <= 48 ? warn(`${rWR}% WR`) : `${rWR}% WR`;
+    sentences.push(`${hero(r1.name)} rising ${up('+' + dpct(r1.pick_delta) + ' pick')} — ${wrTag}. ${hero(f1.name)} shedding ${dn('-' + dpct(f1.pick_delta) + ' pick')}.`);
+  }
+
+  if (dominant.length >= 1) {
+    const d1 = dominant[0];
+    const trend = d1.pick_delta > 0.005 ? ` and still climbing` : d1.pick_delta < -0.005 ? ` despite falling pick` : ``;
+    sentences.push(`${hero(d1.name)} leads at ${up(pct(d1.win_rate) + ' WR')}${trend} — strongest performing hero at Asc+ this week.`);
+  }
+
+  if (contested.length > 0) {
+    const c = contested[0];
+    sentences.push(`${warn('⚠')} ${hero(c.name)} is a trap — ${warn(pct(c.win_rate) + ' WR')} despite high pick. Avoid or counter it.`);
+  }
+
+  if (hotItems.length >= 1) {
+    const getCat = name => { for (const cat of ['weapon','vitality','spirit']) { if (ITEMS[cat].find(i=>i.name===name)) return cat; } return ''; };
+    const rising2 = hotItems.slice(0,2);
+    const cats = rising2.map(r => getCat(r.name));
+    const allWeapon = cats.every(c => c === 'weapon');
+    const allSpirit = cats.every(c => c === 'spirit');
+    const metaNote = allWeapon ? warn('weapon-heavy') : allSpirit ? `<span class="up">spirit-heavy</span>` : `mixed`;
+    sentences.push(`${rising2.map(r => item(r.name)).join(' and ')} spiking — ${metaNote} item meta this week.`);
+  }
+
+  output.innerHTML = sentences.map(s => `<div class="summary-sentence">${s}</div>`).join('');
+  output.classList.add('visible');
+  if (refresh) refresh.classList.add('visible');
+}
+
+document.getElementById('summary-btn').addEventListener('click', generateSummary);
 
 // TRENDS TAB SWITCHING
 document.querySelectorAll('.trends-sub-btn').forEach(btn => {
