@@ -525,239 +525,187 @@
 
 
 
-  /* GRID */
-  .grid {
+  /* ═══════════════════════════════════════
+     HERO PORTRAIT GRID
+  ═══════════════════════════════════════ */
+  .hero-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    padding: 0;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 6px;
+    padding: 16px;
+    background: var(--bg);
   }
-
-  /* HERO CARD */
-  .hero-card {
-    background: var(--bg2);
-    padding: 0;
-    transition: background 0.15s;
+  .hero-tile {
+    position: relative;
     cursor: pointer;
-    position: relative;
-  }
-  .hero-card:hover { background: var(--bg3); }
-  .hero-card.expanded { background: var(--bg3); z-index: 10; }
-
-  .card-header {
-    padding: 0 !important;
-    position: relative;
+    border-radius: 4px;
     overflow: hidden;
-    height: 64px;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.15s;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s;
+    aspect-ratio: 3/4;
+    background: var(--bg3);
   }
-  .hero-card.expanded .card-header { border-color: var(--border); }
-
-  .hero-portrait {
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 100%;
-    width: 80px;
-    object-fit: cover;
-    object-position: center top;
-    opacity: 0.85;
-    mask-image: linear-gradient(to left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-  }
-
-  .card-header-content {
-    position: relative;
-    z-index: 1;
-    padding: 12px 90px 12px 16px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-  }
-
-  .hero-name {
+  .hero-tile:hover { transform: scale(1.04); z-index: 2; box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+  .hero-tile[data-role~="tank"]:hover       { border-color: var(--vitality); }
+  .hero-tile[data-role~="assassin"]:hover   { border-color: #e05050; }
+  .hero-tile[data-role~="initiator"]:hover  { border-color: var(--weapon); }
+  .hero-tile[data-role~="support"]:hover    { border-color: var(--spirit); }
+  .hero-tile[data-role~="disruptor"]:hover  { border-color: #9060d0; }
+  .hero-tile[data-role~="carry"]:hover      { border-color: var(--accent); }
+  .hero-tile-portrait { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  .hero-tile:hover .hero-tile-portrait { filter: brightness(1.1); }
+  .hero-tile-name {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 18px 6px 6px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 23px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: #e8f0fa;
-    line-height: 1;
-    text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+    font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase; color: #fff; text-align: center;
+    line-height: 1.1; text-shadow: 0 1px 4px rgba(0,0,0,0.9);
   }
 
-  .hero-weapon {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: var(--text3);
-    letter-spacing: 0.5px;
+  /* ═══════════════════════════════════════
+     HERO DEEP DIVE OVERLAY
+  ═══════════════════════════════════════ */
+  .hero-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
   }
-
-  .expand-icon {
-    color: var(--text3);
-    font-size: 12px;
-    transition: transform 0.2s;
-    position: absolute;
-    bottom: 8px;
-    right: 10px;
-    z-index: 2;
+  .hero-overlay.active { display: flex; }
+  .hero-overlay-panel {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: min(900px, 100vw);
+    background: var(--bg2); border-left: 1px solid var(--border2);
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: -12px 0 40px rgba(0,0,0,0.8);
+    animation: slideInRight 0.2s ease-out;
   }
-  .hero-card.expanded .expand-icon { transform: rotate(180deg); }
-
-  /* BASE STATS ROW */
-  .base-stats {
-    padding: 10px 16px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 20px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg4);
+  @keyframes slideInRight {
+    from { transform: translateX(60px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
   }
-  .stat-pill {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 13px;
+  .ov-header {
+    flex-shrink: 0; position: relative; height: 180px;
+    overflow: hidden; background: var(--bg3); border-bottom: 1px solid var(--border2);
   }
-  .stat-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  .ov-header-portrait {
+    position: absolute; right: 0; top: 0; height: 100%; width: 280px;
+    object-fit: cover; object-position: center top;
+    mask-image: linear-gradient(to left, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
   }
-  .stat-value {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
+  .ov-header-content {
+    position: relative; z-index: 1; padding: 24px 24px 16px;
+    height: 100%; display: flex; flex-direction: column; justify-content: space-between;
   }
+  .ov-hero-name {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 42px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: #fff; line-height: 1;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  }
+  .ov-hero-weapon { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text2); letter-spacing: 1px; margin-top: 4px; }
+  .ov-hero-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .ov-tag {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 2px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text2);
+  }
+  .ov-base-stats { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .stat-pill { display: flex; align-items: center; gap: 5px; }
+  .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: 600; color: var(--text); }
   .stat-value.weapon { color: var(--weapon); }
   .stat-value.spirit { color: var(--spirit); }
   .stat-value.vitality { color: var(--vitality); }
-
-  /* ABILITIES */
-  .abilities {
-    display: none;
-    position: absolute;
-    left: -1px;
-    right: -1px;
-    top: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-top: none;
-    padding: 0 0 6px 0;
-    z-index: 20;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.7);
-    max-height: 480px;
-    overflow-y: auto;
+  .ov-close {
+    position: absolute; top: 16px; right: 16px; z-index: 10;
+    background: rgba(0,0,0,0.4); border: 1px solid var(--border2); border-radius: 3px;
+    color: var(--text2); font-size: 18px; cursor: pointer;
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
   }
-  .abilities.expand-up {
-    top: auto;
-    bottom: 100%;
-    border-top: 1px solid var(--border2);
-    border-bottom: none;
-    box-shadow: 0 -8px 24px rgba(0,0,0,0.7);
+  .ov-close:hover { color: #fff; background: rgba(255,255,255,0.1); }
+  .ov-body { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+  .ov-section { border-bottom: 1px solid var(--border); padding: 16px 24px; }
+  .ov-section-title {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 12px;
   }
-  .hero-card.expanded .abilities { display: block; }
-
-  .ability {
-    padding: 11px 16px;
-    border-bottom: 1px solid var(--border);
+  .ov-ability-order { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .ov-order-step { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .ov-order-num { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text3); }
+  .ov-order-ability {
+    width: 36px; height: 36px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700;
+    border: 2px solid var(--border); color: var(--text2); background: var(--bg4);
   }
-  .ability:last-child { border-bottom: none; }
-
-  .ability-header {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 7px;
+  .ov-order-ability.slot-1 { border-color: var(--accent2); color: var(--accent); }
+  .ov-order-ability.slot-2 { border-color: #4a8a4a; color: #60c060; }
+  .ov-order-ability.slot-3 { border-color: #8a4a8a; color: #c060c0; }
+  .ov-order-ability.slot-4 { border-color: #8a6a2a; color: #c09030; }
+  .ov-order-sep { color: var(--border2); font-size: 12px; margin: 0 2px; align-self: center; padding-top: 18px; }
+  .ov-hero-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ov-hero-chip {
+    display: flex; align-items: center; gap: 8px; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 4px; padding: 6px 10px 6px 6px;
+    cursor: pointer; transition: border-color 0.15s; min-width: 160px;
   }
-  .ability-num {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: var(--text2);
-    flex-shrink: 0;
-    background: var(--bg4);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 1px 5px;
+  .ov-hero-chip:hover { border-color: var(--border2); background: var(--bg4); }
+  .ov-hero-chip img { width: 32px; height: 32px; border-radius: 3px; object-fit: cover; object-position: top center; flex-shrink: 0; }
+  .ov-hero-chip-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+  .ov-hero-chip-wr { font-family: 'Share Tech Mono', monospace; font-size: 11px; margin-left: auto; padding-left: 8px; }
+  .ov-hero-chip-wr.good { color: #40e870; }
+  .ov-hero-chip-wr.bad  { color: #ff5555; }
+  .ov-item-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ov-item-chip {
+    display: flex; align-items: center; gap: 8px; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 4px; padding: 6px 10px 6px 6px; min-width: 160px;
   }
-  .ability-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 17px;
-    letter-spacing: 0.5px;
-    color: #e8f0fa;
-    flex: 1;
+  .ov-item-chip-icon {
+    width: 28px; height: 34px; border-radius: 2px; overflow: hidden;
+    position: relative; flex-shrink: 0; background: var(--bg4);
   }
-  .ability-cd {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    color: var(--text2);
+  .ov-item-chip-icon img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 2px; }
+  .ov-item-chip-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
+  .ov-item-chip-wr { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: #40e870; margin-left: auto; padding-left: 8px; }
+  .ov-abilities { display: flex; flex-direction: column; gap: 0; }
+  .ov-ability { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .ov-ability:last-child { border-bottom: none; }
+  .ov-ability-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .ov-ability-num {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #fff;
+    background: var(--accent2); border-radius: 2px; padding: 1px 5px; flex-shrink: 0;
   }
-
-  .ability-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px 16px;
-    margin-bottom: 8px;
-    padding: 7px 10px;
-    background: rgba(0,0,0,0.25);
-    border-radius: 3px;
-    border: 1px solid var(--border);
+  .ov-ability-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; color: #e8f0fa; flex: 1; }
+  .ov-ability-cd { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text2); }
+  .ov-ability-stats {
+    display: flex; flex-wrap: wrap; gap: 5px 16px; margin-bottom: 8px;
+    padding: 7px 10px; background: rgba(0,0,0,0.3); border-radius: 3px; border: 1px solid var(--border);
   }
-  .coef {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-  }
+  .coef { font-family: 'Share Tech Mono', monospace; font-size: 12px; }
   .coef .label { color: var(--text2); }
   .coef .val { color: var(--spirit); font-weight: 600; font-size: 13px; }
   .coef .val.weapon-dmg { color: var(--weapon); }
   .coef .val.melee-dmg { color: var(--melee); }
   .coef .val.heal { color: var(--vitality); }
+  .ov-upgrades { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .ov-upgrade { display: flex; gap: 8px; font-size: 13px; line-height: 1.45; align-items: flex-start; }
+  .ov-upgrade-tier {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    color: #fff; background: var(--accent2); border-radius: 2px; padding: 1px 5px; flex-shrink: 0; margin-top: 1px;
+  }
+  .ov-upgrade-text { color: var(--text); font-size: 13px; }
+  .ov-ability-note { font-size: 12px; color: var(--text2); font-style: italic; margin-top: 6px; }
+  .ov-loading { display: flex; align-items: center; gap: 8px; color: var(--text3); font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+  .ov-loading::before { content: '◈'; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-  .upgrades {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-top: 6px;
-  }
-  .upgrade {
-    display: flex;
-    gap: 8px;
-    font-size: 13px;
-    line-height: 1.45;
-    align-items: flex-start;
-  }
-  .upgrade-tier {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #fff;
-    background: var(--accent2);
-    border-radius: 2px;
-    padding: 1px 5px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .upgrade-text { color: var(--text); }
-
-  /* NOTES */
+  /* NOTES (legacy, kept for any remaining uses) */
   .ability-note {
-    font-size: 12px;
-    color: var(--text2);
-    font-style: italic;
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px solid var(--border);
-    line-height: 1.5;
+    font-size: 12px; color: var(--text2); font-style: italic;
+    margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); line-height: 1.5;
   }
+
 
   /* EMPTY STATE */
   .empty {
@@ -874,8 +822,24 @@
 
   /* Table */
   .trends-table {
-    width: 100%;
+    width: auto;
+    min-width: 100%;
     border-collapse: collapse;
+  }
+  .trends-table th:first-child,
+  .trends-table td:first-child {
+    width: 280px;
+    min-width: 200px;
+  }
+  .trends-table th:nth-child(2), .trends-table td:nth-child(2),
+  .trends-table th:nth-child(3), .trends-table td:nth-child(3),
+  .trends-table th:nth-child(4), .trends-table td:nth-child(4),
+  .trends-table th:nth-child(5), .trends-table td:nth-child(5) {
+    width: 140px;
+  }
+  .trends-table th:last-child,
+  .trends-table td:last-child {
+    width: 160px;
   }
   .trends-table thead th {
     position: sticky;
@@ -1066,7 +1030,26 @@
 </nav>
 
 <div class="tab-panel active" id="tab-heroes">
-  <div class="grid" id="grid"></div>
+  <div class="hero-grid" id="grid"></div>
+</div>
+
+<!-- Hero Deep Dive Overlay -->
+<div class="hero-overlay" id="hero-overlay">
+  <div class="hero-overlay-panel" id="hero-overlay-panel">
+    <div class="ov-header">
+      <img class="ov-header-portrait" id="ov-portrait" src="" alt="">
+      <div class="ov-header-content">
+        <div>
+          <div class="ov-hero-name" id="ov-name"></div>
+          <div class="ov-hero-weapon" id="ov-weapon"></div>
+          <div class="ov-hero-tags" id="ov-tags"></div>
+        </div>
+        <div class="ov-base-stats" id="ov-stats"></div>
+      </div>
+      <button class="ov-close" id="ov-close">✕</button>
+    </div>
+    <div class="ov-body" id="ov-body"></div>
+  </div>
 </div>
 
 <div class="tab-panel" id="tab-shop">
@@ -2038,118 +2021,294 @@ function coefClass(t) {
   return '';
 }
 
-function renderCard(hero) {
-  const card = document.createElement('div');
-  card.className = 'hero-card';
-  card.dataset.name = hero.name.toLowerCase();
-  card.dataset.tags = hero.tags.join(' ');
-
-  const statItems = [
-    { l: 'HP', v: hero.stats.hp, c: 'vitality' },
-    { l: 'MS', v: hero.stats.ms, c: '' },
-    { l: 'DPS', v: hero.stats.dps, c: 'weapon' },
-    { l: 'SP/boon', v: hero.stats.sp ? hero.stats.sp.split('+')[1] || hero.stats.sp : '—', c: 'spirit' },
-    { l: 'BDMG', v: hero.stats.bdmg || '—', c: 'weapon' },
-    { l: 'RANGE', v: hero.stats.falloff || '—', c: '' },
-  ];
-
-  const tagsHTML = '';
-
-  const statsHTML = statItems.map(s =>
-    `<div class="stat-pill"><span class="stat-label">${s.l}</span><span class="stat-value ${s.c}">${s.v}</span></div>`
-  ).join('');
-
-  const abilitiesHTML = hero.abilities.map(a => {
-    const coefs = (a.stats || []).map(s =>
-      `<div class="coef"><span class="label">${s.l}: </span><span class="val ${coefClass(s.t)}">${s.v}</span></div>`
-    ).join('');
-    const ups = (a.upgrades || []).map((u, i) =>
-      `<div class="upgrade"><span class="upgrade-tier">T${i+1}</span><span class="upgrade-text">${u}</span></div>`
-    ).join('');
-    const note = a.notes ? `<div class="ability-note">${a.notes}</div>` : '';
-    return `
-      <div class="ability">
-        <div class="ability-header">
-          <span class="ability-num">${a.num}</span>
-          <span class="ability-name">${a.name}</span>
-          <span class="ability-cd">${a.cd || ''}</span>
-        </div>
-        ${coefs ? `<div class="ability-stats">${coefs}</div>` : ''}
-        ${note}
-        ${ups ? `<div class="upgrades">${ups}</div>` : ''}
-      </div>`;
-  }).join('');
-
-  const heroNotes = hero.notes ? `<div class="ability-note" style="padding:8px 16px;border-top:none;border-bottom:1px solid var(--border);font-style:normal;color:var(--text2);font-size:12px">${hero.notes}</div>` : '';
-
-  const portraitUrl = PORTRAITS[hero.name] || '';
-  const portraitHTML = portraitUrl
-    ? `<img class="hero-portrait" src="${portraitUrl}" alt="${hero.name}" loading="lazy" onerror="this.style.display='none'">`
-    : '';
-
-  card.innerHTML = `
-    <div class="card-header">
-      ${portraitHTML}
-      <div class="card-header-content">
-        <div class="hero-name">${hero.name}</div>
-        <div class="hero-weapon">${hero.weapon}</div>
-      </div>
-      <div class="expand-icon">▼</div>
-    </div>
-    <div class="abilities">
-      <div class="base-stats">${statsHTML}</div>
-      ${heroNotes}
-      ${abilitiesHTML}
-    </div>`;
-
-  card.querySelector('.card-header').addEventListener('click', () => {
-    const wasExpanded = card.classList.contains('expanded');
-    // Close all others first
-    document.querySelectorAll('.hero-card.expanded').forEach(c => {
-      c.classList.remove('expanded');
-      c.querySelector('.abilities').classList.remove('expand-up');
-    });
-    if (!wasExpanded) {
-      card.classList.add('expanded');
-      // Decide direction: if bottom half of viewport, expand upward
-      const rect = card.getBoundingClientRect();
-      const abilitiesEl = card.querySelector('.abilities');
-      const panelHeight = 420;
-      const spaceBelow = window.innerHeight - rect.bottom;
-      if (spaceBelow < panelHeight) {
-        abilitiesEl.classList.add('expand-up');
-      }
-    }
-  });
-
-  return card;
-}
-
-function filterAndRender() {
+function renderHeroGrid() {
   const q = searchEl.value.toLowerCase().trim();
   grid.innerHTML = '';
   let count = 0;
-
   HEROES.forEach(hero => {
-    const searchTarget = [
-      hero.name,
-      hero.weapon,
-      hero.notes || '',
-      ...hero.abilities.map(a => `${a.name} ${(a.stats||[]).map(s=>s.l+' '+s.v).join(' ')} ${(a.upgrades||[]).join(' ')}`)
-    ].join(' ').toLowerCase();
-    const matchSearch = !q || searchTarget.includes(q);
-
-    if (matchSearch) {
-      grid.appendChild(renderCard(hero));
-      count++;
-    }
+    const searchTarget = [hero.name, hero.weapon, hero.notes||'', ...hero.tags,
+      ...hero.abilities.map(a => a.name)].join(' ').toLowerCase();
+    if (q && !searchTarget.includes(q)) return;
+    const tile = document.createElement('div');
+    tile.className = 'hero-tile';
+    tile.dataset.role = hero.tags.join(' ');
+    const portrait = PORTRAITS[hero.name] || '';
+    tile.innerHTML = `
+      ${portrait ? `<img class="hero-tile-portrait" src="${portrait}" alt="${hero.name}" loading="lazy" onerror="this.style.background='var(--bg4)'">` : ''}
+      <div class="hero-tile-name">${hero.name}</div>`;
+    tile.addEventListener('click', () => openHeroOverlay(hero));
+    grid.appendChild(tile);
+    count++;
   });
-
-  if (count === 0) {
-    grid.innerHTML = '<div class="empty">NO HEROES MATCH</div>';
-  }
   countEl.textContent = `${count} / ${HEROES.length} heroes`;
 }
+
+// ═══════════════════════════════════════════════
+// HERO OVERLAY
+// ═══════════════════════════════════════════════
+const heroOverlay  = document.getElementById('hero-overlay');
+const ovClose      = document.getElementById('ov-close');
+const ovPortrait   = document.getElementById('ov-portrait');
+const ovName       = document.getElementById('ov-name');
+const ovWeapon     = document.getElementById('ov-weapon');
+const ovTags       = document.getElementById('ov-tags');
+const ovStats      = document.getElementById('ov-stats');
+const ovBody       = document.getElementById('ov-body');
+
+ovClose.addEventListener('click', closeHeroOverlay);
+heroOverlay.addEventListener('click', e => { if (e.target === heroOverlay) closeHeroOverlay(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHeroOverlay(); });
+
+function closeHeroOverlay() {
+  heroOverlay.classList.remove('active');
+}
+
+function openHeroOverlay(hero) {
+  // Header
+  const portrait = PORTRAITS[hero.name] || '';
+  ovPortrait.src = portrait;
+  ovName.textContent = hero.name;
+  ovWeapon.textContent = hero.weapon;
+  ovTags.innerHTML = hero.tags.map(t => `<span class="ov-tag">${t}</span>`).join('');
+
+  const statDefs = [
+    { l:'HP',    v: hero.stats.hp,       c:'vitality' },
+    { l:'MS',    v: hero.stats.ms,       c:'' },
+    { l:'DPS',   v: hero.stats.dps,      c:'weapon' },
+    { l:'SP',    v: hero.stats.sp||'—',  c:'spirit' },
+    { l:'BDMG',  v: hero.stats.bdmg||'—', c:'weapon' },
+    { l:'RANGE', v: hero.stats.falloff||'—', c:'' },
+  ];
+  ovStats.innerHTML = statDefs.map(s =>
+    `<div class="stat-pill"><span class="stat-label">${s.l}</span><span class="stat-value ${s.c}">${s.v}</span></div>`
+  ).join('');
+
+  // Body — build static sections immediately, API sections with loading state
+  const heroId = getHeroIdByName(hero.name);
+
+  ovBody.innerHTML = `
+    <!-- Abilities -->
+    <div class="ov-section">
+      <div class="ov-section-title">Abilities & Scaling</div>
+      <div class="ov-abilities">${buildAbilitiesHTML(hero)}</div>
+    </div>
+
+    <!-- Ability order -->
+    <div class="ov-section" id="ov-order-section">
+      <div class="ov-section-title">Asc+ Ability Upgrade Order</div>
+      <div id="ov-order-content"><div class="ov-loading">Loading…</div></div>
+    </div>
+
+    <!-- Synergies -->
+    <div class="ov-section" id="ov-syn-section">
+      <div class="ov-section-title">Top Synergies (Asc+)</div>
+      <div id="ov-syn-content"><div class="ov-loading">Loading…</div></div>
+    </div>
+
+    <!-- Counters -->
+    <div class="ov-section" id="ov-ctr-section">
+      <div class="ov-section-title">Top Counters (Asc+)</div>
+      <div id="ov-ctr-content"><div class="ov-loading">Loading…</div></div>
+    </div>
+
+    <!-- Item combos -->
+    <div class="ov-section" id="ov-items-section">
+      <div class="ov-section-title">Top Item Combos (Asc+)</div>
+      <div id="ov-items-content"><div class="ov-loading">Loading…</div></div>
+    </div>
+  `;
+
+  heroOverlay.classList.add('active');
+  ovBody.scrollTop = 0;
+
+  // Populate from pre-fetched cache or fetch now
+  renderOverlayApiSections(hero, heroId);
+}
+
+function buildAbilitiesHTML(hero) {
+  return hero.abilities.map(a => {
+    const coefs = (a.stats||[]).map(s =>
+      `<div class="coef"><span class="label">${s.l}: </span><span class="val ${coefClass(s.t)}">${s.v}</span></div>`
+    ).join('');
+    const ups = (a.upgrades||[]).map((u,i) =>
+      `<div class="ov-upgrade"><span class="ov-upgrade-tier">T${i+1}</span><span class="ov-upgrade-text">${u}</span></div>`
+    ).join('');
+    const note = a.notes ? `<div class="ov-ability-note">${a.notes}</div>` : '';
+    return `<div class="ov-ability">
+      <div class="ov-ability-header">
+        <span class="ov-ability-num">${a.num}</span>
+        <span class="ov-ability-name">${a.name}</span>
+        <span class="ov-ability-cd">${a.cd||''}</span>
+      </div>
+      ${coefs ? `<div class="ov-ability-stats">${coefs}</div>` : ''}
+      ${note}
+      ${ups ? `<div class="ov-upgrades">${ups}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function getHeroIdByName(name) {
+  for (const [id, n] of Object.entries(HERO_ID_MAP)) {
+    if (n === name) return +id;
+  }
+  return null;
+}
+
+async function renderOverlayApiSections(hero, heroId) {
+  if (!heroId) {
+    ['order','syn','ctr','items'].forEach(k => {
+      const el = document.getElementById(`ov-${k}-content`);
+      if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Hero ID not found</span>';
+    });
+    return;
+  }
+
+  const badge = 100;
+
+  try {
+    const [orderRes, synRes, ctrRes] = await Promise.all([
+      fetch(`https://api.deadlock-api.com/v1/analytics/ability-order-stats?hero_ids=${heroId}&min_average_badge=${badge}`),
+      fetch(`https://api.deadlock-api.com/v1/analytics/hero-synergies-stats?hero_ids=${heroId}&min_average_badge=${badge}`),
+      fetch(`https://api.deadlock-api.com/v1/analytics/hero-counters-stats?hero_ids=${heroId}&min_average_badge=${badge}`),
+    ]);
+
+    const [orderData, synData, ctrData] = await Promise.all([
+      orderRes.ok ? orderRes.json() : [],
+      synRes.ok ? synRes.json() : [],
+      ctrRes.ok ? ctrRes.json() : [],
+    ]);
+
+    // Ability order
+    const orderEl = document.getElementById('ov-order-content');
+    if (orderEl) {
+      if (orderData && orderData.length) {
+        // Sort by frequency, take top result
+        const sorted = [...orderData].sort((a,b) => (b.matches||0) - (a.matches||0));
+        const top = sorted[0];
+        // ability_order is array of ability slot numbers
+        const order = top.ability_order || top.order || [];
+        const slotColors = {1:'slot-1', 2:'slot-2', 3:'slot-3', 4:'slot-4'};
+        const abilityNames = {1: hero.abilities[0]?.name||'1', 2: hero.abilities[1]?.name||'2', 3: hero.abilities[2]?.name||'3', 4: hero.abilities[3]?.name||'4'};
+        orderEl.innerHTML = `<div class="ov-ability-order">` +
+          order.map((slot, i) => `
+            <div class="ov-order-step">
+              <div class="ov-order-num">${i+1}</div>
+              <div class="ov-order-ability ${slotColors[slot]||''}">${slot}</div>
+            </div>
+            ${i < order.length-1 ? '<div class="ov-order-sep">›</div>' : ''}
+          `).join('') +
+          `</div><div style="font-size:11px;color:var(--text3);margin-top:8px">${Math.round((top.matches||0))} matches tracked</div>`;
+      } else {
+        orderEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
+      }
+    }
+
+    // Synergies
+    const synEl = document.getElementById('ov-syn-content');
+    if (synEl) {
+      if (synData && synData.length) {
+        const top5 = [...synData]
+          .filter(r => r.matches > 20)
+          .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)))
+          .slice(0, 5);
+        synEl.innerHTML = `<div class="ov-hero-row">` + top5.map(r => {
+          const alliedId = r.hero_id2 || r.allied_hero_id || (r.hero_id === heroId ? r.hero_id2 : r.hero_id);
+          const name = HERO_ID_MAP[alliedId] || `Hero ${alliedId}`;
+          const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
+          const portrait = PORTRAITS[name] || '';
+          return `<div class="ov-hero-chip" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${name}')||HEROES[0])">
+            ${portrait ? `<img src="${portrait}" alt="${name}" onerror="this.style.display='none'">` : ''}
+            <span class="ov-hero-chip-name">${name}</span>
+            <span class="ov-hero-chip-wr good">${wr}%</span>
+          </div>`;
+        }).join('') + '</div>';
+      } else {
+        synEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
+      }
+    }
+
+    // Counters
+    const ctrEl = document.getElementById('ov-ctr-content');
+    if (ctrEl) {
+      if (ctrData && ctrData.length) {
+        const sorted = [...ctrData].filter(r => r.matches > 20)
+          .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)));
+        // Counters = enemies with highest win rate AGAINST our hero
+        // win rate here means the enemy wins more
+        const top5 = sorted.slice(0, 5);
+        const bot5 = sorted.slice(-5).reverse(); // heroes our hero beats
+        ctrEl.innerHTML = `
+          <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700">Beats ${hero.name.split(' ')[0]}</div>
+          <div class="ov-hero-row" style="margin-bottom:12px">` + top5.map(r => {
+          const enemyId = r.hero_id2 || (r.hero_id === heroId ? r.hero_id2 : r.hero_id);
+          const name = HERO_ID_MAP[enemyId] || `Hero ${enemyId}`;
+          const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
+          const portrait = PORTRAITS[name] || '';
+          return `<div class="ov-hero-chip">
+            ${portrait ? `<img src="${portrait}" alt="${name}" onerror="this.style.display='none'">` : ''}
+            <span class="ov-hero-chip-name">${name}</span>
+            <span class="ov-hero-chip-wr bad">${wr}% WR</span>
+          </div>`;
+        }).join('') + `</div>
+          <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700">${hero.name.split(' ')[0]} beats</div>
+          <div class="ov-hero-row">` + bot5.map(r => {
+          const enemyId = r.hero_id2 || (r.hero_id === heroId ? r.hero_id2 : r.hero_id);
+          const name = HERO_ID_MAP[enemyId] || `Hero ${enemyId}`;
+          const wr = Math.round((1 - r.wins/Math.max(r.matches,1)) * 100);
+          const portrait = PORTRAITS[name] || '';
+          return `<div class="ov-hero-chip">
+            ${portrait ? `<img src="${portrait}" alt="${name}" onerror="this.style.display='none'">` : ''}
+            <span class="ov-hero-chip-name">${name}</span>
+            <span class="ov-hero-chip-wr good">${wr}% WR</span>
+          </div>`;
+        }).join('') + '</div>';
+      } else {
+        ctrEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
+      }
+    }
+
+  } catch(e) {
+    ['order','syn','ctr'].forEach(k => {
+      const el = document.getElementById(`ov-${k}-content`);
+      if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Failed to load (needs HTTPS)</span>';
+    });
+  }
+
+  // Item permutations — separate fetch as it may take longer
+  try {
+    const itemRes = await fetch(`https://api.deadlock-api.com/v1/analytics/build-item-stats?hero_ids=${heroId}&min_average_badge=${badge}`);
+    const itemData = itemRes.ok ? await itemRes.json() : [];
+    const itemsEl = document.getElementById('ov-items-content');
+    if (itemsEl) {
+      if (itemData && itemData.length) {
+        const top8 = [...itemData]
+          .filter(r => r.matches > 20)
+          .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)))
+          .slice(0, 8);
+        const itemCatMap = {};
+        ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = { cat, tier: item.tier }; }));
+        itemsEl.innerHTML = `<div class="ov-item-row">` + top8.map(r => {
+          const name = ITEM_ID_MAP[r.item_id] || `Item ${r.item_id}`;
+          const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
+          const meta = itemCatMap[name];
+          const iconUrl = meta ? itemIconUrl(name, meta.cat) : '';
+          return `<div class="ov-item-chip">
+            <div class="ov-item-chip-icon">${iconUrl ? `<img src="${iconUrl}" alt="${name}" onerror="this.style.display='none'">` : ''}</div>
+            <span class="ov-item-chip-name">${name}</span>
+            <span class="ov-item-chip-wr">${wr}%</span>
+          </div>`;
+        }).join('') + '</div>';
+      } else {
+        itemsEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
+      }
+    }
+  } catch(e) {
+    const el = document.getElementById('ov-items-content');
+    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Failed to load (needs HTTPS)</span>';
+  }
+}
+
+function filterAndRender() { renderHeroGrid(); }
 
 searchEl.addEventListener('input', () => {
   heroSearchWrap.classList.toggle('has-value', searchEl.value.length > 0);
@@ -2749,7 +2908,7 @@ async function loadTrends(force = false) {
     const [heroData, itemData] = await Promise.all([heroRes.json(), itemRes.json()]);
 
     trendsCache = { heroData, itemData, fetchedAt: Date.now() };
-    statusEl.textContent = 'Asc+ · ' + new Date().toLocaleTimeString();
+    statusEl.textContent = 'Asc+ · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     statusEl.className = 'trends-status';
   } catch(e) {
     statusEl.textContent = 'Failed to load — CORS? Try from GitHub Pages';
@@ -2895,6 +3054,7 @@ function renderTrends() {
     rows = rows.slice(0, 38);
 
     let html = `<table class="trends-table">
+      <colgroup><col><col><col><col><col><col></colgroup>
       <thead><tr>
         <th>Hero</th>
         <th class="num sorted${trendSortAsc ? ' asc':''}" data-col="pick_delta">Pick Δ</th>
@@ -2948,6 +3108,7 @@ function renderTrends() {
     });
 
     let html = `<table class="trends-table">
+      <colgroup><col><col><col><col><col><col></colgroup>
       <thead><tr>
         <th>Item</th>
         <th class="num" data-col="pick_delta">Pick Δ</th>
