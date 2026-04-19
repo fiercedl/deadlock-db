@@ -2369,12 +2369,12 @@ function openHeroOverlay(hero) {
 
     <!-- Ability order -->
     <!-- Most purchased items + item pairs side by side -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)">
-      <div style="padding:16px 20px;border-right:1px solid var(--border)" id="ov-build-section">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);max-height:420px">
+      <div style="padding:16px 20px;border-right:1px solid var(--border);overflow-y:auto;scrollbar-width:thin" id="ov-build-section">
         <div class="ov-section-title">Most Built Items (Asc+)</div>
         <div id="ov-build-content"><div class="ov-loading">Loading…</div></div>
       </div>
-      <div style="padding:16px 20px" id="ov-items-section">
+      <div style="padding:16px 20px;overflow-y:auto;scrollbar-width:thin" id="ov-items-section">
         <div class="ov-section-title">Highest WR Item Pairs (Asc+)</div>
         <div id="ov-items-content"><div class="ov-loading">Loading…</div></div>
       </div>
@@ -2493,13 +2493,13 @@ async function renderOverlayApiSections(hero, heroId) {
         const top6 = [...permData]
           .filter(r => r.matches >= 50)
           .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)))
-          .slice(0, 6);
+          .slice(0, 4);
         itemsEl.innerHTML = top6.map((r, pairIdx) => {
           const names = (r.item_ids || []).map(id => ITEM_ID_MAP[id]).filter(Boolean);
           if (names.length < 2) return '';
           const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
-          return `<div style="margin-bottom:8px">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:4px">#${pairIdx+1} · ${wr}% WR · ${r.matches.toLocaleString()} matches</div>
+          return `<div style="margin-bottom:4px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:3px">#${pairIdx+1} · ${wr}% WR · ${r.matches.toLocaleString()} matches</div>
             <div class="ov-item-row">${names.map(n => itemChipHTML(n, '')).join('')}</div>
           </div>`;
         }).filter(Boolean).join('') || '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
