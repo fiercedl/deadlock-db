@@ -1200,6 +1200,16 @@
 
 <header>
   <div class="logo">DEADLOCK <span>HERO DB · v2026.04.10</span></div>
+  <div id="live-data-badge" style="
+    font-family:'Share Tech Mono',monospace;
+    font-size:10px;
+    padding:3px 8px;
+    border-radius:2px;
+    border:1px solid var(--border);
+    color:var(--text3);
+    white-space:nowrap;
+    letter-spacing:0.5px;
+  ">◌ data loading…</div>
   <div class="search-wrap" id="hero-search-wrap">
     <span class="search-icon">⌕</span>
     <input type="text" id="search" placeholder="Search heroes, abilities, tags…" autocomplete="off">
@@ -2351,7 +2361,12 @@ function buildAbilitiesHTML(hero) {
 }
 
 function getHeroIdByName(name) {
+  // HERO_ID_MAP is id→name, so invert the lookup
   for (const [id, n] of Object.entries(HERO_ID_MAP)) {
+    if (n === name) return +id;
+  }
+  // Fallback to hardcoded map
+  for (const [id, n] of Object.entries(HERO_ID_FALLBACK)) {
     if (n === name) return +id;
   }
   return null;
@@ -2961,8 +2976,15 @@ async function mergeLiveData() {
       fetch('https://assets.deadlock-api.com/v2/heroes?only_active=true'),
       fetch('https://assets.deadlock-api.com/v2/items?only_active=true')
     ]);
-    if (!heroRes.ok || !itemRes.ok) return;
+    if (!heroRes.ok || !itemRes.ok) throw new Error('API error');
     const [liveHeroes, liveItems] = await Promise.all([heroRes.json(), itemRes.json()]);
+
+    // ── Build ID maps from authoritative API data ────────────
+    HERO_ID_MAP = {};
+    liveHeroes.forEach(h => { if (h.id && h.name) HERO_ID_MAP[h.id] = h.name; });
+
+    ITEM_ID_MAP = {};
+    liveItems.forEach(i => { if (i.id && i.name) ITEM_ID_MAP[i.id] = i.name; });
 
     // ── Hero base stats ──────────────────────────────────────
     const heroApiMap = {};
@@ -2973,7 +2995,7 @@ async function mergeLiveData() {
       if (!live?.starting_stats) return;
       const s = live.starting_stats;
       if (s.max_health?.value)      hero.stats.hp  = Math.round(s.max_health.value).toString();
-      if (s.max_move_speed?.value)  hero.stats.ms  = s.max_move_speed.value.toFixed(2);
+      if (s.max_move_speed?.value)  hero.stats.ms  = s.max_move_speed.value.toFixed(1);
       if (s.stamina?.value != null) hero.stats.stamina = s.stamina.value.toString();
     });
 
@@ -2987,8 +3009,6 @@ async function mergeLiveData() {
         if (!live) return;
         if (live.cost)      item.cost = live.cost;
         if (live.item_tier) item.tier = live.item_tier;
-
-        // Update stat values from properties
         const p = live.properties || {};
         const upd = {};
         if (p.BonusHealth?.value)                  upd['+Health']        = p.BonusHealth.value;
@@ -3010,10 +3030,26 @@ async function mergeLiveData() {
     // Re-render with fresh data
     filterAndRender();
     renderItemGrid(activeItemCategory || 'all');
-    console.log('[DB] Live data merged — assets API');
+
+    const badge = document.getElementById('live-data-badge');
+    if (badge) {
+      const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      badge.textContent = `✓ live · ${time}`;
+      badge.style.color = 'var(--vitality)';
+      badge.style.borderColor = 'rgba(64,200,96,0.3)';
+      badge.style.background = 'rgba(64,200,96,0.06)';
+    }
+    console.log('[DB] Live data merged —', liveHeroes.length, 'heroes,', liveItems.length, 'items');
 
   } catch(e) {
-    console.warn('[DB] Live merge failed (offline or local file):', e.message);
+    // Use hardcoded fallback IDs
+    Object.assign(HERO_ID_MAP, HERO_ID_FALLBACK);
+    const badge = document.getElementById('live-data-badge');
+    if (badge) {
+      badge.textContent = '✗ offline · hardcoded';
+      badge.style.color = 'var(--text3)';
+    }
+    console.warn('[DB] Live merge failed — using fallback IDs:', e.message);
   }
 }
 
@@ -3090,47 +3126,26 @@ const TRENDS_API = 'https://api.deadlock-api.com/v1/analytics';
 const BADGE_MIN = 100; // Ascendant+Eternus
 
 // hero_id → name mapping (built from HEROES array)
-const HERO_ID_MAP = {
-  1: "Infernus", 2: "Seven", 3: "Vindicta", 4: "Lady Geist",
-  6: "Abrams", 7: "Wraith", 8: "McGinnis", 10: "Paradox",
-  11: "Dynamo", 12: "Kelvin", 13: "Haze", 14: "Holliday",
-  15: "Bebop", 17: "Grey Talon", 18: "Mo & Krill", 19: "Shiv",
-  20: "Ivy", 25: "Warden", 27: "Yamato", 31: "Lash",
-  35: "Viscous", 50: "Mirage", 52: "Calico", 53: "Pocket",
-  54: "Sinclair", 55: "Vyper", 56: "Mina", 57: "Paradox",
-  58: "Drifter", 59: "Celeste", 60: "Dynamo", 62: "Wraith",
-  // Newer heroes
-  61: "Apollo", 63: "The Doorman", 64: "Rem", 65: "Paige",
-  66: "Billy", 67: "Graves", 68: "Silver", 69: "Venator",
-};
+// Hero/item ID maps — populated from assets API at startup
+let HERO_ID_MAP = {};
+let ITEM_ID_MAP = {};
 
-// item_id → name mapping (partial — API uses numeric IDs)
-// We'll match by name after fetching assets
-let ITEM_ID_MAP = {}; // populated from assets API
+// Fallback hardcoded IDs in case API is unavailable
+const HERO_ID_FALLBACK = {
+  1:"Infernus",2:"Seven",3:"Vindicta",4:"Lady Geist",6:"Abrams",7:"Wraith",
+  8:"McGinnis",10:"Paradox",11:"Dynamo",12:"Kelvin",13:"Haze",14:"Holliday",
+  15:"Bebop",16:"Calico",17:"Grey Talon",18:"Mo & Krill",19:"Shiv",20:"Ivy",
+  25:"Warden",27:"Yamato",31:"Lash",35:"Viscous",50:"Mirage",52:"Pocket",
+  58:"Vyper",60:"Sinclair",63:"Mina",64:"Drifter",65:"Venator",66:"Victor",
+  67:"Paige",69:"The Doorman",72:"Billy",76:"Graves",77:"Apollo",79:"Rem",
+  80:"Silver",81:"Celeste"
+};
 
 let trendsCache = null;
 let trendsLoading = false;
 let activeTrendSection = 'heroes';
 let activeTrendSort = 'pick_delta';
 let trendSortAsc = false;
-
-async function fetchHeroIds() {
-  try {
-    const r = await fetch('https://assets.deadlock-api.com/v2/heroes?only_active=true');
-    if (!r.ok) return;
-    const data = await r.json();
-    data.forEach(h => { if (h.id && h.name) HERO_ID_MAP[h.id] = h.name; });
-  } catch(e) {}
-}
-
-async function fetchItemIds() {
-  try {
-    const r = await fetch('https://assets.deadlock-api.com/v2/items?only_active=true');
-    if (!r.ok) return;
-    const data = await r.json();
-    data.forEach(item => { if (item.id && item.name) ITEM_ID_MAP[item.id] = item.name; });
-  } catch(e) {}
-}
 
 async function loadTrends(force = false) {
   if (trendsLoading) return;
@@ -3144,9 +3159,6 @@ async function loadTrends(force = false) {
   refreshBtn.disabled = true;
 
   try {
-    // Fetch hero IDs and item IDs first
-    await Promise.all([fetchHeroIds(), fetchItemIds()]);
-
     // Two weeks of data bucketed by week
     const now = Math.floor(Date.now() / 1000);
     const twoWeeksAgo = now - 28 * 86400;
@@ -3274,17 +3286,14 @@ function processItemTrends(itemData) {
 }
 
 function fmtPct(v) {
-  const pct = v * 100;
-  return pct < 1 ? pct.toFixed(1) + '%' : Math.round(pct) + '%';
+  return Math.round(v * 100) + '%';
 }
 function fmtDelta(v) {
-  if (Math.abs(v) < 0.0005) return '<span class="delta flat">—</span>';
+  if (Math.abs(v) < 0.005) return '<span class="delta flat">—</span>';
   const sign = v > 0 ? '+' : '';
   const cls = v > 0 ? 'up' : 'down';
   const arrow = v > 0 ? '▲' : '▼';
-  const pct = v * 100;
-  const str = Math.abs(pct) < 1 ? pct.toFixed(1) : Math.round(pct).toString();
-  return `<span class="delta ${cls}">${arrow} ${sign}${str}%</span>`;
+  return `<span class="delta ${cls}">${arrow} ${sign}${Math.round(v * 100)}%</span>`;
 }
 
 function renderTrends() {
@@ -3482,8 +3491,8 @@ function generateBrief() {
 
   function fmtDeltaVal(v, cls) {
     const sign = v > 0 ? '+' : '';
-    const str = Math.abs(v*100) < 1 ? (v*100).toFixed(1) : Math.round(v*100).toString();
-    return `<span class="brief-val ${cls}">${sign}${str}%</span>`;
+    const str = Math.round(Math.abs(v*100)).toString();
+    return `<span class="brief-val ${cls}">${sign}${v > 0 ? '' : '-'}${str}%</span>`;
   }
 
   bodyEl.innerHTML = `
