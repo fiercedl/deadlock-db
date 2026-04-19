@@ -610,28 +610,30 @@
 
   /* BASE STATS ROW */
   .base-stats {
-    padding: 9px 16px;
+    padding: 10px 16px;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 16px;
+    gap: 8px 20px;
     border-bottom: 1px solid var(--border);
     background: var(--bg4);
   }
   .stat-pill {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     font-size: 13px;
   }
   .stat-label {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: var(--text3);
+    font-size: 10px;
+    color: var(--text2);
     text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   .stat-value {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--text);
   }
   .stat-value.weapon { color: var(--weapon); }
@@ -648,10 +650,10 @@
     background: var(--bg3);
     border: 1px solid var(--border2);
     border-top: none;
-    padding: 0 0 4px 0;
+    padding: 0 0 6px 0;
     z-index: 20;
     box-shadow: 0 8px 24px rgba(0,0,0,0.7);
-    max-height: 420px;
+    max-height: 480px;
     overflow-y: auto;
   }
   .abilities.expand-up {
@@ -664,7 +666,7 @@
   .hero-card.expanded .abilities { display: block; }
 
   .ability {
-    padding: 9px 16px;
+    padding: 11px 16px;
     border-bottom: 1px solid var(--border);
   }
   .ability:last-child { border-bottom: none; }
@@ -673,40 +675,48 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
-    margin-bottom: 5px;
+    margin-bottom: 7px;
   }
   .ability-num {
     font-family: 'Share Tech Mono', monospace;
     font-size: 11px;
-    color: var(--text3);
+    color: var(--text2);
     flex-shrink: 0;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 1px 5px;
   }
   .ability-name {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    font-size: 15px;
+    font-weight: 700;
+    font-size: 17px;
     letter-spacing: 0.5px;
-    color: var(--text);
+    color: #e8f0fa;
     flex: 1;
   }
   .ability-cd {
     font-family: 'Share Tech Mono', monospace;
     font-size: 12px;
-    color: var(--text3);
+    color: var(--text2);
   }
 
   .ability-stats {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 14px;
-    margin-bottom: 5px;
+    gap: 5px 16px;
+    margin-bottom: 8px;
+    padding: 7px 10px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 3px;
+    border: 1px solid var(--border);
   }
   .coef {
     font-family: 'Share Tech Mono', monospace;
     font-size: 12px;
   }
-  .coef .label { color: var(--text3); }
-  .coef .val { color: var(--spirit); }
+  .coef .label { color: var(--text2); }
+  .coef .val { color: var(--spirit); font-weight: 600; font-size: 13px; }
   .coef .val.weapon-dmg { color: var(--weapon); }
   .coef .val.melee-dmg { color: var(--melee); }
   .coef .val.heal { color: var(--vitality); }
@@ -714,32 +724,39 @@
   .upgrades {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    margin-top: 5px;
+    gap: 4px;
+    margin-top: 6px;
   }
   .upgrade {
     display: flex;
-    gap: 6px;
-    font-size: 12px;
-    line-height: 1.4;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.45;
+    align-items: flex-start;
   }
   .upgrade-tier {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Barlow Condensed', sans-serif;
     font-size: 11px;
-    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+    background: var(--accent2);
+    border-radius: 2px;
+    padding: 1px 5px;
     flex-shrink: 0;
     margin-top: 1px;
   }
-  .upgrade-text { color: var(--text2); }
+  .upgrade-text { color: var(--text); }
 
   /* NOTES */
   .ability-note {
     font-size: 12px;
-    color: var(--text3);
+    color: var(--text2);
     font-style: italic;
-    margin-top: 4px;
-    padding-top: 4px;
+    margin-top: 6px;
+    padding-top: 6px;
     border-top: 1px solid var(--border);
+    line-height: 1.5;
   }
 
   /* EMPTY STATE */
@@ -768,6 +785,261 @@
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ═══════════════════════════════════════
+     TRENDS TAB
+  ═══════════════════════════════════════ */
+  .trends-layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 90px);
+    background: var(--bg);
+  }
+  .trends-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 24px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .trends-sub-tabs {
+    display: flex;
+    gap: 2px;
+  }
+  .trends-sub-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: none;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .trends-sub-btn:hover { color: var(--text); border-color: var(--border2); }
+  .trends-sub-btn.active { background: var(--bg4); color: var(--accent); border-color: var(--accent2); }
+
+  .trends-sort-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .trends-sort-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .trends-sort-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: none;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .trends-sort-btn:hover { color: var(--text2); }
+  .trends-sort-btn.active { color: var(--text); border-color: var(--border2); background: var(--bg4); }
+
+  .trends-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+  .trends-status.loading { color: var(--accent2); }
+  .trends-status.error { color: #e05050; }
+
+  .trends-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  /* Table */
+  .trends-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .trends-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg3);
+    border-bottom: 2px solid var(--border2);
+    padding: 10px 16px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text2);
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  .trends-table thead th:hover { color: var(--text); }
+  .trends-table thead th.sorted { color: var(--accent); }
+  .trends-table thead th.sorted::after { content: ' ↓'; }
+  .trends-table thead th.sorted.asc::after { content: ' ↑'; }
+  .trends-table thead th.num { text-align: right; }
+
+  .trends-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .trends-table tbody tr:hover { background: var(--bg3); }
+
+  .trends-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  .trends-table td.num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    text-align: right;
+    color: var(--text);
+  }
+
+  /* Hero/item name cell */
+  .trend-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .trend-portrait {
+    width: 36px;
+    height: 36px;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: top center;
+    flex-shrink: 0;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+  }
+  .trend-item-icon-wrap {
+    width: 36px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+  }
+  .trend-item-backer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .trend-item-icon {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+  }
+  .trend-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #e8f0fa;
+  }
+  .trend-tags {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  /* Delta chips */
+  .delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .delta.up   { color: #40e870; background: rgba(64,200,96,0.15); }
+  .delta.down { color: #ff5555; background: rgba(224,80,80,0.15); }
+  .delta.flat { color: var(--text3); background: transparent; }
+
+  /* PRO column */
+  .pro-badge {
+    display: inline-block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    border: 1px solid var(--accent2);
+    color: var(--accent);
+    background: rgba(74,158,255,0.1);
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  .pro-note {
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  /* Empty / loading states */
+  .trends-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    gap: 12px;
+    color: var(--text3);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+  }
+  .trends-placeholder .big { font-size: 28px; opacity: 0.4; }
+
+  .trends-refresh-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    background: none;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .trends-refresh-btn:hover { color: var(--text); border-color: var(--accent2); }
+  .trends-refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -790,6 +1062,7 @@
 <nav class="tab-nav">
   <button class="tab-btn active" data-tab="heroes">Hero</button>
   <button class="tab-btn" data-tab="shop">Shop</button>
+  <button class="tab-btn" data-tab="trends">Trends</button>
 </nav>
 
 <div class="tab-panel active" id="tab-heroes">
@@ -839,6 +1112,31 @@
   </div>
 </div>
 
+<div class="tab-panel" id="tab-trends">
+  <div class="trends-layout">
+    <div class="trends-toolbar">
+      <div class="trends-sub-tabs">
+        <button class="trends-sub-btn active" data-trend="heroes">Heroes</button>
+        <button class="trends-sub-btn" data-trend="items">Items</button>
+      </div>
+      <div class="trends-sort-wrap">
+        <span class="trends-sort-label">Sort</span>
+        <button class="trends-sort-btn active" data-sort="pick_delta">Pick Δ</button>
+        <button class="trends-sort-btn" data-sort="pick_rate">Pick %</button>
+        <button class="trends-sort-btn" data-sort="win_rate">Win %</button>
+        <button class="trends-sort-btn" data-sort="win_delta">Win Δ</button>
+      </div>
+      <span class="trends-status" id="trends-status">—</span>
+      <button class="trends-refresh-btn" id="trends-refresh-btn">⟳ Refresh</button>
+    </div>
+    <div class="trends-body" id="trends-body">
+      <div class="trends-placeholder">
+        <div class="big">◈</div>
+        <div>Switch to Trends to load data</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
@@ -1782,7 +2080,7 @@ function renderCard(hero) {
       </div>`;
   }).join('');
 
-  const heroNotes = hero.notes ? `<div class="ability-note" style="padding:6px 16px;border-top:1px solid var(--border)">${hero.notes}</div>` : '';
+  const heroNotes = hero.notes ? `<div class="ability-note" style="padding:8px 16px;border-top:none;border-bottom:1px solid var(--border);font-style:normal;color:var(--text2);font-size:12px">${hero.notes}</div>` : '';
 
   const portraitUrl = PORTRAITS[hero.name] || '';
   const portraitHTML = portraitUrl
@@ -2309,9 +2607,448 @@ const totalAll = ITEMS.weapon.length + ITEMS.vitality.length + ITEMS.spirit.leng
 
 filterAndRender();
 
+// ═══════════════════════════════════════════════════════════
+// PRO DATA — fill in after each Night Shift episode
+// ═══════════════════════════════════════════════════════════
+const PRO_DATA = [
+  // Example structure — add entries after each Night Shift:
+  // {
+  //   episode: "Night Shift #47",
+  //   patch: "2026-04-10",
+  //   matches: [
+  //     {
+  //       picks_t1: ["Bebop", "Ivy", "Infernus", "McGinnis", "Dynamo"],
+  //       picks_t2: ["Haze", "Seven", "Lash", "Wraith", "Abrams"],
+  //       bans: ["Calico", "Shiv", "Grey Talon", "Viscous"],
+  //       winner: 1,
+  //       items: { "Bebop": ["Restorative Locket", "Return Fire"], "Dynamo": ["Rescue Beam"] },
+  //       note: "Bebop lane bully build"
+  //     }
+  //   ]
+  // },
+];
 
+// Derive pro stats from PRO_DATA
+function buildProStats() {
+  const heroStats = {}; // name -> { picks, bans, wins, items: {name: count} }
+  const itemStats = {}; // name -> { picks }
+  let totalMatches = 0;
 
+  PRO_DATA.forEach(episode => {
+    episode.matches.forEach(m => {
+      totalMatches++;
+      const allPicks = [...(m.picks_t1 || []), ...(m.picks_t2 || [])];
+      const bans = m.bans || [];
+      const winner = m.winner; // 1 or 2
 
+      allPicks.forEach((hero, idx) => {
+        if (!heroStats[hero]) heroStats[hero] = { picks: 0, bans: 0, wins: 0, items: {} };
+        heroStats[hero].picks++;
+        const onTeam1 = (m.picks_t1 || []).includes(hero);
+        if ((onTeam1 && winner === 1) || (!onTeam1 && winner === 2)) heroStats[hero].wins++;
+        // items
+        if (m.items && m.items[hero]) {
+          m.items[hero].forEach(item => {
+            heroStats[hero].items[item] = (heroStats[hero].items[item] || 0) + 1;
+          });
+        }
+      });
+      bans.forEach(hero => {
+        if (!heroStats[hero]) heroStats[hero] = { picks: 0, bans: 0, wins: 0, items: {} };
+        heroStats[hero].bans++;
+      });
+      // item stats
+      if (m.items) {
+        Object.values(m.items).forEach(itemList => {
+          itemList.forEach(item => {
+            if (!itemStats[item]) itemStats[item] = { picks: 0 };
+            itemStats[item].picks++;
+          });
+        });
+      }
+    });
+  });
+  return { heroStats, itemStats, totalMatches };
+}
+
+// ═══════════════════════════════════════════════════════════
+// TRENDS — API fetch + render
+// ═══════════════════════════════════════════════════════════
+const TRENDS_API = 'https://api.deadlock-api.com/v1/analytics';
+const BADGE_MIN = 90; // Ascendant+Eternus
+
+// hero_id → name mapping (built from HEROES array)
+const HERO_ID_MAP = {
+  1: "Infernus", 2: "Seven", 3: "Vindicta", 4: "Lady Geist",
+  6: "Abrams", 7: "Wraith", 8: "McGinnis", 10: "Paradox",
+  11: "Dynamo", 12: "Kelvin", 13: "Haze", 14: "Holliday",
+  15: "Bebop", 17: "Grey Talon", 18: "Mo & Krill", 19: "Shiv",
+  20: "Ivy", 25: "Warden", 27: "Yamato", 31: "Lash",
+  35: "Viscous", 50: "Mirage", 52: "Calico", 53: "Pocket",
+  54: "Sinclair", 55: "Vyper", 56: "Mina", 57: "Paradox",
+  58: "Drifter", 59: "Celeste", 60: "Dynamo", 62: "Wraith",
+  // Newer heroes
+  61: "Apollo", 63: "The Doorman", 64: "Rem", 65: "Paige",
+  66: "Billy", 67: "Graves", 68: "Silver", 69: "Venator",
+};
+
+// item_id → name mapping (partial — API uses numeric IDs)
+// We'll match by name after fetching assets
+let ITEM_ID_MAP = {}; // populated from assets API
+
+let trendsCache = null;
+let trendsLoading = false;
+let activeTrendSection = 'heroes';
+let activeTrendSort = 'pick_delta';
+let trendSortAsc = false;
+
+async function fetchHeroIds() {
+  try {
+    const r = await fetch('https://assets.deadlock-api.com/v2/heroes?only_active=true');
+    if (!r.ok) return;
+    const data = await r.json();
+    data.forEach(h => { if (h.id && h.name) HERO_ID_MAP[h.id] = h.name; });
+  } catch(e) {}
+}
+
+async function fetchItemIds() {
+  try {
+    const r = await fetch('https://assets.deadlock-api.com/v2/items?only_active=true');
+    if (!r.ok) return;
+    const data = await r.json();
+    data.forEach(item => { if (item.id && item.name) ITEM_ID_MAP[item.id] = item.name; });
+  } catch(e) {}
+}
+
+async function loadTrends(force = false) {
+  if (trendsLoading) return;
+  if (trendsCache && !force) { renderTrends(); return; }
+
+  trendsLoading = true;
+  const statusEl = document.getElementById('trends-status');
+  const refreshBtn = document.getElementById('trends-refresh-btn');
+  statusEl.textContent = 'Fetching…';
+  statusEl.className = 'trends-status loading';
+  refreshBtn.disabled = true;
+
+  try {
+    // Fetch hero IDs and item IDs first
+    await Promise.all([fetchHeroIds(), fetchItemIds()]);
+
+    // Two weeks of data bucketed by week
+    const now = Math.floor(Date.now() / 1000);
+    const twoWeeksAgo = now - 14 * 86400;
+
+    const [heroRes, itemRes] = await Promise.all([
+      fetch(`${TRENDS_API}/hero-stats?min_average_badge=${BADGE_MIN}&bucket=start_time_week&min_unix_timestamp=${twoWeeksAgo}`),
+      fetch(`${TRENDS_API}/item-stats?min_average_badge=${BADGE_MIN}&bucket=start_time_week&min_unix_timestamp=${twoWeeksAgo}`)
+    ]);
+
+    if (!heroRes.ok || !itemRes.ok) throw new Error('API error');
+
+    const [heroData, itemData] = await Promise.all([heroRes.json(), itemRes.json()]);
+
+    trendsCache = { heroData, itemData, fetchedAt: Date.now() };
+    statusEl.textContent = 'Asc+ · ' + new Date().toLocaleTimeString();
+    statusEl.className = 'trends-status';
+  } catch(e) {
+    statusEl.textContent = 'Failed to load — CORS? Try from GitHub Pages';
+    statusEl.className = 'trends-status error';
+    document.getElementById('trends-body').innerHTML = `
+      <div class="trends-placeholder">
+        <div class="big">⚠</div>
+        <div>Could not reach api.deadlock-api.com</div>
+        <div style="color:var(--text3);font-size:10px;margin-top:4px">Works when served from GitHub Pages (HTTPS). Doesn't work from local file://</div>
+      </div>`;
+    trendsLoading = false;
+    refreshBtn.disabled = false;
+    return;
+  }
+
+  trendsLoading = false;
+  document.getElementById('trends-refresh-btn').disabled = false;
+  renderTrends();
+}
+
+function processHeroTrends(heroData) {
+  const byHero = {};
+  heroData.forEach(row => {
+    if (!byHero[row.hero_id]) byHero[row.hero_id] = [];
+    byHero[row.hero_id].push(row);
+  });
+
+  // matches_per_bucket = total player-slots in that bucket across all heroes
+  // Use the max value per bucket (all heroes share same total)
+  const bucketTotals = {};
+  heroData.forEach(row => {
+    const b = row.bucket;
+    if (!bucketTotals[b] || row.matches_per_bucket > bucketTotals[b])
+      bucketTotals[b] = row.matches_per_bucket;
+  });
+  window.__heroBucketTotals__ = bucketTotals; // share with item processing
+
+  const results = [];
+  Object.entries(byHero).forEach(([heroId, rows]) => {
+    rows.sort((a, b) => a.bucket - b.bucket);
+    if (rows.length < 2) return;
+
+    const prev = rows[rows.length - 2];
+    const curr = rows[rows.length - 1];
+
+    const prevTotal = bucketTotals[prev.bucket] || 1;
+    const currTotal = bucketTotals[curr.bucket] || 1;
+
+    const prevPick = prev.matches / prevTotal;
+    const currPick = curr.matches / currTotal;
+    const prevWin  = prev.wins / Math.max(prev.matches, 1);
+    const currWin  = curr.wins / Math.max(curr.matches, 1);
+
+    const name = HERO_ID_MAP[+heroId];
+    if (!name) return;
+
+    results.push({
+      id: +heroId,
+      name,
+      pick_rate: currPick,
+      pick_delta: currPick - prevPick,
+      win_rate: currWin,
+      win_delta: currWin - prevWin,
+      matches: curr.matches,
+    });
+  });
+  return results;
+}
+
+function processItemTrends(itemData) {
+  const byItem = {};
+  itemData.forEach(row => {
+    if (!byItem[row.item_id]) byItem[row.item_id] = [];
+    byItem[row.item_id].push(row);
+  });
+
+  // Items don't have matches_per_bucket — use hero bucket totals (same game pool)
+  // matches_per_bucket from heroes = total player slots = total heroes * avg pick rate denominator
+  // For items: matches = number of times purchased. Divide by (matches_per_bucket / 6)
+  // since each 6-player team buys items. Actually simplest: use matches_per_bucket directly
+  // as the total player count in that bucket.
+  const bucketTotals = window.__heroBucketTotals__ || {};
+
+  const results = [];
+  Object.entries(byItem).forEach(([itemId, rows]) => {
+    rows.sort((a, b) => a.bucket - b.bucket);
+    if (rows.length < 2) return;
+
+    const prev = rows[rows.length - 2];
+    const curr = rows[rows.length - 1];
+
+    const prevTotal = bucketTotals[prev.bucket] || 1;
+    const currTotal = bucketTotals[curr.bucket] || 1;
+
+    // Item pick rate = purchases / total player slots in that bucket
+    const prevPick = prev.matches / prevTotal;
+    const currPick = curr.matches / currTotal;
+    const prevWin  = prev.wins / Math.max(prev.matches, 1);
+    const currWin  = curr.wins / Math.max(curr.matches, 1);
+
+    const name = ITEM_ID_MAP[+itemId];
+    if (!name) return;
+
+    results.push({
+      id: +itemId,
+      name,
+      pick_rate: currPick,
+      pick_delta: currPick - prevPick,
+      win_rate: currWin,
+      win_delta: currWin - prevWin,
+      matches: curr.matches,
+    });
+  });
+  return results;
+}
+
+function fmtPct(v) {
+  const pct = v * 100;
+  return pct < 1 ? pct.toFixed(1) + '%' : Math.round(pct) + '%';
+}
+function fmtDelta(v) {
+  if (Math.abs(v) < 0.0005) return '<span class="delta flat">—</span>';
+  const sign = v > 0 ? '+' : '';
+  const cls = v > 0 ? 'up' : 'down';
+  const arrow = v > 0 ? '▲' : '▼';
+  const pct = v * 100;
+  const str = Math.abs(pct) < 1 ? pct.toFixed(1) : Math.round(pct).toString();
+  return `<span class="delta ${cls}">${arrow} ${sign}${str}%</span>`;
+}
+
+function renderTrends() {
+  if (!trendsCache) return;
+  const { heroData, itemData } = trendsCache;
+  const proStats = buildProStats();
+  const body = document.getElementById('trends-body');
+
+  let rows;
+  if (activeTrendSection === 'heroes') {
+    rows = processHeroTrends(heroData);
+    // Sort
+    rows.sort((a, b) => {
+      const av = a[activeTrendSort] ?? 0;
+      const bv = b[activeTrendSort] ?? 0;
+      return trendSortAsc ? av - bv : bv - av;
+    });
+    // Filter out rows with tiny sample
+    rows = rows.filter(r => r.matches >= 20);
+    // Cap at top 38 heroes
+    rows = rows.slice(0, 38);
+
+    let html = `<table class="trends-table">
+      <thead><tr>
+        <th>Hero</th>
+        <th class="num sorted${trendSortAsc ? ' asc':''}" data-col="pick_delta">Pick Δ</th>
+        <th class="num" data-col="pick_rate">Pick %</th>
+        <th class="num" data-col="win_rate">Win %</th>
+        <th class="num" data-col="win_delta">Win Δ</th>
+        <th>Pro</th>
+      </tr></thead><tbody>`;
+
+    rows.forEach(r => {
+      const hero = HEROES.find(h => h.name === r.name);
+      const portrait = hero ? (PORTRAITS[r.name] || '') : '';
+      const tags = hero ? hero.tags.join(' · ') : '';
+      const ps = proStats.heroStats[r.name];
+      let proHtml = '<span style="color:var(--text3);font-size:10px">—</span>';
+      if (ps && proStats.totalMatches > 0) {
+        const presence = ((ps.picks + ps.bans) / proStats.totalMatches * 100).toFixed(0);
+        const wr = ps.picks > 0 ? (ps.wins / ps.picks * 100).toFixed(0) + '% WR' : '';
+        const topItems = Object.entries(ps.items).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]).join(', ');
+        proHtml = `<span class="pro-badge">PRO</span><span class="pro-note">${presence}% presence${wr ? ' · ' + wr : ''}${topItems ? '<br><span style="font-size:10px;color:var(--text3)">' + topItems + '</span>' : ''}</span>`;
+      }
+      html += `<tr>
+        <td><div class="trend-name-cell">
+          ${portrait ? `<img class="trend-portrait" src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
+          <div><div class="trend-name">${r.name}</div><div class="trend-tags">${tags}</div></div>
+        </div></td>
+        <td class="num">${fmtDelta(r.pick_delta)}</td>
+        <td class="num">${fmtPct(r.pick_rate)}</td>
+        <td class="num">${fmtPct(r.win_rate)}</td>
+        <td class="num">${fmtDelta(r.win_delta)}</td>
+        <td>${proHtml}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    body.innerHTML = html;
+
+  } else {
+    // Items
+    rows = processItemTrends(itemData);
+    rows.sort((a, b) => {
+      const av = a[activeTrendSort] ?? 0;
+      const bv = b[activeTrendSort] ?? 0;
+      return trendSortAsc ? av - bv : bv - av;
+    });
+    rows = rows.filter(r => r.matches >= 30).slice(0, 60);
+
+    // Map item name to category
+    const itemCatMap = {};
+    ['weapon','vitality','spirit'].forEach(cat => {
+      ITEMS[cat].forEach(item => { itemCatMap[item.name] = cat; });
+    });
+
+    let html = `<table class="trends-table">
+      <thead><tr>
+        <th>Item</th>
+        <th class="num" data-col="pick_delta">Pick Δ</th>
+        <th class="num" data-col="pick_rate">Pick %</th>
+        <th class="num" data-col="win_rate">Win %</th>
+        <th class="num" data-col="win_delta">Win Δ</th>
+        <th>Pro</th>
+      </tr></thead><tbody>`;
+
+    rows.forEach(r => {
+      const cat = itemCatMap[r.name] || '';
+      const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text3)';
+      const catLabel = cat ? `<span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${catColor};text-transform:uppercase;font-weight:600">${cat}</span>` : '';
+      // Item icon using existing CDN functions
+      const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
+      const backerU = cat ? (() => { const itemObj = ITEMS[cat]?.find(i => i.name === r.name); return itemObj ? backerUrl(cat, itemObj.tier) : ''; })() : '';
+      const iconHtml = iconUrl ? `
+        <div class="trend-item-icon-wrap">
+          <img class="trend-item-backer" src="${backerU}" alt="" onerror="this.style.display='none'">
+          <img class="trend-item-icon" src="${iconUrl}" alt="${r.name}" onerror="this.style.display='none'">
+        </div>` : '';
+      const ps = proStats.itemStats[r.name];
+      let proHtml = '<span style="color:var(--text3);font-size:10px">—</span>';
+      if (ps && proStats.totalMatches > 0) {
+        const presence = (ps.picks / proStats.totalMatches * 100).toFixed(0);
+        proHtml = `<span class="pro-badge">PRO</span><span class="pro-note">${presence}% presence</span>`;
+      }
+      html += `<tr>
+        <td><div class="trend-name-cell">
+          ${iconHtml}
+          <div><div class="trend-name">${r.name}</div>${catLabel}</div>
+        </div></td>
+        <td class="num">${fmtDelta(r.pick_delta)}</td>
+        <td class="num">${fmtPct(r.pick_rate)}</td>
+        <td class="num">${fmtPct(r.win_rate)}</td>
+        <td class="num">${fmtDelta(r.win_delta)}</td>
+        <td>${proHtml}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    body.innerHTML = html;
+  }
+
+  // Re-attach column sort listeners
+  document.querySelectorAll('.trends-table thead th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (activeTrendSort === col) { trendSortAsc = !trendSortAsc; }
+      else { activeTrendSort = col; trendSortAsc = false; }
+      // sync sort buttons
+      document.querySelectorAll('.trends-sort-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.sort === col);
+      });
+      renderTrends();
+    });
+  });
+}
+
+// TRENDS TAB SWITCHING
+document.querySelectorAll('.trends-sub-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeTrendSection = btn.dataset.trend;
+    document.querySelectorAll('.trends-sub-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (trendsCache) renderTrends();
+  });
+});
+
+// TRENDS SORT BUTTONS
+document.querySelectorAll('.trends-sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sort = btn.dataset.sort;
+    if (activeTrendSort === sort) { trendSortAsc = !trendSortAsc; }
+    else { activeTrendSort = sort; trendSortAsc = false; }
+    document.querySelectorAll('.trends-sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (trendsCache) renderTrends();
+  });
+});
+
+// REFRESH BUTTON
+document.getElementById('trends-refresh-btn').addEventListener('click', () => {
+  trendsCache = null;
+  loadTrends(true);
+});
+
+// Hook into main tab switch to auto-load trends
+const _origTabSwitch = document.querySelectorAll('.tab-btn');
+_origTabSwitch.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.tab === 'trends' && !trendsCache && !trendsLoading) {
+      loadTrends();
+    }
+  });
+});
 </script>
 </body>
 </html>
