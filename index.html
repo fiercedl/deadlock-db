@@ -1052,7 +1052,7 @@
   .trends-table tbody tr:hover { background: var(--bg3); }
 
   .trends-table td {
-    padding: 8px 16px;
+    padding: 7px 16px;
     font-size: 14px;
     vertical-align: middle;
     height: 54px;
@@ -1070,6 +1070,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    height: 38px;
+    overflow: hidden;
   }
   .trend-portrait {
     width: 36px;
@@ -3306,7 +3308,7 @@ function renderTrends() {
     rows.forEach(r => {
       const cat = itemCatMap[r.name] || '';
       const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text3)';
-      const catLabel = cat ? `<span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${catColor};text-transform:uppercase;font-weight:600">${cat}</span>` : '';
+      const catLabel = cat ? `<span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${catColor};text-transform:uppercase;font-weight:600;display:block;margin-top:1px;line-height:1">${cat}</span>` : '';
       // Item icon using existing CDN functions
       const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
       const backerU = cat ? (() => { const itemObj = ITEMS[cat]?.find(i => i.name === r.name); return itemObj ? backerUrl(cat, itemObj.tier) : ''; })() : '';
