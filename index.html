@@ -661,18 +661,73 @@
   .ov-hero-chip-wr { font-family: 'Share Tech Mono', monospace; font-size: 11px; margin-left: auto; padding-left: 8px; }
   .ov-hero-chip-wr.good { color: #40e870; }
   .ov-hero-chip-wr.bad  { color: #ff5555; }
-  .ov-item-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ov-item-row { display: flex; flex-direction: column; gap: 4px; }
   .ov-item-chip {
-    display: flex; align-items: center; gap: 8px; background: var(--bg3);
-    border: 1px solid var(--border); border-radius: 4px; padding: 6px 10px 6px 6px; min-width: 160px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 5px 8px 5px 6px;
+    transition: border-color 0.15s;
   }
-  .ov-item-chip-icon {
-    width: 28px; height: 34px; border-radius: 2px; overflow: hidden;
-    position: relative; flex-shrink: 0; background: var(--bg4);
+  .ov-item-chip:hover { border-color: var(--border2); }
+  .ov-item-chip-rank {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    width: 18px;
+    flex-shrink: 0;
+    text-align: right;
   }
-  .ov-item-chip-icon img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 2px; }
-  .ov-item-chip-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
-  .ov-item-chip-wr { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: #40e870; margin-left: auto; padding-left: 8px; }
+  .ov-item-chip-backer {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: block; border-radius: 2px;
+  }
+  .ov-item-chip-icon-wrap {
+    width: 32px;
+    height: 38px;
+    position: relative;
+    flex-shrink: 0;
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--bg4);
+  }
+  .ov-item-chip-icon-wrap img.ov-icon-main {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain; padding: 2px;
+    z-index: 1;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7));
+  }
+  .ov-item-chip-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .ov-item-chip-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ov-item-chip-cat {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+  .ov-item-chip-wr {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: #40e870;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
   .ov-abilities { display: flex; flex-direction: column; gap: 0; }
   .ov-ability { padding: 12px 0; border-bottom: 1px solid var(--border); }
   .ov-ability:last-child { border-bottom: none; }
@@ -1456,7 +1511,7 @@ const HEROES = [
     name: "Celeste",
     tags: ["disruptor", "support"],
     weapon: "Carny Life",
-    stats: { hp: "700+45", ms: "6.2", dps: "~62", sp: "0+1.1", bdmg: "18+0.82", falloff: "—" },
+    stats: { hp: "700+45", ms: "6.2", dps: "~62", sp: "0+1.1", bdmg: "18+0.82", falloff: "22→60m" },
     notes: "April 10 patch: HP 700, no neg BR, bullet dmg 18+0.82. −25% gravity, +44% air ctrl. Cannot buy headshot items.",
     abilities: [
       { num: 1, name: "Light Eater", cd: "20s",
@@ -1474,10 +1529,10 @@ const HEROES = [
     ]
   },
   {
-    name: "The Doorman",
+    name: "Doorman",
     tags: ["disruptor", "support"],
     weapon: "Service With A Smile",
-    stats: { hp: "765+54", ms: "7.9", dps: "43", sp: "0+1.1", bdmg: "—", falloff: "—" },
+    stats: { hp: "765+54", ms: "7.9", dps: "43", sp: "0+1.1", bdmg: "29.3+1.15", falloff: "20→58m" },
     notes: "Pistol. −50% pierce. Crit −25%.",
     abilities: [
       { num: 1, name: "Call Bell", cd: "—",
@@ -1499,7 +1554,7 @@ const HEROES = [
     name: "Drifter",
     tags: ["assassin"],
     weapon: "Crimson Grasp",
-    stats: { hp: "765+51", ms: "6.9", dps: "44.2", sp: "0+1.1", bdmg: "—", falloff: "22→27m" },
+    stats: { hp: "765+51", ms: "6.9", dps: "44.2", sp: "0+1.1", bdmg: "19.5+0.8", falloff: "22→27m" },
     notes: "3-pellet burst. Crit −45%. 3.5 HP regen.",
     abilities: [
       { num: 1, name: "Rend", cd: "16s",
@@ -1520,7 +1575,7 @@ const HEROES = [
     name: "Dynamo",
     tags: ["support", "initiator"],
     weapon: "The Vonnegun",
-    stats: { hp: "890+74", ms: "6.7", dps: "48", sp: "0+1.1", bdmg: "—", falloff: "—" },
+    stats: { hp: "890+74", ms: "6.7", dps: "48", sp: "0+1.1", bdmg: "12.6+0.3", falloff: "20→58m" },
     notes: "BR 0%+0.625/boon.",
     abilities: [
       { num: 1, name: "Kinetic Pulse", cd: "26s (5s charge)",
@@ -1586,7 +1641,7 @@ const HEROES = [
     name: "Haze",
     tags: ["assassin"],
     weapon: "Censure & Penance",
-    stats: { hp: "740+45", ms: "8.2", dps: "50.1", sp: "0+0.5", bdmg: "—", falloff: "20→46m", bv: "762" },
+    stats: { hp: "740+45", ms: "8.2", dps: "50.1", sp: "0+0.5", bdmg: "5.26+0.16", falloff: "20→46m", bv: "762" },
     notes: "Ammo ×0.5 SP scaling. SP/boon 0.5.",
     abilities: [
       { num: 1, name: "Sleep Dagger", cd: "30s",
@@ -1674,7 +1729,7 @@ const HEROES = [
     name: "Kelvin",
     tags: ["support"],
     weapon: "Expedition's End",
-    stats: { hp: "890+73", ms: "6.7", dps: "70.9", sp: "0+1.3", bdmg: "—", falloff: "—" },
+    stats: { hp: "890+73", ms: "6.7", dps: "70.9", sp: "0+1.3", bdmg: "18.6+1.2", falloff: "20→58m" },
     notes: "SP/boon 1.3. SR 0%+0.625/boon. Crit −25%. Lowest sprint 1.1m/s.",
     abilities: [
       { num: 1, name: "Frost Grenade", cd: "30s (7s charge)",
@@ -1854,7 +1909,7 @@ const HEROES = [
     name: "Paradox",
     tags: ["disruptor"],
     weapon: "Trade Secret",
-    stats: { hp: "740+58", ms: "6.7", dps: "48.5", sp: "0+1.1", bdmg: "6.8+0.26", falloff: "—", bv: "525" },
+    stats: { hp: "740+58", ms: "6.7", dps: "48.5", sp: "0+1.1", bdmg: "6.8+0.26", falloff: "20→58m", bv: "525" },
     notes: "5-bullet burst. April 10: bdmg 6.8+0.26, Time Wall 8m wide / 4m tall.",
     abilities: [
       { num: 1, name: "Pulse Grenade", cd: "32s",
@@ -1875,7 +1930,7 @@ const HEROES = [
     name: "Pocket",
     tags: ["assassin", "disruptor"],
     weapon: "The Black Sheep",
-    stats: { hp: "790+43", ms: "7.2", dps: "57.1", sp: "0+1.1", bdmg: "4.28+0.22", falloff: "—", bv: "559" },
+    stats: { hp: "790+43", ms: "7.2", dps: "57.1", sp: "0+1.1", bdmg: "4.28+0.22", falloff: "16→46m", bv: "559" },
     notes: "Shotgun. −15% innate spirit resist.",
     abilities: [
       { num: 1, name: "Barrage", cd: "32s",
@@ -1896,7 +1951,7 @@ const HEROES = [
     name: "Rem",
     tags: ["support"],
     weapon: "Long Night",
-    stats: { hp: "690+39", ms: "7.2", dps: "—", sp: "0+1.1", bdmg: "16+0.34", falloff: "—", bv: "160" },
+    stats: { hp: "690+39", ms: "7.2", dps: "—", sp: "0+1.1", bdmg: "16+0.34", falloff: "20→58m", bv: "160" },
     notes: "Highest sprint 4m/s. Crit −20%. Melee resist −5%.",
     abilities: [
       { num: 1, name: "Pillow Toss", cd: "25s (10s charge)",
@@ -1962,7 +2017,7 @@ const HEROES = [
     name: "Silver",
     tags: ["assassin"],
     weapon: "Hair of the Dog",
-    stats: { hp: "840+39", ms: "6.7", dps: "42", sp: "0+1.1", bdmg: "—", falloff: "20→46m", bv: "813" },
+    stats: { hp: "840+39", ms: "6.7", dps: "42", sp: "0+1.1", bdmg: "14+0.5", falloff: "20→46m", bv: "813" },
     notes: "Shotgun 7 pellets, 0.3s reload. Transformed weapon (Loose Muzzle): DPS 50, 25+0.819/boon, BV 254.",
     abilities: [
       { num: 1, name: "Slam Fire", cd: "—",
@@ -1984,7 +2039,7 @@ const HEROES = [
     name: "Sinclair",
     tags: ["disruptor"],
     weapon: "The Prestige",
-    stats: { hp: "740+50", ms: "7.2 +×0.0138 SP", dps: "48.3", sp: "0+1.3", bdmg: "17.8+0.55", falloff: "—", bv: "300" },
+    stats: { hp: "740+50", ms: "7.2 +×0.0138 SP", dps: "48.3", sp: "0+1.3", bdmg: "17.8+0.55", falloff: "25→61m", bv: "300" },
     notes: "2-bullet burst. MS scales with SP (×0.0138). SP/boon 1.3.",
     abilities: [
       { num: 1, name: "Vexing Bolt", cd: "24s (3s charge)",
@@ -2090,7 +2145,7 @@ const HEROES = [
     name: "Viscous",
     tags: ["disruptor"],
     weapon: "Deep Sea Interpreter",
-    stats: { hp: "790+57", ms: "7.2", dps: "49.2", sp: "0+1.3", bdmg: "10.3+0.36", falloff: "—", bv: "254" },
+    stats: { hp: "790+57", ms: "7.2", dps: "49.2", sp: "0+1.3", bdmg: "10.3+0.36", falloff: "20→58m", bv: "254" },
     notes: "SP/boon 1.3. Alt-fire 5 ammo/shot, 42 flat dmg.",
     abilities: [
       { num: 1, name: "Splatter", cd: "26s",
@@ -2183,7 +2238,7 @@ const PORTRAITS = {
   "Billy":       BASE + "punkgoat_vertical.webp",
   "Calico":      BASE + "nano_vertical.webp",
   "Celeste":     BASE + "unicorn_vertical.webp",
-  "The Doorman": BASE + "doorman_vertical.webp",
+  "Doorman": BASE + "doorman_vertical.webp",
   "Drifter":     BASE + "drifter_vertical.webp",
   "Dynamo":      BASE + "sumo_vertical.webp",
   "Graves":      BASE + "necro_vertical.webp",
@@ -2313,21 +2368,16 @@ function openHeroOverlay(hero) {
     </div>
 
     <!-- Ability order -->
-    <div class="ov-section" id="ov-order-section">
-      <div class="ov-section-title">Asc+ Ability Upgrade Order</div>
-      <div id="ov-order-content"><div class="ov-loading">Loading…</div></div>
-    </div>
-
-    <!-- Most purchased items -->
-    <div class="ov-section" id="ov-build-section">
-      <div class="ov-section-title">Most Purchased Items (Asc+)</div>
-      <div id="ov-build-content"><div class="ov-loading">Loading…</div></div>
-    </div>
-
-    <!-- Item combos -->
-    <div class="ov-section" id="ov-items-section">
-      <div class="ov-section-title">Highest Win Rate Item Pairs (Asc+)</div>
-      <div id="ov-items-content"><div class="ov-loading">Loading…</div></div>
+    <!-- Most purchased items + item pairs side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)">
+      <div style="padding:16px 20px;border-right:1px solid var(--border)" id="ov-build-section">
+        <div class="ov-section-title">Most Built Items (Asc+)</div>
+        <div id="ov-build-content"><div class="ov-loading">Loading…</div></div>
+      </div>
+      <div style="padding:16px 20px" id="ov-items-section">
+        <div class="ov-section-title">Highest WR Item Pairs (Asc+)</div>
+        <div id="ov-items-content"><div class="ov-loading">Loading…</div></div>
+      </div>
     </div>
   `;
 
@@ -2361,13 +2411,13 @@ function buildAbilitiesHTML(hero) {
 }
 
 function getHeroIdByName(name) {
-  // HERO_ID_MAP is id→name, so invert the lookup
+  // Normalise "Doorman" -> "The Doorman" for API lookup
+  const lookupName = name === 'Doorman' ? 'The Doorman' : name;
   for (const [id, n] of Object.entries(HERO_ID_MAP)) {
-    if (n === name) return +id;
+    if (n === lookupName || n === name) return +id;
   }
-  // Fallback to hardcoded map
   for (const [id, n] of Object.entries(HERO_ID_FALLBACK)) {
-    if (n === name) return +id;
+    if (n === lookupName || n === name) return +id;
   }
   return null;
 }
@@ -2385,77 +2435,32 @@ async function renderOverlayApiSections(hero, heroId) {
   const itemCatMap = {};
   ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = { cat, tier: item.tier }; }));
 
-  function itemChipHTML(name, extraLabel) {
+  function itemChipHTML(name, extraLabel, rank) {
     const meta = itemCatMap[name];
-    const iconUrl = meta ? itemIconUrl(name, meta.cat) : '';
-    const catColor = meta ? (meta.cat === 'weapon' ? 'var(--weapon)' : meta.cat === 'vitality' ? 'var(--vitality)' : 'var(--spirit)') : 'var(--text3)';
-    return `<div class="ov-item-chip">
-      <div class="ov-item-chip-icon">${iconUrl ? `<img src="${iconUrl}" alt="${name}" onerror="this.style.display='none'">` : ''}</div>
-      <div>
+    const cat = meta?.cat || '';
+    const tier = meta?.tier || 1;
+    const iconUrl = cat ? itemIconUrl(name, cat) : '';
+    const bUrl = cat ? backerUrl(cat, tier) : '';
+    const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text3)';
+    const catLabel = cat ? `${cat.toUpperCase()} T${tier}` : '';
+    const rankHtml = rank != null ? `<div class="ov-item-chip-rank">#${rank}</div>` : '';
+    return `<div class="ov-item-chip" title="${name}">
+      ${rankHtml}
+      <div class="ov-item-chip-icon-wrap">
+        ${bUrl ? `<img class="ov-item-chip-backer" src="${bUrl}" alt="" onerror="this.style.display='none'">` : ''}
+        ${iconUrl ? `<img class="ov-icon-main" src="${iconUrl}" alt="${name}" onerror="this.style.display='none'">` : ''}
+      </div>
+      <div class="ov-item-chip-info">
         <div class="ov-item-chip-name">${name}</div>
-        ${meta ? `<div style="font-size:9px;color:${catColor};font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:1px">${meta.cat} T${meta.tier}</div>` : ''}
+        ${catLabel ? `<div class="ov-item-chip-cat" style="color:${catColor}">${catLabel}</div>` : ''}
       </div>
       ${extraLabel ? `<span class="ov-item-chip-wr">${extraLabel}</span>` : ''}
     </div>`;
   }
 
-  // ── Ability order ──────────────────────────────
+  // ── Most built items — hero_id singular for correct filtering ──
   try {
-    const orderRes = await fetch(`https://api.deadlock-api.com/v1/analytics/ability-order-stats?hero_id=${heroId}&min_average_badge=${badge}`);
-    const orderData = orderRes.ok ? await orderRes.json() : [];
-    const orderEl = document.getElementById('ov-order-content');
-    if (orderEl) {
-      if (orderData && orderData.length) {
-        // Pick order with best win rate (min 50 matches)
-        const best = [...orderData]
-          .filter(o => o.matches >= 50)
-          .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)))[0]
-          || orderData.sort((a,b) => b.matches - a.matches)[0];
-
-        const seq = best.abilities || [];
-
-        // Map ability IDs → slot index by order of first appearance
-        const idToSlot = {};
-        let slotIdx = 1;
-        for (const id of seq) {
-          if (!(id in idToSlot)) {
-            idToSlot[id] = slotIdx++;
-            if (slotIdx > 4) break;
-          }
-        }
-
-        const slotColors = ['','slot-1','slot-2','slot-3','slot-4'];
-        const abilityNames = hero.abilities.map(a => a.name);
-        const wr = Math.round(best.wins / Math.max(best.matches,1) * 100);
-
-        // Compress sequence: show each "level up" for each ability slot
-        // seq is 14 entries (one per upgrade point), show first 14
-        orderEl.innerHTML = `
-          <div class="ov-ability-order">` +
-          seq.slice(0, 14).map((id, i) => {
-            const slot = idToSlot[id] || 1;
-            const abName = abilityNames[slot-1] || slot;
-            return `<div class="ov-order-step" title="${abName}">
-              <div class="ov-order-num">${i+1}</div>
-              <div class="ov-order-ability ${slotColors[slot]}">${slot}</div>
-            </div>${i < 13 ? '<div class="ov-order-sep">›</div>' : ''}`;
-          }).join('') +
-          `</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:10px;font-family:'Share Tech Mono',monospace">
-            ${wr}% WR · ${best.matches.toLocaleString()} matches
-          </div>`;
-      } else {
-        orderEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
-      }
-    }
-  } catch(e) {
-    const el = document.getElementById('ov-order-content');
-    if (el) el.innerHTML = '<span style="color:var(--text3);font-size:12px">Needs HTTPS (use GitHub Pages)</span>';
-  }
-
-  // ── Most purchased items ───────────────────────
-  try {
-    const buildRes = await fetch(`https://api.deadlock-api.com/v1/analytics/build-item-stats?hero_ids=${heroId}&min_average_badge=${badge}`);
+    const buildRes = await fetch(`https://api.deadlock-api.com/v1/analytics/build-item-stats?hero_id=${heroId}&min_average_badge=${badge}`);
     const buildData = buildRes.ok ? await buildRes.json() : [];
     const buildEl = document.getElementById('ov-build-content');
     if (buildEl) {
@@ -2464,11 +2469,10 @@ async function renderOverlayApiSections(hero, heroId) {
           .sort((a,b) => (b.builds||0) - (a.builds||0))
           .slice(0, 10);
         buildEl.innerHTML = `<div class="ov-item-row">` +
-          top10.map(r => {
+          top10.map((r, i) => {
             const name = ITEM_ID_MAP[r.item_id] || null;
             if (!name) return '';
-            const pct = top10[0].builds > 0 ? Math.round(r.builds / top10[0].builds * 100) : 0;
-            return itemChipHTML(name, `${r.builds.toLocaleString()}`);
+            return itemChipHTML(name, '', i + 1);
           }).filter(Boolean).join('') + '</div>';
       } else {
         buildEl.innerHTML = '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
@@ -2490,12 +2494,12 @@ async function renderOverlayApiSections(hero, heroId) {
           .filter(r => r.matches >= 50)
           .sort((a,b) => (b.wins/Math.max(b.matches,1)) - (a.wins/Math.max(a.matches,1)))
           .slice(0, 6);
-        itemsEl.innerHTML = top6.map(r => {
+        itemsEl.innerHTML = top6.map((r, pairIdx) => {
           const names = (r.item_ids || []).map(id => ITEM_ID_MAP[id]).filter(Boolean);
           if (names.length < 2) return '';
           const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
-          return `<div style="margin-bottom:10px">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:6px">${wr}% WR · ${r.matches.toLocaleString()} matches</div>
+          return `<div style="margin-bottom:8px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:4px">#${pairIdx+1} · ${wr}% WR · ${r.matches.toLocaleString()} matches</div>
             <div class="ov-item-row">${names.map(n => itemChipHTML(n, '')).join('')}</div>
           </div>`;
         }).filter(Boolean).join('') || '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
@@ -2991,7 +2995,9 @@ async function mergeLiveData() {
     liveHeroes.forEach(h => { if (h.name) heroApiMap[h.name] = h; });
 
     HEROES.forEach(hero => {
-      const live = heroApiMap[hero.name];
+      // API uses "The Doorman", our array uses "Doorman"
+      const apiName = hero.name === 'Doorman' ? 'The Doorman' : hero.name;
+      const live = heroApiMap[apiName];
       if (!live?.starting_stats) return;
       const s = live.starting_stats;
       if (s.max_health?.value)      hero.stats.hp  = Math.round(s.max_health.value).toString();
