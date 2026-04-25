@@ -844,7 +844,7 @@
     padding: 12px 20px;
     flex-shrink: 0;
     flex-basis: auto;
-    max-height: 290px;
+    max-height: 310px;
     overflow: hidden;
     border-bottom: 2px solid var(--border2);
   }
@@ -887,7 +887,7 @@
 
   /* Data sections — no scroll, 2-col grid */
   .sidebar-body {
-    padding: 8px 16px;
+    padding: 6px 16px;
     flex: 1;
     overflow: hidden;
     display: grid;
@@ -930,22 +930,33 @@
     background: var(--bg4);
   }
   .brief-hero-icon {
-    width: 22px;
-    height: 28px;
+    width: 30px;
+    height: 36px;
     flex-shrink: 0;
-    border-radius: 2px;
+    border-radius: 3px;
     overflow: hidden;
     position: relative;
     background: var(--bg4);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
   }
   .brief-hero-icon img {
     position: absolute;
     inset: 0;
     width: 100%;
-    height: 160%;
+    height: 170%;
     object-fit: cover;
     object-position: top center;
+  }
+  .brief-item-icon {
+    width: 30px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg4);
+    border: 1px solid var(--border2);
   }
   .brief-name {
     font-family: 'Barlow Condensed', sans-serif;
@@ -973,19 +984,6 @@
     font-family: 'Share Tech Mono', monospace;
     font-size: 11px;
     padding: 12px 0;
-  }
-  .brief-item-icon {
-    width: 18px;
-    height: 22px;
-    border-radius: 2px;
-    overflow: hidden;
-    position: relative;
-    flex-shrink: 0;
-    background: var(--bg4);
-  }
-  .brief-item-icon img {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: contain; padding: 1px;
   }
 
   /* Table — RIGHT side, secondary */
@@ -1027,6 +1025,117 @@
   }
   .trends-sub-btn:hover { color: var(--text); border-color: var(--border2); }
   .trends-sub-btn.active { background: var(--bg4); color: var(--accent); border-color: var(--accent2); }
+
+  .trends-view-tabs {
+    display: flex;
+    gap: 2px;
+    margin-left: 8px;
+  }
+  .trends-view-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: none;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .trends-view-btn:hover { color: var(--text); border-color: var(--border2); }
+  .trends-view-btn.active { background: var(--bg4); color: var(--accent); border-color: var(--accent2); }
+
+  /* Leaderboard */
+  .leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 24px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  .lb-row:hover { background: var(--bg3); }
+  .lb-rank {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--text3);
+    width: 32px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .lb-rank.top { color: var(--accent); font-weight: 700; }
+  .lb-portrait {
+    width: 38px;
+    height: 38px;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: top center;
+    flex-shrink: 0;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+  }
+  .lb-name-wrap { flex: 1; min-width: 0; }
+  .lb-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #e8f0fa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lb-tags {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 1px;
+  }
+  .lb-pos {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    width: 40px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+  .lb-stat {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    width: 60px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .lb-stat.dim { color: var(--text3); }
+  .lb-wr {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    width: 60px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .lb-wr.good { color: #40e870; }
+  .lb-wr.bad  { color: #ff5555; }
+  .lb-wr.mid  { color: var(--text2); }
+  .lb-item-icon-lb {
+    width: 30px;
+    height: 36px;
+    position: relative;
+    flex-shrink: 0;
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+  }
+  .lb-item-icon-lb img.lb-backer { position:absolute;inset:0;width:100%;height:100%;object-fit:cover; }
+  .lb-item-icon-lb img.lb-icon { position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:2px; }
 
   .trends-sort-wrap {
     display: flex;
@@ -1379,7 +1488,11 @@
         <button class="trends-sub-btn active" data-trend="heroes">Hero</button>
         <button class="trends-sub-btn" data-trend="items">Item</button>
       </div>
-      <div class="trends-sort-wrap">
+      <div class="trends-view-tabs">
+        <button class="trends-view-btn active" data-view="table" title="Table view">Table</button>
+        <button class="trends-view-btn" data-view="leaderboard" title="Leaderboard view">Leaderboard</button>
+      </div>
+      <div class="trends-sort-wrap" id="trends-sort-wrap">
         <span class="trends-sort-label">Sort</span>
         <button class="trends-sort-btn active" data-sort="pick_delta">Pick Δ</button>
         <button class="trends-sort-btn" data-sort="pick_rate">Pick %</button>
@@ -3177,7 +3290,7 @@ let trendSortAsc = false;
 
 async function loadTrends(force = false) {
   if (trendsLoading) return;
-  if (trendsCache && !force) { renderTrends(); generateBrief(); return; }
+  if (trendsCache && !force) { renderTrendsView(); generateBrief(); return; }
 
   trendsLoading = true;
   const statusEl = document.getElementById('trends-status');
@@ -3219,7 +3332,7 @@ async function loadTrends(force = false) {
 
   trendsLoading = false;
   document.getElementById('trends-refresh-btn').disabled = false;
-  renderTrends();
+  renderTrendsView();
   generateBrief();
 }
 
@@ -3244,19 +3357,22 @@ function processHeroTrends(heroData) {
     rows.sort((a, b) => a.bucket - b.bucket);
     if (rows.length < 2) return;
 
-    // Use two most recent buckets for clean week-on-week delta
+    // Use oldest vs newest for pick/win delta (shows 4-week trend clearly)
+    const prev = rows[0];
     const curr = rows[rows.length - 1];
-    const prev = rows[rows.length - 2];
+    // Use two most recent for rank change only (less noisy)
+    const prevRecent = rows[rows.length - 2];
 
     const prevTotal = bucketTotals[prev.bucket] || 1;
     const currTotal = bucketTotals[curr.bucket] || 1;
+    const prevRecentTotal = bucketTotals[prevRecent.bucket] || 1;
 
     const prevPick = prev.matches / prevTotal;
     const currPick = curr.matches / currTotal;
     const prevWin  = prev.wins / Math.max(prev.matches, 1);
     const currWin  = curr.wins / Math.max(curr.matches, 1);
+    const prevRecentPick = prevRecent.matches / prevRecentTotal;
 
-    // Normalise API name "The Doorman" to our display name "Doorman"
     const name = (HERO_ID_MAP[+heroId] || '').replace('The Doorman', 'Doorman');
     if (!name) return;
 
@@ -3268,7 +3384,7 @@ function processHeroTrends(heroData) {
       win_rate: currWin,
       win_delta: currWin - prevWin,
       matches: curr.matches,
-      _prevPick: prevPick, // used for rank change calculation
+      _prevPick: prevRecentPick, // use recent bucket for rank change
     });
   });
 
@@ -3510,6 +3626,100 @@ function renderTrends() {
 }
 
 // META BRIEF
+let activeTrendView = 'table'; // 'table' or 'leaderboard'
+
+function renderLeaderboard() {
+  if (!trendsCache) return;
+  const { heroData, itemData } = trendsCache;
+  const body = document.getElementById('trends-body');
+  const sortWrap = document.getElementById('trends-sort-wrap');
+  if (sortWrap) sortWrap.style.opacity = '0.3';
+
+  const isHero = activeTrendSection === 'heroes';
+  const rows = isHero
+    ? processHeroTrends(heroData).filter(r => r.matches >= 20)
+    : processItemTrends(itemData).filter(r => r.matches >= 30);
+
+  rows.sort((a,b) => b.pick_rate - a.pick_rate);
+
+  if (isHero) {
+    let html = '<div class="leaderboard">';
+    rows.forEach((r, i) => {
+      const rank = i + 1;
+      const portrait = PORTRAITS[r.name] || '';
+      const hero = HEROES.find(h => h.name === r.name);
+      const tags = hero ? (hero.tags || []).join(' · ') : '';
+      const rc = r.rank_change || 0;
+      const rcHtml = rc === 0
+        ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
+        : rc > 0
+          ? `<span style="color:#40e870;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:700">▲${rc}</span>`
+          : `<span style="color:#ff5555;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:700">▼${Math.abs(rc)}</span>`;
+      const wr = Math.round(r.win_rate * 100);
+      const wrClass = wr >= 53 ? 'good' : wr <= 47 ? 'bad' : 'mid';
+      html += `<div class="lb-row">
+        <div class="lb-rank${rank <= 3 ? ' top' : ''}">#${rank}</div>
+        ${portrait ? `<img class="lb-portrait" src="${portrait}" alt="${r.name}" onerror="this.style.display='none'">` : '<div class="lb-portrait"></div>'}
+        <div class="lb-name-wrap">
+          <div class="lb-name">${r.name}</div>
+          ${tags ? `<div class="lb-tags">${tags}</div>` : ''}
+        </div>
+        <div class="lb-pos">${rcHtml}</div>
+        <div class="lb-stat">${Math.round(r.pick_rate * 100)}%<span style="color:var(--text3);font-size:10px;margin-left:3px">pick</span></div>
+        <div class="lb-wr ${wrClass}">${wr}%<span style="color:var(--text3);font-size:10px;margin-left:3px">WR</span></div>
+      </div>`;
+    });
+    html += '</div>';
+    body.innerHTML = html;
+  } else {
+    const itemCatMap = {};
+    ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = {cat, tier: item.tier}; }));
+    let html = '<div class="leaderboard">';
+    rows.slice(0, 60).forEach((r, i) => {
+      const rank = i + 1;
+      const meta = itemCatMap[r.name];
+      const cat = meta?.cat || '';
+      const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
+      const bUrl = meta ? backerUrl(cat, meta.tier) : '';
+      const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : 'var(--spirit)';
+      const rc = r.rank_change || 0;
+      const rcHtml = rc === 0
+        ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
+        : rc > 0
+          ? `<span style="color:#40e870;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:700">▲${rc}</span>`
+          : `<span style="color:#ff5555;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:700">▼${Math.abs(rc)}</span>`;
+      const wr = Math.round(r.win_rate * 100);
+      const wrClass = wr >= 53 ? 'good' : wr <= 47 ? 'bad' : 'mid';
+      html += `<div class="lb-row">
+        <div class="lb-rank${rank <= 3 ? ' top' : ''}">#${rank}</div>
+        <div class="lb-item-icon-lb">
+          ${bUrl ? `<img class="lb-backer" src="${bUrl}" onerror="this.style.display='none'">` : ''}
+          ${iconUrl ? `<img class="lb-icon" src="${iconUrl}" onerror="this.style.display='none'">` : ''}
+        </div>
+        <div class="lb-name-wrap">
+          <div class="lb-name">${r.name}</div>
+          ${cat ? `<div class="lb-tags" style="color:${catColor}">${cat.toUpperCase()} T${meta.tier}</div>` : ''}
+        </div>
+        <div class="lb-pos">${rcHtml}</div>
+        <div class="lb-stat">${Math.round(r.pick_rate * 100)}%<span style="color:var(--text3);font-size:10px;margin-left:3px">pick</span></div>
+        <div class="lb-wr ${wrClass}">${wr}%<span style="color:var(--text3);font-size:10px;margin-left:3px">WR</span></div>
+      </div>`;
+    });
+    html += '</div>';
+    body.innerHTML = html;
+  }
+}
+
+function renderTrendsView() {
+  if (activeTrendView === 'leaderboard') {
+    renderLeaderboard();
+  } else {
+    renderTrends();
+    const sortWrap = document.getElementById('trends-sort-wrap');
+    if (sortWrap) sortWrap.style.opacity = '1';
+  }
+}
+
 function generateBrief() {
   if (!trendsCache) return;
   const { heroData, itemData } = trendsCache;
@@ -3529,18 +3739,23 @@ function generateBrief() {
       <div class="brief-hero-icon">
         ${portrait ? `<img src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
       </div>
-      <span class="brief-name">${r.name}</span>
+      <span class="brief-name" style="color:var(--text)">${r.name}</span>
       ${valHtml}
     </div>`;
   }
 
   function itemRowHTML(r, valHtml) {
-    const hero = null;
     const cat = (() => { for (const c of ['weapon','vitality','spirit']) { if (ITEMS[c].find(i=>i.name===r.name)) return c; } return ''; })();
     const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
+    const itemObj = cat ? ITEMS[cat].find(i=>i.name===r.name) : null;
+    const bUrl = itemObj ? backerUrl(cat, itemObj.tier) : '';
+    const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text3)';
     return `<div class="brief-row">
-      <div class="brief-item-icon">${iconUrl ? `<img src="${iconUrl}" alt="">` : ''}</div>
-      <span class="brief-name">${r.name}</span>
+      <div class="brief-item-icon">
+        ${bUrl ? `<img style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" src="${bUrl}" onerror="this.style.display='none'">` : ''}
+        ${iconUrl ? `<img style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:2px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))" src="${iconUrl}" onerror="this.style.display='none'">` : ''}
+      </div>
+      <span class="brief-name" style="color:${catColor}">${r.name}</span>
       ${valHtml}
     </div>`;
   }
@@ -3679,13 +3894,26 @@ document.querySelectorAll('.trends-sub-btn').forEach(btn => {
     activeTrendSection = btn.dataset.trend;
     document.querySelectorAll('.trends-sub-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    if (trendsCache) renderTrends();
+    if (trendsCache) renderTrendsView();
+  });
+});
+
+// VIEW TOGGLE (table / leaderboard)
+document.querySelectorAll('.trends-view-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeTrendView = btn.dataset.view;
+    document.querySelectorAll('.trends-view-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const sortWrap = document.getElementById('trends-sort-wrap');
+    if (sortWrap) sortWrap.style.opacity = activeTrendView === 'leaderboard' ? '0.3' : '1';
+    if (trendsCache) renderTrendsView();
   });
 });
 
 // TRENDS SORT BUTTONS
 document.querySelectorAll('.trends-sort-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    if (activeTrendView === 'leaderboard') return; // sort disabled in leaderboard
     const sort = btn.dataset.sort;
     if (activeTrendSort === sort) { trendSortAsc = !trendSortAsc; }
     else { activeTrendSort = sort; trendSortAsc = false; }
