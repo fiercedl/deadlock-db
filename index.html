@@ -897,7 +897,8 @@
     align-content: start;
     min-height: 0;
   }
-  .brief-section { margin-bottom: 6px; }
+  .brief-section { margin-bottom: 4px; }
+  .brief-row { display: flex; align-items: center; gap: 6px; padding: 1px 0; }
   .brief-section-label {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 10px;
@@ -914,12 +915,6 @@
   .brief-section-label.contested{ color: var(--weapon); }
   .brief-section-label.items    { color: var(--spirit); }
 
-  .brief-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 2px 0;
-  }
   .brief-portrait {
     width: 22px;
     height: 22px;
@@ -3739,7 +3734,7 @@ function generateBrief() {
       <div class="brief-hero-icon">
         ${portrait ? `<img src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
       </div>
-      <span class="brief-name" style="color:var(--text)">${r.name}</span>
+      <span class="brief-name" style="color:var(--accent)">${r.name}</span>
       ${valHtml}
     </div>`;
   }
