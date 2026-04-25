@@ -856,10 +856,10 @@
   .summary-output { display: none; }
   .summary-output.visible { display: block; }
   .summary-sentence {
-    font-size: 17px;
+    font-size: 15px;
     color: var(--text);
-    line-height: 1.75;
-    padding: 12px 0;
+    line-height: 1.6;
+    padding: 8px 0;
     border-bottom: 1px solid var(--border);
   }
   .summary-sentence:first-child { padding-top: 0; }
@@ -887,12 +887,12 @@
 
   /* Data sections — no scroll, 2-col grid */
   .sidebar-body {
-    padding: 10px 20px;
+    padding: 8px 16px;
     flex: 1;
     overflow: hidden;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 16px;
+    column-gap: 12px;
     row-gap: 0;
     align-content: start;
     min-height: 0;
@@ -3244,8 +3244,9 @@ function processHeroTrends(heroData) {
     rows.sort((a, b) => a.bucket - b.bucket);
     if (rows.length < 2) return;
 
-    const prev = rows[0];
+    // Use two most recent buckets for clean week-on-week delta
     const curr = rows[rows.length - 1];
+    const prev = rows[rows.length - 2];
 
     const prevTotal = bucketTotals[prev.bucket] || 1;
     const currTotal = bucketTotals[curr.bucket] || 1;
@@ -3255,7 +3256,8 @@ function processHeroTrends(heroData) {
     const prevWin  = prev.wins / Math.max(prev.matches, 1);
     const currWin  = curr.wins / Math.max(curr.matches, 1);
 
-    const name = HERO_ID_MAP[+heroId];
+    // Normalise API name "The Doorman" to our display name "Doorman"
+    const name = (HERO_ID_MAP[+heroId] || '').replace('The Doorman', 'Doorman');
     if (!name) return;
 
     results.push({
@@ -3293,32 +3295,21 @@ function processItemTrends(itemData) {
     byItem[row.item_id].push(row);
   });
 
-  // Build item-specific bucket totals from matches_per_bucket
-  // (item matches_per_bucket is on a different scale to hero bucket totals)
-  const itemBucketTotals = window.__itemBucketTotals__ || {};
-
-  // Compute fresh if not already set
-  if (Object.keys(itemBucketTotals).length === 0) {
-    itemData.forEach(row => {
-      const b = row.bucket;
-      if (!itemBucketTotals[b] || row.matches_per_bucket > itemBucketTotals[b])
-        itemBucketTotals[b] = row.matches_per_bucket;
-    });
-  }
-
-  // Fallback to hero totals if item totals still unavailable
-  const heroBucketTotals = window.__heroBucketTotals__ || {};
+  // Items share the same hero bucket totals for normalisation
+  // since matches_per_bucket in item data may not be populated
+  const bucketTotals = window.__heroBucketTotals__ || {};
 
   const results = [];
   Object.entries(byItem).forEach(([itemId, rows]) => {
     rows.sort((a, b) => a.bucket - b.bucket);
     if (rows.length < 2) return;
 
-    const prev = rows[0];
+    // Use only the two most recent buckets to avoid distortion from new items
     const curr = rows[rows.length - 1];
+    const prev = rows[rows.length - 2];
 
-    const prevTotal = itemBucketTotals[prev.bucket] || heroBucketTotals[prev.bucket] || 1;
-    const currTotal = itemBucketTotals[curr.bucket] || heroBucketTotals[curr.bucket] || 1;
+    const prevTotal = bucketTotals[prev.bucket] || 1;
+    const currTotal = bucketTotals[curr.bucket] || 1;
 
     const prevPick = prev.matches / prevTotal;
     const currPick = curr.matches / currTotal;
@@ -3328,11 +3319,15 @@ function processItemTrends(itemData) {
     const name = ITEM_ID_MAP[+itemId];
     if (!name) return;
 
+    // Cap relative delta at ±50% to prevent outliers from dominating
+    const raw_delta = prevPick > 0 ? (currPick - prevPick) / prevPick : 0;
+    const pick_delta_rel = Math.max(-0.5, Math.min(0.5, raw_delta));
+
     results.push({
       id: +itemId,
       name,
       pick_rate: currPick,
-      pick_delta: currPick - prevPick,
+      pick_delta: pick_delta_rel,
       win_rate: currWin,
       win_delta: currWin - prevWin,
       matches: curr.matches,
@@ -3518,17 +3513,6 @@ function renderTrends() {
 function generateBrief() {
   if (!trendsCache) return;
   const { heroData, itemData } = trendsCache;
-
-  // Must run processHeroTrends first to populate __heroBucketTotals__
-  // Then compute item-specific bucket totals before processing items
-  const itemBucketTotals = {};
-  itemData.forEach(row => {
-    const b = row.bucket;
-    if (!itemBucketTotals[b] || row.matches_per_bucket > itemBucketTotals[b])
-      itemBucketTotals[b] = row.matches_per_bucket;
-  });
-  window.__itemBucketTotals__ = itemBucketTotals;
-
   const heroRows = processHeroTrends(heroData).filter(r => r.matches >= 20);
   const itemRows = processItemTrends(itemData).filter(r => r.matches >= 30);
 
