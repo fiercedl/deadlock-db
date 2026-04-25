@@ -841,11 +841,12 @@
 
   /* Summary — big, readable, dominant */
   .sidebar-summary-wrap {
-    padding: 16px 20px;
+    padding: 12px 20px;
     flex-shrink: 0;
-    border-bottom: 2px solid var(--border2);
-    max-height: 44%;
+    flex-basis: auto;
+    max-height: 290px;
     overflow: hidden;
+    border-bottom: 2px solid var(--border2);
   }
   .summary-placeholder {
     color: var(--text3);
@@ -896,14 +897,14 @@
     align-content: start;
     min-height: 0;
   }
-  .brief-section { margin-bottom: 8px; }
+  .brief-section { margin-bottom: 6px; }
   .brief-section-label {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     padding-bottom: 2px;
     border-bottom: 1px solid var(--border);
   }
@@ -917,7 +918,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 3px 0;
+    padding: 2px 0;
   }
   .brief-portrait {
     width: 22px;
@@ -929,10 +930,10 @@
     background: var(--bg4);
   }
   .brief-hero-icon {
-    width: 28px;
-    height: 34px;
+    width: 22px;
+    height: 28px;
     flex-shrink: 0;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
     position: relative;
     background: var(--bg4);
@@ -948,7 +949,7 @@
   }
   .brief-name {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text);
     flex: 1;
@@ -1084,10 +1085,13 @@
   .trends-table td:first-child {
     width: 180px;
   }
-  .trends-table th:nth-child(2), .trends-table td:nth-child(2),
+  .trends-table th:nth-child(2), .trends-table td:nth-child(2) {
+    width: 60px;
+  }
   .trends-table th:nth-child(3), .trends-table td:nth-child(3),
   .trends-table th:nth-child(4), .trends-table td:nth-child(4),
-  .trends-table th:nth-child(5), .trends-table td:nth-child(5) {
+  .trends-table th:nth-child(5), .trends-table td:nth-child(5),
+  .trends-table th:nth-child(6), .trends-table td:nth-child(6) {
     width: 100px;
   }
   .trends-table th:last-child,
@@ -3274,7 +3278,8 @@ function processHeroTrends(heroData) {
   currRanked.forEach((r,i) => {
     const currRank = i + 1;
     const prevRank = prevRankMap[r.id] || currRank;
-    r.rank_change = prevRank - currRank; // positive = moved up, negative = moved down
+    const raw = prevRank - currRank;
+    r.rank_change = Math.abs(raw) > 10 ? 0 : raw; // cap noise
     r.curr_rank = currRank;
   });
 
@@ -3288,18 +3293,32 @@ function processItemTrends(itemData) {
     byItem[row.item_id].push(row);
   });
 
-  const bucketTotals = window.__heroBucketTotals__ || {};
+  // Build item-specific bucket totals from matches_per_bucket
+  // (item matches_per_bucket is on a different scale to hero bucket totals)
+  const itemBucketTotals = window.__itemBucketTotals__ || {};
+
+  // Compute fresh if not already set
+  if (Object.keys(itemBucketTotals).length === 0) {
+    itemData.forEach(row => {
+      const b = row.bucket;
+      if (!itemBucketTotals[b] || row.matches_per_bucket > itemBucketTotals[b])
+        itemBucketTotals[b] = row.matches_per_bucket;
+    });
+  }
+
+  // Fallback to hero totals if item totals still unavailable
+  const heroBucketTotals = window.__heroBucketTotals__ || {};
 
   const results = [];
   Object.entries(byItem).forEach(([itemId, rows]) => {
     rows.sort((a, b) => a.bucket - b.bucket);
     if (rows.length < 2) return;
 
-    const prev = rows[0]; // oldest week in window
-    const curr = rows[rows.length - 1]; // most recent week
+    const prev = rows[0];
+    const curr = rows[rows.length - 1];
 
-    const prevTotal = bucketTotals[prev.bucket] || 1;
-    const currTotal = bucketTotals[curr.bucket] || 1;
+    const prevTotal = itemBucketTotals[prev.bucket] || heroBucketTotals[prev.bucket] || 1;
+    const currTotal = itemBucketTotals[curr.bucket] || heroBucketTotals[curr.bucket] || 1;
 
     const prevPick = prev.matches / prevTotal;
     const currPick = curr.matches / currTotal;
@@ -3402,6 +3421,19 @@ function renderTrends() {
   } else {
     // Items
     rows = processItemTrends(itemData);
+
+    // Compute item rank changes (by pick rate)
+    const itemsSortedByPickNow = [...rows].sort((a,b) => b.pick_rate - a.pick_rate);
+    const itemsSortedByPickPrev = [...rows].sort((a,b) => (b.pick_rate - b.pick_delta) - (a.pick_rate - a.pick_delta));
+    const itemPrevRankMap = {};
+    itemsSortedByPickPrev.forEach((r,i) => { itemPrevRankMap[r.id] = i + 1; });
+    itemsSortedByPickNow.forEach((r,i) => {
+      const currRank = i + 1;
+      const prevRank = itemPrevRankMap[r.id] || currRank;
+      const raw = prevRank - currRank;
+      r.rank_change = Math.abs(raw) > 10 ? 0 : raw; // cap at 10, zero out noise
+    });
+
     rows.sort((a, b) => {
       const av = a[activeTrendSort] ?? 0;
       const bv = b[activeTrendSort] ?? 0;
@@ -3416,9 +3448,10 @@ function renderTrends() {
     });
 
     let html = `<table class="trends-table">
-      <colgroup><col><col><col><col><col><col></colgroup>
+      <colgroup><col><col style="width:60px"><col><col><col><col><col></colgroup>
       <thead><tr>
         <th>Item</th>
+        <th class="num" style="width:60px">Pos</th>
         <th class="num" data-col="pick_delta">Pick Δ</th>
         <th class="num" data-col="pick_rate">Pick %</th>
         <th class="num" data-col="win_rate">Win %</th>
@@ -3430,7 +3463,6 @@ function renderTrends() {
       const cat = itemCatMap[r.name] || '';
       const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text3)';
       const catLabel = cat ? `<span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${catColor};text-transform:uppercase;font-weight:600;display:block;margin-top:1px;line-height:1">${cat}</span>` : '';
-      // Item icon using existing CDN functions
       const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
       const backerU = cat ? (() => { const itemObj = ITEMS[cat]?.find(i => i.name === r.name); return itemObj ? backerUrl(cat, itemObj.tier) : ''; })() : '';
       const iconHtml = iconUrl ? `
@@ -3444,11 +3476,18 @@ function renderTrends() {
         const presence = (ps.picks / proStats.totalMatches * 100).toFixed(0);
         proHtml = `<span class="pro-badge">PRO</span><span class="pro-note">${presence}% presence</span>`;
       }
+      const rc = r.rank_change || 0;
+      const rcHtml = rc === 0
+        ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
+        : rc > 0
+          ? `<span style="color:#40e870;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▲${rc}</span>`
+          : `<span style="color:#ff5555;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▼${Math.abs(rc)}</span>`;
       html += `<tr>
         <td><div class="trend-name-cell">
           ${iconHtml}
           <div><div class="trend-name">${r.name}</div>${catLabel}</div>
         </div></td>
+        <td class="num">${rcHtml}</td>
         <td class="num">${fmtDelta(r.pick_delta)}</td>
         <td class="num">${fmtPct(r.pick_rate)}</td>
         <td class="num">${fmtPct(r.win_rate)}</td>
@@ -3479,6 +3518,17 @@ function renderTrends() {
 function generateBrief() {
   if (!trendsCache) return;
   const { heroData, itemData } = trendsCache;
+
+  // Must run processHeroTrends first to populate __heroBucketTotals__
+  // Then compute item-specific bucket totals before processing items
+  const itemBucketTotals = {};
+  itemData.forEach(row => {
+    const b = row.bucket;
+    if (!itemBucketTotals[b] || row.matches_per_bucket > itemBucketTotals[b])
+      itemBucketTotals[b] = row.matches_per_bucket;
+  });
+  window.__itemBucketTotals__ = itemBucketTotals;
+
   const heroRows = processHeroTrends(heroData).filter(r => r.matches >= 20);
   const itemRows = processItemTrends(itemData).filter(r => r.matches >= 30);
 
@@ -3491,15 +3541,11 @@ function generateBrief() {
 
   function heroRowHTML(r, valHtml) {
     const portrait = PORTRAITS[r.name] || '';
-    const rc = r.rank_change || 0;
-    const rcHtml = rc === 0 ? '' : rc > 0
-      ? `<span style="color:#40e870;font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;margin-right:2px">▲${rc}</span>`
-      : `<span style="color:#ff5555;font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;margin-right:2px">▼${Math.abs(rc)}</span>`;
     return `<div class="brief-row">
       <div class="brief-hero-icon">
         ${portrait ? `<img src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
       </div>
-      <span class="brief-name">${rcHtml}${r.name}</span>
+      <span class="brief-name">${r.name}</span>
       ${valHtml}
     </div>`;
   }
