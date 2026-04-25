@@ -925,10 +925,10 @@
     background: var(--bg4);
   }
   .brief-hero-icon {
-    width: 30px;
-    height: 36px;
+    width: 24px;
+    height: 30px;
     flex-shrink: 0;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
     position: relative;
     background: var(--bg4);
@@ -944,10 +944,10 @@
     object-position: top center;
   }
   .brief-item-icon {
-    width: 30px;
-    height: 36px;
+    width: 24px;
+    height: 30px;
     flex-shrink: 0;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
     position: relative;
     background: var(--bg4);
@@ -1077,7 +1077,7 @@
     background: var(--bg4);
     border: 1px solid var(--border);
   }
-  .lb-name-wrap { flex: 1; min-width: 0; }
+  .lb-name-wrap { flex: 1; min-width: 0; max-width: 300px; }
   .lb-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 17px;
@@ -1096,7 +1096,7 @@
   .lb-pos {
     font-family: 'Share Tech Mono', monospace;
     font-size: 12px;
-    width: 40px;
+    width: 48px;
     flex-shrink: 0;
     text-align: center;
   }
@@ -1104,7 +1104,7 @@
     font-family: 'Share Tech Mono', monospace;
     font-size: 13px;
     color: var(--text);
-    width: 60px;
+    width: 80px;
     flex-shrink: 0;
     text-align: right;
   }
@@ -1112,7 +1112,7 @@
   .lb-wr {
     font-family: 'Share Tech Mono', monospace;
     font-size: 13px;
-    width: 60px;
+    width: 80px;
     flex-shrink: 0;
     text-align: right;
   }
@@ -3638,7 +3638,15 @@ function renderLeaderboard() {
   rows.sort((a,b) => b.pick_rate - a.pick_rate);
 
   if (isHero) {
-    let html = '<div class="leaderboard">';
+    let html = `<div class="leaderboard">
+      <div class="lb-row" style="border-bottom:2px solid var(--border2);padding:6px 24px">
+        <div class="lb-rank"></div>
+        <div style="width:38px;flex-shrink:0"></div>
+        <div class="lb-name-wrap" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Hero</div>
+        <div class="lb-pos" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Pos</div>
+        <div class="lb-stat" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Pick %</div>
+        <div class="lb-wr" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Win %</div>
+      </div>`;
     rows.forEach((r, i) => {
       const rank = i + 1;
       const portrait = PORTRAITS[r.name] || '';
@@ -3734,7 +3742,7 @@ function generateBrief() {
       <div class="brief-hero-icon">
         ${portrait ? `<img src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
       </div>
-      <span class="brief-name" style="color:var(--accent)">${r.name}</span>
+      <span class="brief-name">${r.name}</span>
       ${valHtml}
     </div>`;
   }
@@ -3828,7 +3836,11 @@ function generateSummary() {
   const { rising, falling, dominant, contested, hotItems, coolingItems } = snap;
   const sentences = [];
 
-  function hero(name) { return `<strong>${name}</strong>`; }
+  function hero(name) {
+    const portrait = PORTRAITS[name] || '';
+    const icon = portrait ? `<img src="${portrait}" style="width:14px;height:18px;object-fit:cover;object-position:top center;vertical-align:middle;margin-right:3px;border-radius:2px;border:1px solid var(--border2)" onerror="this.style.display='none'">` : '';
+    return `${icon}<strong>${name}</strong>`;
+  }
   function item(name) { return `<strong>${name}</strong>`; }
   function up(s) { return `<span class="up">${s}</span>`; }
   function dn(s) { return `<span class="down">${s}</span>`; }
