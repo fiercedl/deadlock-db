@@ -1119,6 +1119,70 @@
   .lb-wr.good { color: #40e870; }
   .lb-wr.bad  { color: #ff5555; }
   .lb-wr.mid  { color: var(--text2); }
+
+  /* Column header tooltips */
+  .th-tip {
+    position: relative;
+    cursor: help;
+  }
+  .th-tip::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg4);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+    padding: 5px 8px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+  }
+  .th-tip:hover::after { opacity: 1; }
+
+  /* Leaderboard sort toggle */
+  .lb-sort-wrap {
+    display: flex;
+    gap: 6px;
+    padding: 8px 24px;
+    border-bottom: 1px solid var(--border2);
+    background: var(--bg2);
+  }
+  .lb-sort-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text3);
+    align-self: center;
+    margin-right: 4px;
+  }
+  .lb-sort-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: none;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lb-sort-btn:hover { color: var(--text); border-color: var(--border2); }
+  .lb-sort-btn.active { background: var(--bg4); color: var(--accent); border-color: var(--accent2); }
   .lb-item-icon-lb {
     width: 30px;
     height: 36px;
@@ -3358,9 +3422,9 @@ function processHeroTrends(heroData) {
     // Use two most recent for rank change only (less noisy)
     const prevRecent = rows[rows.length - 2];
 
-    const prevTotal = bucketTotals[prev.bucket] || 1;
-    const currTotal = bucketTotals[curr.bucket] || 1;
-    const prevRecentTotal = bucketTotals[prevRecent.bucket] || 1;
+    const prevTotal = (bucketTotals[prev.bucket] || 1) / 12;
+    const currTotal = (bucketTotals[curr.bucket] || 1) / 12;
+    const prevRecentTotal = (bucketTotals[prevRecent.bucket] || 1) / 12;
 
     const prevPick = prev.matches / prevTotal;
     const currPick = curr.matches / currTotal;
@@ -3482,11 +3546,11 @@ function renderTrends() {
       <colgroup><col><col style="width:60px"><col><col><col><col><col></colgroup>
       <thead><tr>
         <th>Hero</th>
-        <th class="num" style="width:60px">Pos</th>
-        <th class="num sorted${trendSortAsc ? ' asc':''}" data-col="pick_delta">Pick Δ</th>
-        <th class="num" data-col="pick_rate">Pick %</th>
-        <th class="num" data-col="win_rate">Win %</th>
-        <th class="num" data-col="win_delta">Win Δ</th>
+        <th class="num th-tip" style="width:60px" data-tip="Pick rate rank change vs last week">↕ Pos</th>
+        <th class="num th-tip sorted${trendSortAsc ? ' asc':''}" data-col="pick_delta" data-tip="Pick rate change over 4 weeks (percentage points, per game)">Pick Δ</th>
+        <th class="num th-tip" data-col="pick_rate" data-tip="% of Asc+ games this hero appeared in">Pick %</th>
+        <th class="num th-tip" data-col="win_rate" data-tip="Current win rate at Asc+">Win %</th>
+        <th class="num th-tip" data-col="win_delta" data-tip="Win rate change over 4 weeks">Win Δ</th>
         <th>Pro</th>
       </tr></thead><tbody>`;
 
@@ -3557,11 +3621,11 @@ function renderTrends() {
       <colgroup><col><col style="width:60px"><col><col><col><col><col></colgroup>
       <thead><tr>
         <th>Item</th>
-        <th class="num" style="width:60px">Pos</th>
-        <th class="num" data-col="pick_delta">Pick Δ</th>
-        <th class="num" data-col="pick_rate">Pick %</th>
-        <th class="num" data-col="win_rate">Win %</th>
-        <th class="num" data-col="win_delta">Win Δ</th>
+        <th class="num th-tip" style="width:60px" data-tip="Pick rate rank change vs last week">↕ Pos</th>
+        <th class="num th-tip" data-col="pick_delta" data-tip="Relative pick rate change week-on-week (capped ±50%)">Pick Δ</th>
+        <th class="num th-tip" data-col="pick_rate" data-tip="Current pick rate at Asc+">Pick %</th>
+        <th class="num th-tip" data-col="win_rate" data-tip="Current win rate at Asc+">Win %</th>
+        <th class="num th-tip" data-col="win_delta" data-tip="Win rate change week-on-week">Win Δ</th>
         <th>Pro</th>
       </tr></thead><tbody>`;
 
@@ -3622,6 +3686,7 @@ function renderTrends() {
 
 // META BRIEF
 let activeTrendView = 'table'; // 'table' or 'leaderboard'
+let lbSort = 'pick_rate'; // 'pick_rate' or 'win_rate'
 
 function renderLeaderboard() {
   if (!trendsCache) return;
@@ -3635,10 +3700,17 @@ function renderLeaderboard() {
     ? processHeroTrends(heroData).filter(r => r.matches >= 20)
     : processItemTrends(itemData).filter(r => r.matches >= 30);
 
-  rows.sort((a,b) => b.pick_rate - a.pick_rate);
+  rows.sort((a,b) => b[lbSort] - a[lbSort]);
+
+  const sortBar = `<div class="lb-sort-wrap">
+    <span class="lb-sort-label">Rank by</span>
+    <button class="lb-sort-btn${lbSort==='pick_rate'?' active':''}" data-lbsort="pick_rate">Pick Rate <span style="color:var(--text3);font-size:9px">most played</span></button>
+    <button class="lb-sort-btn${lbSort==='win_rate'?' active':''}" data-lbsort="win_rate">Win Rate <span style="color:var(--text3);font-size:9px">strongest</span></button>
+  </div>`;
 
   if (isHero) {
     let html = `<div class="leaderboard">
+      ${sortBar}
       <div class="lb-row" style="border-bottom:2px solid var(--border2);padding:6px 24px">
         <div class="lb-rank"></div>
         <div style="width:38px;flex-shrink:0"></div>
@@ -3677,7 +3749,7 @@ function renderLeaderboard() {
   } else {
     const itemCatMap = {};
     ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = {cat, tier: item.tier}; }));
-    let html = '<div class="leaderboard">';
+    let html = `<div class="leaderboard">${sortBar}`;
     rows.slice(0, 60).forEach((r, i) => {
       const rank = i + 1;
       const meta = itemCatMap[r.name];
@@ -3771,7 +3843,7 @@ function generateBrief() {
 
   // Dominant — highest win rate, pick rate above 2%, max 3
   const dominant = [...heroRows]
-    .filter(r => r.pick_rate >= 0.02)
+    .filter(r => r.pick_rate >= 0.20)
     .sort((a,b) => b.win_rate - a.win_rate)
     .slice(0,3);
 
@@ -3903,6 +3975,14 @@ document.querySelectorAll('.trends-sub-btn').forEach(btn => {
     btn.classList.add('active');
     if (trendsCache) renderTrendsView();
   });
+});
+
+// LEADERBOARD SORT BUTTONS (delegated since they're re-rendered)
+document.getElementById('trends-body').addEventListener('click', e => {
+  const btn = e.target.closest('.lb-sort-btn');
+  if (!btn) return;
+  lbSort = btn.dataset.lbsort;
+  renderLeaderboard();
 });
 
 // VIEW TOGGLE (table / leaderboard)
