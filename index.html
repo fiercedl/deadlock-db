@@ -5,24 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Deadlock — Hero Reference Database</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap');
 
   :root {
-    --bg: #0a0c0f;
-    --bg2: #0f1218;
-    --bg3: #151a22;
-    --bg4: #1c2330;
-    --border: #2a3545;
-    --border2: #3a4a60;
-    --text: #c8d4e0;
-    --text2: #7a90a8;
-    --text3: #4a5f75;
-    --accent: #4a9eff;
-    --accent2: #2a6eb8;
-    --weapon: #e8a040;
-    --spirit: #a060f0;
-    --vitality: #40c860;
-    --melee: #e85040;
+    --bg:      #080a0b;
+    --bg2:     #0d1014;
+    --bg3:     #121619;
+    --bg4:     #191e23;
+    --border:  #1e2428;
+    --border2: #2a3038;
+    --text:    #c5cdd4;
+    --text2:   #6b7a84;
+    --text3:   #3d4d57;
+    --accent:  #c8a96e;
+    --accent2: #8a7048;
+    --weapon:  #e8a040;
+    --spirit:  #a060f0;
+    --vitality:#40c860;
+    --melee:   #e85040;
+    --teal:    #00c8b4;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,35 +31,56 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Barlow', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 15px;
+    font-weight: 500;
     line-height: 1.5;
     min-height: 100vh;
+  }
+
+  /* Subtle grain texture overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
   }
 
   /* HEADER */
   header {
     background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 24px;
+    border-bottom: 1px solid var(--border2);
+    padding: 0 24px;
+    height: 56px;
     display: flex;
     align-items: center;
     gap: 24px;
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: 0 1px 20px rgba(0,200,180,0.05);
   }
 
   .logo {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-weight: 700;
-    font-size: 18px;
-    letter-spacing: 2px;
+    font-size: 20px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--text);
     white-space: nowrap;
   }
-  .logo span { color: var(--text2); font-weight: 400; font-size: 12px; margin-left: 8px; letter-spacing: 1px; }
+  .logo span {
+    color: var(--text3);
+    font-weight: 500;
+    font-size: 11px;
+    margin-left: 10px;
+    letter-spacing: 1.5px;
+    vertical-align: middle;
+  }
 
   .search-wrap {
     flex: 1;
@@ -70,14 +92,18 @@
     background: var(--bg3);
     border: 1px solid var(--border);
     color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-size: 13px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
     padding: 7px 12px 7px 34px;
-    border-radius: 4px;
+    border-radius: 2px;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .search-wrap input:focus { border-color: var(--accent2); }
+  .search-wrap input:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 12px rgba(200,169,110,0.1);
+  }
   .search-wrap input::placeholder { color: var(--text3); }
   .search-clear {
     position: absolute;
@@ -105,32 +131,31 @@
     font-size: 14px;
   }
 
-
-
   .count {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text3);
     white-space: nowrap;
     margin-left: auto;
+    letter-spacing: 1px;
   }
 
   /* TAB NAV */
   .tab-nav {
     display: flex;
     background: var(--bg2);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border2);
     padding: 0 24px;
     gap: 4px;
   }
   .tab-btn {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 1px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--text2);
-    padding: 10px 18px;
+    color: var(--text3);
+    padding: 10px 20px;
     border: none;
     border-bottom: 2px solid transparent;
     background: none;
@@ -138,22 +163,26 @@
     transition: color 0.15s, border-color 0.15s;
     margin-bottom: -1px;
   }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover { color: var(--text2); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    text-shadow: 0 0 12px rgba(200,169,110,0.2);
+  }
 
   /* SUB-TAB NAV (inside Shop) */
   .sub-tab-nav {
     display: flex;
-    background: var(--bg3);
+    background: var(--bg2);
     border-bottom: 1px solid var(--border);
     padding: 0 24px;
     gap: 4px;
   }
   .sub-tab-btn {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--text3);
     padding: 8px 16px;
@@ -230,7 +259,7 @@
     object-fit: contain;
   }
   .shop-col-header-label {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -267,7 +296,7 @@
     z-index: 4;
   }
   .item-tier-header .tier-roman {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 12px;
     font-weight: 700;
     color: var(--text3);
@@ -339,7 +368,7 @@
   }
   /* Fallback initials when icon fails to load */
   .item-tile-initials {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: rgba(255,255,255,0.25);
@@ -357,7 +386,7 @@
     right: 0;
     padding: 3px 4px 3px;
     background: rgba(0,0,0,0.72);
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 10px;
     font-weight: 600;
     color: #fff;
@@ -444,7 +473,7 @@
   }
   .detail-name-block { flex: 1; min-width: 0; }
   .detail-name {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 18px;
     font-weight: 700;
     line-height: 1.1;
@@ -466,7 +495,7 @@
     color: var(--text2);
   }
   .detail-tier-badge {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -478,7 +507,7 @@
     border: 1px solid var(--border);
   }
   .detail-active-badge {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -495,7 +524,7 @@
     border-bottom: 1px solid var(--border);
   }
   .detail-section-label {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -563,7 +592,7 @@
     position: absolute; bottom: 0; left: 0; right: 0;
     padding: 18px 6px 6px;
     background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
     text-transform: uppercase; color: #fff; text-align: center;
     line-height: 1.1; text-shadow: 0 1px 4px rgba(0,0,0,0.9);
@@ -582,7 +611,7 @@
     width: min(900px, 100vw);
     background: var(--bg2); border-left: 1px solid var(--border2);
     display: flex; flex-direction: column; overflow: hidden;
-    box-shadow: -12px 0 40px rgba(0,0,0,0.8);
+    box-shadow: -12px 0 60px rgba(0,0,0,0.9), -1px 0 0 rgba(255,255,255,0.04);
     animation: slideInRight 0.2s ease-out;
   }
   @keyframes slideInRight {
@@ -604,14 +633,14 @@
     height: 100%; display: flex; flex-direction: column; justify-content: space-between;
   }
   .ov-hero-name {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 42px; font-weight: 700;
+    font-family: 'Rajdhani', sans-serif; font-size: 42px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; color: #fff; line-height: 1;
     text-shadow: 0 2px 12px rgba(0,0,0,0.8);
   }
   .ov-hero-weapon { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text2); letter-spacing: 1px; margin-top: 4px; }
   .ov-hero-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
   .ov-tag {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+    font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700;
     letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 2px;
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text2);
   }
@@ -633,7 +662,7 @@
   .ov-body { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
   .ov-section { border-bottom: 1px solid var(--border); padding: 16px 24px; }
   .ov-section-title {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 12px;
   }
   .ov-ability-order { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
@@ -641,7 +670,7 @@
   .ov-order-num { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text3); }
   .ov-order-ability {
     width: 36px; height: 36px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700;
+    font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700;
     border: 2px solid var(--border); color: var(--text2); background: var(--bg4);
   }
   .ov-order-ability.slot-1 { border-color: var(--accent2); color: var(--accent); }
@@ -657,7 +686,7 @@
   }
   .ov-hero-chip:hover { border-color: var(--border2); background: var(--bg4); }
   .ov-hero-chip img { width: 32px; height: 32px; border-radius: 3px; object-fit: cover; object-position: top center; flex-shrink: 0; }
-  .ov-hero-chip-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+  .ov-hero-chip-name { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
   .ov-hero-chip-wr { font-family: 'Share Tech Mono', monospace; font-size: 11px; margin-left: auto; padding-left: 8px; }
   .ov-hero-chip-wr.good { color: #40e870; }
   .ov-hero-chip-wr.bad  { color: #ff5555; }
@@ -705,7 +734,7 @@
     min-width: 0;
   }
   .ov-item-chip-name {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 14px;
     font-weight: 700;
     color: var(--text);
@@ -736,7 +765,7 @@
     font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #fff;
     background: var(--accent2); border-radius: 2px; padding: 1px 5px; flex-shrink: 0;
   }
-  .ov-ability-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; color: #e8f0fa; flex: 1; }
+  .ov-ability-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; color: #e8f0fa; flex: 1; }
   .ov-ability-cd { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text2); }
   .ov-ability-stats {
     display: flex; flex-wrap: wrap; gap: 5px 16px; margin-bottom: 8px;
@@ -751,7 +780,7 @@
   .ov-upgrades { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
   .ov-upgrade { display: flex; gap: 8px; font-size: 13px; line-height: 1.45; align-items: flex-start; }
   .ov-upgrade-tier {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px;
     color: #fff; background: var(--accent2); border-radius: 2px; padding: 1px 5px; flex-shrink: 0; margin-top: 1px;
   }
   .ov-upgrade-text { color: var(--text); font-size: 13px; }
@@ -818,19 +847,20 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 1px 0 20px rgba(0,0,0,0.3);
   }
   .sidebar-header {
-    padding: 16px 20px 10px;
-    border-bottom: 1px solid var(--border);
+    padding: 12px 20px 10px;
+    border-bottom: 1px solid var(--border2);
     flex-shrink: 0;
   }
   .sidebar-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--text3);
+    color: var(--accent);
   }
   .sidebar-date {
     font-family: 'Share Tech Mono', monospace;
@@ -900,7 +930,7 @@
   .brief-section { margin-bottom: 4px; }
   .brief-row { display: flex; align-items: center; gap: 6px; padding: 1px 0; }
   .brief-section-label {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -954,7 +984,7 @@
     border: 1px solid var(--border2);
   }
   .brief-name {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 13px;
     font-weight: 700;
     color: var(--text);
@@ -1005,7 +1035,7 @@
     gap: 2px;
   }
   .trends-sub-btn {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -1019,7 +1049,7 @@
     transition: all 0.15s;
   }
   .trends-sub-btn:hover { color: var(--text); border-color: var(--border2); }
-  .trends-sub-btn.active { background: var(--bg4); color: var(--accent); border-color: var(--accent2); }
+  .trends-sub-btn.active { background: rgba(200,169,110,0.06); color: var(--accent); border-color: var(--accent2); box-shadow: 0 0 8px rgba(255,255,255,0.04); }
 
   .trends-view-tabs {
     display: flex;
@@ -1027,21 +1057,21 @@
     margin-left: 8px;
   }
   .trends-view-btn {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    padding: 5px 12px;
+    padding: 5px 14px;
     border: 1px solid var(--border);
-    border-radius: 3px;
+    border-radius: 2px;
     background: none;
     color: var(--text3);
     cursor: pointer;
     transition: all 0.15s;
   }
   .trends-view-btn:hover { color: var(--text); border-color: var(--border2); }
-  .trends-view-btn.active { background: var(--bg4); color: var(--accent); border-color: var(--accent2); }
+  .trends-view-btn.active { background: rgba(200,169,110,0.06); color: var(--accent); border-color: var(--accent2); box-shadow: 0 0 8px rgba(255,255,255,0.04); }
 
   /* Leaderboard */
   .leaderboard {
@@ -1079,7 +1109,7 @@
   }
   .lb-name-wrap { flex: 1; min-width: 0; max-width: 300px; }
   .lb-name {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 17px;
     font-weight: 700;
     color: #e8f0fa;
@@ -1134,7 +1164,7 @@
     background: var(--bg4);
     border: 1px solid var(--border2);
     color: var(--text);
-    font-family: 'Barlow', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 11px;
     font-weight: 400;
     letter-spacing: 0;
@@ -1158,7 +1188,7 @@
     background: var(--bg2);
   }
   .lb-sort-label {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -1168,7 +1198,7 @@
     margin-right: 4px;
   }
   .lb-sort-btn {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -1210,10 +1240,10 @@
     letter-spacing: 1px;
   }
   .trends-sort-btn {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     padding: 4px 10px;
     border: 1px solid var(--border);
@@ -1223,16 +1253,17 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-  .trends-sort-btn:hover { color: var(--text2); }
-  .trends-sort-btn.active { color: var(--text); border-color: var(--border2); background: var(--bg4); }
+  .trends-sort-btn:hover { color: var(--text2); border-color: var(--border2); }
+  .trends-sort-btn.active { color: var(--accent); border-color: var(--accent2); background: rgba(255,255,255,0.03); }
 
   .trends-status {
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px;
     color: var(--text3);
     white-space: nowrap;
+    letter-spacing: 1px;
   }
-  .trends-status.loading { color: var(--accent2); }
+  .trends-status.loading { color: var(--accent); }
   .trends-status.error { color: #e05050; }
 
   .trends-body {
@@ -1240,7 +1271,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: var(--border2) transparent;
+    scrollbar-color: rgba(200,169,110,0.15) transparent;
   }
 
   /* Table */
@@ -1270,21 +1301,21 @@
     position: sticky;
     top: 0;
     z-index: 5;
-    background: var(--bg3);
-    border-bottom: 2px solid var(--border2);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border2);
     padding: 10px 16px;
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--text2);
+    color: var(--text3);
     text-align: left;
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
   }
-  .trends-table thead th:hover { color: var(--text); }
+  .trends-table thead th:hover { color: var(--text2); }
   .trends-table thead th.sorted { color: var(--accent); }
   .trends-table thead th.sorted::after { content: ' ↓'; }
   .trends-table thead th.sorted.asc::after { content: ' ↑'; }
@@ -1354,7 +1385,7 @@
     padding: 4px;
   }
   .trend-name {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -1391,7 +1422,7 @@
   /* PRO column */
   .pro-badge {
     display: inline-block;
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -1423,22 +1454,33 @@
   .trends-placeholder .big { font-size: 28px; opacity: 0.4; }
 
   .trends-refresh-btn {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    padding: 5px 12px;
+    padding: 5px 14px;
     border: 1px solid var(--border2);
-    border-radius: 3px;
-    background: none;
-    color: var(--text2);
+    border-radius: 2px;
+    background: rgba(255,255,255,0.02);
+    color: var(--accent);
     cursor: pointer;
     transition: all 0.15s;
     flex-shrink: 0;
   }
-  .trends-refresh-btn:hover { color: var(--text); border-color: var(--accent2); }
-  .trends-refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .trends-refresh-btn:hover {
+    background: rgba(200,169,110,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(255,255,255,0.04);
+  }
+  .trends-refresh-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* Teal glow on table row hover */
+  .trends-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .lb-row:hover { background: rgba(255,255,255,0.02); }
+
+  /* Hero tile teal glow on hover */
+  .hero-tile:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,169,110,0.2); }
 </style>
 </head>
 <body>
@@ -1448,13 +1490,14 @@
   <div id="live-data-badge" style="
     font-family:'Share Tech Mono',monospace;
     font-size:10px;
-    padding:3px 8px;
+    padding:3px 10px;
     border-radius:2px;
-    border:1px solid var(--border);
+    border:1px solid rgba(200,169,110,0.15);
     color:var(--text3);
     white-space:nowrap;
-    letter-spacing:0.5px;
-  ">◌ data loading…</div>
+    letter-spacing:1px;
+    background:rgba(255,255,255,0.02);
+  ">◌ loading…</div>
   <div class="search-wrap" id="hero-search-wrap">
     <span class="search-icon">⌕</span>
     <input type="text" id="search" placeholder="Search heroes, abilities, tags…" autocomplete="off">
@@ -3696,94 +3739,132 @@ function renderLeaderboard() {
   if (sortWrap) sortWrap.style.opacity = '0.3';
 
   const isHero = activeTrendSection === 'heroes';
-  const rows = isHero
-    ? processHeroTrends(heroData).filter(r => r.matches >= 20)
-    : processItemTrends(itemData).filter(r => r.matches >= 30);
 
-  rows.sort((a,b) => b[lbSort] - a[lbSort]);
+  const TIERS = [
+    { id: 'S+', label: 'S+', color: '#e8c96e', bg: 'rgba(232,201,110,0.08)', border: 'rgba(232,201,110,0.3)',  minScore: 0.95 },
+    { id: 'S',  label: 'S',  color: '#e87040', bg: 'rgba(232,112,64,0.08)',  border: 'rgba(232,112,64,0.3)',   minScore: 0.82 },
+    { id: 'A',  label: 'A',  color: '#40c860', bg: 'rgba(64,200,96,0.06)',   border: 'rgba(64,200,96,0.2)',    minScore: 0.66 },
+    { id: 'B',  label: 'B',  color: '#4a9eff', bg: 'rgba(74,158,255,0.06)',  border: 'rgba(74,158,255,0.2)',   minScore: 0.50 },
+    { id: 'C',  label: 'C',  color: '#7a90a8', bg: 'rgba(122,144,168,0.04)', border: 'rgba(122,144,168,0.15)', minScore: 0.34 },
+    { id: 'D',  label: 'D',  color: '#e85040', bg: 'rgba(232,80,64,0.04)',   border: 'rgba(232,80,64,0.15)',   minScore: 0    },
+  ];
 
-  const sortBar = `<div class="lb-sort-wrap">
-    <span class="lb-sort-label">Rank by</span>
-    <button class="lb-sort-btn${lbSort==='pick_rate'?' active':''}" data-lbsort="pick_rate">Pick Rate <span style="color:var(--text3);font-size:9px">most played</span></button>
-    <button class="lb-sort-btn${lbSort==='win_rate'?' active':''}" data-lbsort="win_rate">Win Rate <span style="color:var(--text3);font-size:9px">strongest</span></button>
-  </div>`;
+  function computeScore(rows) {
+    const maxPick = Math.max(...rows.map(r => r.pick_rate), 0.001);
+    return rows.map(r => ({
+      ...r,
+      score: r.win_rate * 0.6 + (r.pick_rate / maxPick) * 0.4
+    }));
+  }
+
+  function assignTiers(scored) {
+    const maxScore = Math.max(...scored.map(r => r.score));
+    // Normalise scores relative to max so thresholds are relative
+    const normed = scored.map(r => ({ ...r, normScore: r.score / maxScore }));
+
+    const tierMap = {};
+    TIERS.forEach(t => { tierMap[t.id] = []; });
+
+    normed.forEach(r => {
+      // Find highest tier this hero qualifies for
+      for (const tier of TIERS) {
+        if (r.normScore >= tier.minScore) {
+          // Extra gate for S+: must also have >55% WR
+          if (tier.id === 'S+' && r.win_rate < 0.55) continue;
+          tierMap[tier.id].push(r);
+          break;
+        }
+      }
+    });
+
+    // Remove empty tiers at top (S+ if empty, then S if both empty, etc.)
+    return tierMap;
+  }
 
   if (isHero) {
-    let html = `<div class="leaderboard">
-      ${sortBar}
-      <div class="lb-row" style="border-bottom:2px solid var(--border2);padding:6px 24px">
-        <div class="lb-rank"></div>
-        <div style="width:38px;flex-shrink:0"></div>
-        <div class="lb-name-wrap" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Hero</div>
-        <div class="lb-pos" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Pos</div>
-        <div class="lb-stat" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Pick %</div>
-        <div class="lb-wr" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Win %</div>
-      </div>`;
-    rows.forEach((r, i) => {
-      const rank = i + 1;
-      const portrait = PORTRAITS[r.name] || '';
-      const hero = HEROES.find(h => h.name === r.name);
-      const tags = hero ? (hero.tags || []).join(' · ') : '';
-      const rc = r.rank_change || 0;
-      const rcHtml = rc === 0
-        ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
-        : rc > 0
-          ? `<span style="color:#40e870;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:700">▲${rc}</span>`
-          : `<span style="color:#ff5555;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:700">▼${Math.abs(rc)}</span>`;
-      const wr = Math.round(r.win_rate * 100);
-      const wrClass = wr >= 53 ? 'good' : wr <= 47 ? 'bad' : 'mid';
-      html += `<div class="lb-row">
-        <div class="lb-rank${rank <= 3 ? ' top' : ''}">#${rank}</div>
-        ${portrait ? `<img class="lb-portrait" src="${portrait}" alt="${r.name}" onerror="this.style.display='none'">` : '<div class="lb-portrait"></div>'}
-        <div class="lb-name-wrap">
-          <div class="lb-name">${r.name}</div>
-          ${tags ? `<div class="lb-tags">${tags}</div>` : ''}
+    const rows = processHeroTrends(heroData).filter(r => r.matches >= 20);
+    const scored = computeScore(rows).sort((a,b) => b.score - a.score);
+    const tierMap = assignTiers(scored);
+
+    let html = '<div style="padding:16px 24px">';
+
+    TIERS.forEach(tier => {
+      const heroes = tierMap[tier.id];
+      if (!heroes.length) return; // skip empty tiers
+
+      html += `<div style="display:flex;align-items:stretch;margin-bottom:6px;border:1px solid ${tier.border};border-radius:3px;overflow:hidden;background:var(--bg2)">
+        <div style="width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${tier.bg};border-right:1px solid ${tier.border}">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:${tier.color}">${tier.label}</span>
         </div>
-        <div class="lb-pos">${rcHtml}</div>
-        <div class="lb-stat">${Math.round(r.pick_rate * 100)}%<span style="color:var(--text3);font-size:10px;margin-left:3px">pick</span></div>
-        <div class="lb-wr ${wrClass}">${wr}%<span style="color:var(--text3);font-size:10px;margin-left:3px">WR</span></div>
-      </div>`;
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;align-items:center">`;
+
+      heroes.forEach(r => {
+        const portrait = PORTRAITS[r.name] || '';
+        const wr = Math.round(r.win_rate * 100);
+        const pick = Math.round(r.pick_rate * 100);
+        html += `<div title="${r.name} · ${pick}% pick · ${wr}% WR"
+          onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name}')||HEROES[0])"
+          style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:60px">
+          <div style="width:52px;height:62px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+            ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+          </div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;letter-spacing:0.3px">${r.name}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${wr>=53?'#40c860':wr<=47?'#e85040':'var(--text3)'}">${wr}%</div>
+        </div>`;
+      });
+
+      html += `</div></div>`;
     });
+
     html += '</div>';
     body.innerHTML = html;
+
   } else {
+    // Items tier list
     const itemCatMap = {};
     ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = {cat, tier: item.tier}; }));
-    let html = `<div class="leaderboard">${sortBar}`;
-    rows.slice(0, 60).forEach((r, i) => {
-      const rank = i + 1;
-      const meta = itemCatMap[r.name];
-      const cat = meta?.cat || '';
-      const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
-      const bUrl = meta ? backerUrl(cat, meta.tier) : '';
-      const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : 'var(--spirit)';
-      const rc = r.rank_change || 0;
-      const rcHtml = rc === 0
-        ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
-        : rc > 0
-          ? `<span style="color:#40e870;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:700">▲${rc}</span>`
-          : `<span style="color:#ff5555;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:700">▼${Math.abs(rc)}</span>`;
-      const wr = Math.round(r.win_rate * 100);
-      const wrClass = wr >= 53 ? 'good' : wr <= 47 ? 'bad' : 'mid';
-      html += `<div class="lb-row">
-        <div class="lb-rank${rank <= 3 ? ' top' : ''}">#${rank}</div>
-        <div class="lb-item-icon-lb">
-          ${bUrl ? `<img class="lb-backer" src="${bUrl}" onerror="this.style.display='none'">` : ''}
-          ${iconUrl ? `<img class="lb-icon" src="${iconUrl}" onerror="this.style.display='none'">` : ''}
+
+    const rows = processItemTrends(itemData).filter(r => r.matches >= 30);
+    const scored = computeScore(rows).sort((a,b) => b.score - a.score);
+    const tierMap = assignTiers(scored);
+
+    let html = '<div style="padding:16px 24px">';
+
+    TIERS.forEach(tier => {
+      const items = tierMap[tier.id];
+      if (!items.length) return;
+
+      html += `<div style="display:flex;align-items:stretch;margin-bottom:6px;border:1px solid ${tier.border};border-radius:3px;overflow:hidden;background:var(--bg2)">
+        <div style="width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${tier.bg};border-right:1px solid ${tier.border}">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:${tier.color}">${tier.label}</span>
         </div>
-        <div class="lb-name-wrap">
-          <div class="lb-name">${r.name}</div>
-          ${cat ? `<div class="lb-tags" style="color:${catColor}">${cat.toUpperCase()} T${meta.tier}</div>` : ''}
-        </div>
-        <div class="lb-pos">${rcHtml}</div>
-        <div class="lb-stat">${Math.round(r.pick_rate * 100)}%<span style="color:var(--text3);font-size:10px;margin-left:3px">pick</span></div>
-        <div class="lb-wr ${wrClass}">${wr}%<span style="color:var(--text3);font-size:10px;margin-left:3px">WR</span></div>
-      </div>`;
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;align-items:center">`;
+
+      items.forEach(r => {
+        const meta = itemCatMap[r.name];
+        const cat = meta?.cat || '';
+        const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
+        const bUrl = meta ? backerUrl(cat, meta.tier) : '';
+        const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : 'var(--spirit)';
+        const wr = Math.round(r.win_rate * 100);
+        html += `<div title="${r.name} · ${wr}% WR" style="display:flex;flex-direction:column;align-items:center;gap:3px;width:60px">
+          <div style="width:46px;height:54px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+            ${bUrl ? `<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : ''}
+            ${iconUrl ? `<img src="${iconUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:3px" onerror="this.style.display='none'">` : ''}
+          </div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:${catColor};text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;letter-spacing:0.3px">${r.name}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${wr>=53?'#40c860':wr<=47?'#e85040':'var(--text3)'}">${wr}%</div>
+        </div>`;
+      });
+
+      html += `</div></div>`;
     });
+
     html += '</div>';
     body.innerHTML = html;
   }
 }
+
 
 function renderTrendsView() {
   if (activeTrendView === 'leaderboard') {
