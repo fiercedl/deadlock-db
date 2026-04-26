@@ -416,13 +416,15 @@
 
   /* RIGHT: detail panel */
   .item-detail-panel {
-    width: 280px;
+    width: 300px;
     flex-shrink: 0;
     background: var(--bg2);
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--border2);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
   }
   .item-detail-panel.empty {
     align-items: center;
@@ -432,6 +434,7 @@
     font-size: 11px;
     text-align: center;
     padding: 24px;
+    letter-spacing: 1px;
   }
   .detail-cat-bar { height: 4px; flex-shrink: 0; }
   .weapon-bar { background: var(--weapon); }
@@ -443,17 +446,18 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border2);
+    background: var(--bg3);
   }
   .detail-icon-box {
     width: 64px;
     height: 80px;
     flex-shrink: 0;
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
     position: relative;
-    background: var(--bg3);
-    border: 1px solid var(--border);
+    background: var(--bg4);
+    border: 1px solid var(--border2);
   }
   .detail-icon-backer {
     position: absolute;
@@ -525,12 +529,12 @@
   }
   .detail-section-label {
     font-family: 'Rajdhani', sans-serif;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--text3);
-    margin-bottom: 5px;
+    color: var(--accent);
+    margin-bottom: 6px;
   }
   .detail-stats {
     font-size: 12px;
@@ -1324,7 +1328,9 @@
   .trends-table tbody tr {
     border-bottom: 1px solid var(--border);
     transition: background 0.1s;
+    cursor: pointer;
   }
+  .trends-table tbody tr:hover { background: rgba(200,169,110,0.04); }
   .trends-table tbody tr:hover { background: var(--bg3); }
 
   .trends-table td {
@@ -1528,7 +1534,15 @@
       <img class="ov-header-portrait" id="ov-portrait" src="" alt="">
       <div class="ov-header-content">
         <div>
-          <div class="ov-hero-name" id="ov-name"></div>
+          <div style="display:flex;align-items:baseline;gap:12px">
+            <div class="ov-hero-name" id="ov-name"></div>
+            <button id="ov-trends-btn" onclick="navigateToHeroTrends(document.getElementById('ov-name').textContent)"
+              style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all 0.15s;flex-shrink:0"
+              onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent2)'"
+              onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">
+              Trends ↗
+            </button>
+          </div>
           <div class="ov-hero-weapon" id="ov-weapon"></div>
           <div class="ov-hero-tags" id="ov-tags"></div>
         </div>
@@ -2681,7 +2695,7 @@ async function renderOverlayApiSections(hero, heroId) {
     const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text3)';
     const catLabel = cat ? `${cat.toUpperCase()} T${tier}` : '';
     const rankHtml = rank != null ? `<div class="ov-item-chip-rank">#${rank}</div>` : '';
-    return `<div class="ov-item-chip" title="${name}">
+    return `<div class="ov-item-chip" title="View ${name} in Shop" onclick="navigateToItem('${name.replace(/'/g, "\\'")}')" style="cursor:pointer">
       ${rankHtml}
       <div class="ov-item-chip-icon-wrap">
         ${bUrl ? `<img class="ov-item-chip-backer" src="${bUrl}" alt="" onerror="this.style.display='none'">` : ''}
@@ -3622,7 +3636,7 @@ function renderTrends() {
         : rc > 0
           ? `<span style="color:#40e870;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▲${rc}</span>`
           : `<span style="color:#ff5555;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▼${Math.abs(rc)}</span>`;
-      html += `<tr>
+      html += `<tr style="cursor:pointer" onclick="(function(){const h=HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}');if(h)openHeroOverlay(h);})()">
         <td><div class="trend-name-cell">
           ${portrait ? `<img class="trend-portrait" src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
           <div><div class="trend-name">${r.name}</div><div class="trend-tags">${tags}</div></div>
@@ -4054,7 +4068,83 @@ document.querySelectorAll('.trends-sub-btn').forEach(btn => {
   });
 });
 
-// LEADERBOARD SORT BUTTONS (delegated since they're re-rendered)
+// ── CROSS-TAB NAVIGATION ──────────────────────────────────────────────────────
+
+// Navigate to a tab by name, close overlay first
+function navigateToTab(tabName, callback) {
+  // Always close hero overlay when switching tabs
+  const overlay = document.getElementById('hero-overlay');
+  if (overlay) overlay.classList.remove('active');
+
+  const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+  if (!btn) return;
+  btn.click();
+  if (callback) setTimeout(callback, 150);
+}
+
+// Navigate to Shop tab and open a specific item
+function navigateToItem(itemName) {
+  // Find which category the item belongs to
+  let foundCat = null, foundItem = null;
+  for (const cat of ['weapon', 'vitality', 'spirit']) {
+    const item = ITEMS[cat].find(i => i.name === itemName);
+    if (item) { foundCat = cat; foundItem = item; break; }
+  }
+  if (!foundCat) return;
+
+  navigateToTab('shop', () => {
+    // Switch to correct sub-tab
+    const subBtn = document.querySelector(`.sub-tab-btn[data-subtab="${foundCat}"]`);
+    if (subBtn) subBtn.click();
+
+    setTimeout(() => {
+      // Find and click the item tile
+      const tiles = document.querySelectorAll('.item-tile');
+      for (const tile of tiles) {
+        if (tile.querySelector('.item-tile-name')?.textContent?.trim() === itemName) {
+          tile.click();
+          tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Flash highlight
+          tile.style.outline = '2px solid var(--accent)';
+          setTimeout(() => { tile.style.outline = ''; }, 1500);
+          break;
+        }
+      }
+    }, 200);
+  });
+}
+
+// Navigate to Trends tab and highlight a hero row
+function navigateToHeroTrends(heroName) {
+  navigateToTab('trends', () => {
+    if (!trendsCache) {
+      loadTrends();
+      return;
+    }
+    // Switch to hero table view
+    activeTrendSection = 'heroes';
+    activeTrendView = 'table';
+    document.querySelectorAll('.trends-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.trend === 'heroes'));
+    document.querySelectorAll('.trends-view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'table'));
+    renderTrendsView();
+
+    setTimeout(() => {
+      // Find hero row and highlight
+      const rows = document.querySelectorAll('.trends-table tbody tr');
+      for (const row of rows) {
+        const name = row.querySelector('.trend-name')?.textContent?.trim();
+        if (name === heroName) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.style.background = 'rgba(200,169,110,0.12)';
+          row.style.outline = '1px solid var(--accent2)';
+          setTimeout(() => { row.style.background = ''; row.style.outline = ''; }, 2000);
+          break;
+        }
+      }
+    }, 300);
+  });
+}
+
 document.getElementById('trends-body').addEventListener('click', e => {
   const btn = e.target.closest('.lb-sort-btn');
   if (!btn) return;
