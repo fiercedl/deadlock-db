@@ -3475,6 +3475,12 @@ function processHeroTrends(heroData) {
     const currWin  = curr.wins / Math.max(curr.matches, 1);
     const prevRecentPick = prevRecent.matches / prevRecentTotal;
 
+    // Bayesian WR adjustment — pull heroes with few games toward 50% average
+    // At Asc+, even "low pick" heroes have thousands of games, so weight must be high
+    const BAYES_WEIGHT = 5000;
+    const PRIOR_WR = 0.50;
+    const adjWin = (curr.wins + PRIOR_WR * BAYES_WEIGHT) / (curr.matches + BAYES_WEIGHT);
+
     const name = (HERO_ID_MAP[+heroId] || '').replace('The Doorman', 'Doorman');
     if (!name) return;
 
@@ -3483,10 +3489,11 @@ function processHeroTrends(heroData) {
       name,
       pick_rate: currPick,
       pick_delta: currPick - prevPick,
-      win_rate: currWin,
+      win_rate: adjWin,        // adjusted WR used for tiers and display
+      win_rate_raw: currWin,   // raw WR kept for reference
       win_delta: currWin - prevWin,
       matches: curr.matches,
-      _prevPick: prevRecentPick, // use recent bucket for rank change
+      _prevPick: prevRecentPick,
     });
   });
 
@@ -3740,51 +3747,37 @@ function renderLeaderboard() {
 
   const isHero = activeTrendSection === 'heroes';
 
+  // Tiers based purely on win rate — no pick rate influence
+  // S+ only appears if any hero genuinely clears the bar
   const TIERS = [
-    { id: 'S+', label: 'S+', color: '#e8c96e', bg: 'rgba(232,201,110,0.08)', border: 'rgba(232,201,110,0.3)',  minScore: 0.95 },
-    { id: 'S',  label: 'S',  color: '#e87040', bg: 'rgba(232,112,64,0.08)',  border: 'rgba(232,112,64,0.3)',   minScore: 0.82 },
-    { id: 'A',  label: 'A',  color: '#40c860', bg: 'rgba(64,200,96,0.06)',   border: 'rgba(64,200,96,0.2)',    minScore: 0.66 },
-    { id: 'B',  label: 'B',  color: '#4a9eff', bg: 'rgba(74,158,255,0.06)',  border: 'rgba(74,158,255,0.2)',   minScore: 0.50 },
-    { id: 'C',  label: 'C',  color: '#7a90a8', bg: 'rgba(122,144,168,0.04)', border: 'rgba(122,144,168,0.15)', minScore: 0.34 },
-    { id: 'D',  label: 'D',  color: '#e85040', bg: 'rgba(232,80,64,0.04)',   border: 'rgba(232,80,64,0.15)',   minScore: 0    },
+    { id: 'S+', label: 'S+', color: '#e8c96e', bg: 'rgba(232,201,110,0.08)', border: 'rgba(232,201,110,0.3)',  minWR: 0.57 },
+    { id: 'S',  label: 'S',  color: '#e87040', bg: 'rgba(232,112,64,0.08)',  border: 'rgba(232,112,64,0.3)',   minWR: 0.54 },
+    { id: 'A',  label: 'A',  color: '#40c860', bg: 'rgba(64,200,96,0.06)',   border: 'rgba(64,200,96,0.2)',    minWR: 0.52 },
+    { id: 'B',  label: 'B',  color: '#4a9eff', bg: 'rgba(74,158,255,0.06)',  border: 'rgba(74,158,255,0.2)',   minWR: 0.50 },
+    { id: 'C',  label: 'C',  color: '#7a90a8', bg: 'rgba(122,144,168,0.04)', border: 'rgba(122,144,168,0.15)', minWR: 0.48 },
+    { id: 'D',  label: 'D',  color: '#e85040', bg: 'rgba(232,80,64,0.04)',   border: 'rgba(232,80,64,0.15)',   minWR: 0    },
   ];
 
-  function computeScore(rows) {
-    const maxPick = Math.max(...rows.map(r => r.pick_rate), 0.001);
-    return rows.map(r => ({
-      ...r,
-      score: r.win_rate * 0.6 + (r.pick_rate / maxPick) * 0.4
-    }));
-  }
-
-  function assignTiers(scored) {
-    const maxScore = Math.max(...scored.map(r => r.score));
-    // Normalise scores relative to max so thresholds are relative
-    const normed = scored.map(r => ({ ...r, normScore: r.score / maxScore }));
-
+  function assignTiers(rows) {
     const tierMap = {};
     TIERS.forEach(t => { tierMap[t.id] = []; });
 
-    normed.forEach(r => {
-      // Find highest tier this hero qualifies for
+    rows.forEach(r => {
       for (const tier of TIERS) {
-        if (r.normScore >= tier.minScore) {
-          // Extra gate for S+: must also have >55% WR
-          if (tier.id === 'S+' && r.win_rate < 0.55) continue;
+        if (r.win_rate >= tier.minWR) {
           tierMap[tier.id].push(r);
           break;
         }
       }
     });
 
-    // Remove empty tiers at top (S+ if empty, then S if both empty, etc.)
     return tierMap;
   }
 
   if (isHero) {
     const rows = processHeroTrends(heroData).filter(r => r.matches >= 20);
-    const scored = computeScore(rows).sort((a,b) => b.score - a.score);
-    const tierMap = assignTiers(scored);
+    rows.sort((a,b) => b.win_rate - a.win_rate);
+    const tierMap = assignTiers(rows);
 
     let html = '<div style="padding:16px 24px">';
 
@@ -3801,8 +3794,11 @@ function renderLeaderboard() {
       heroes.forEach(r => {
         const portrait = PORTRAITS[r.name] || '';
         const wr = Math.round(r.win_rate * 100);
+        const rawWr = Math.round((r.win_rate_raw || r.win_rate) * 100);
         const pick = Math.round(r.pick_rate * 100);
-        html += `<div title="${r.name} · ${pick}% pick · ${wr}% WR"
+        const adjusted = Math.abs(wr - rawWr) >= 1;
+        const tip = `${r.name} · ${pick}% pick · ${wr}% WR${adjusted ? ` (raw ${rawWr}% · adjusted for sample size)` : ''}`;
+        html += `<div title="${tip}"
           onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name}')||HEROES[0])"
           style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:60px">
           <div style="width:52px;height:62px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
@@ -3825,8 +3821,8 @@ function renderLeaderboard() {
     ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = {cat, tier: item.tier}; }));
 
     const rows = processItemTrends(itemData).filter(r => r.matches >= 30);
-    const scored = computeScore(rows).sort((a,b) => b.score - a.score);
-    const tierMap = assignTiers(scored);
+    rows.sort((a,b) => b.win_rate - a.win_rate);
+    const tierMap = assignTiers(rows);
 
     let html = '<div style="padding:16px 24px">';
 
