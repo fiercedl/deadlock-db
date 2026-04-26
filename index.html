@@ -4236,14 +4236,39 @@ function generateFullBrief() {
 
   // 8. YOUR HEROES
   if (yourHeroes.length) {
+    const sortedYourHeroes = [...yourHeroes].sort((a, b) => b.win_rate - a.win_rate);
+    const medals = ['🥇','🥈','🥉',''];
     sections.push(`<div class="fb-section">
-      <div class="fb-label">Your Heroes — Bebop / Ivy / Infernus</div>
+      <div class="fb-label">Your Pool</div>
       <div class="fb-text">
-        ${yourHeroes.map(r => {
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:2px">
+        ${sortedYourHeroes.map((r, i) => {
           const trend = r.pick_delta > 0.01 ? '↑ rising' : r.pick_delta < -0.01 ? '↓ falling' : '→ stable';
-          const verdict = r.win_rate >= 0.53 ? 'Strong pick this week.' : r.win_rate <= 0.48 ? 'Struggling — consider whether the meta suits this hero.' : 'Performing around average.';
-          return `${hname(r)}: ${wr(r)}, ${pct(r.pick_rate)} pick, ${trend}. ${verdict}`;
-        }).join('<br>')}
+          const trendColor = r.pick_delta > 0.01 ? '#40e870' : r.pick_delta < -0.01 ? '#ff5555' : '#8ab0c0';
+          const wrColor = r.win_rate >= 0.53 ? '#40c860' : r.win_rate <= 0.47 ? '#ff5555' : '#e0e8f0';
+          const verdict = r.win_rate >= 0.53 ? 'Strong pick this week.' : r.win_rate <= 0.48 ? 'Watch matchups.' : 'Performing around average.';
+          const verdictColor = r.win_rate >= 0.53 ? '#40c860' : r.win_rate <= 0.48 ? '#ff9955' : '#8ab0c0';
+          const medal = medals[i] || '';
+          const portrait = PORTRAITS[r.name] || '';
+          const portraitHtml = portrait ? `<img src="${portrait}" style="width:28px;height:36px;object-fit:cover;object-position:top;border-radius:2px;flex-shrink:0;border:1px solid var(--border2)" onerror="this.style.display='none'">` : '';
+          return `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px">
+            ${portraitHtml}
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <strong style="font-size:15px;color:#e8f0f8">${medal} ${r.name}</strong>
+                <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:${wrColor};font-weight:700">${pct(r.win_rate)} WR</span>
+              </div>
+              <div style="font-size:12px;margin-top:1px">
+                <span style="font-family:'Share Tech Mono',monospace;color:#9ab8c8">${pct(r.pick_rate)} pick</span>
+                <span style="margin:0 4px;color:#4a5a64">·</span>
+                <span style="color:${trendColor}">${trend}</span>
+                <span style="margin:0 4px;color:#4a5a64">·</span>
+                <span style="color:${verdictColor}">${verdict}</span>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+        </div>
       </div>
     </div>`);
   }
