@@ -953,6 +953,8 @@
     border-right: 1px solid var(--border2);
     border-bottom: 1px solid var(--border2);
     break-inside: avoid;
+    overflow: hidden;
+    min-width: 0;
   }
   .fb-section:nth-child(4n) { border-right: none; }
   .fb-section:nth-last-child(-n+4) { border-bottom: none; }
@@ -1063,7 +1065,7 @@
   }
   .brief-val.up      { color: #40e870; }
   .brief-val.down    { color: #ff5555; }
-  .brief-val.neutral { color: var(--text2); }
+  .brief-val.neutral { color: #d0dae0; }
   .brief-val.warn    { color: var(--weapon); }
 
   .brief-placeholder {
@@ -1200,7 +1202,7 @@
     flex-shrink: 0;
     text-align: right;
   }
-  .lb-stat.dim { color: var(--text3); }
+  .lb-stat.dim { color: var(--text2); }
   .lb-wr {
     font-family: 'Share Tech Mono', monospace;
     font-size: 13px;
@@ -1210,7 +1212,7 @@
   }
   .lb-wr.good { color: #40e870; }
   .lb-wr.bad  { color: #ff5555; }
-  .lb-wr.mid  { color: var(--text2); }
+  .lb-wr.mid  { color: var(--text); }
 
   /* Column header tooltips */
   .th-tip {
@@ -3892,7 +3894,7 @@ function renderLeaderboard() {
             ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
           </div>
           <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;letter-spacing:0.3px">${r.name}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${wr>=53?'#40c860':wr<=47?'#e85040':'var(--text3)'}">${wr}%</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${wr>=53?'#40c860':wr<=47?'#e85040':'var(--text)'}">${wr}%</div>
         </div>`;
       });
 
@@ -4092,7 +4094,7 @@ function generateFullBrief() {
   const yourHeroes = YOUR_HEROES.map(name => heroRows.find(r => r.name === name)).filter(Boolean);
 
   function pct(v) { return Math.round(v * 100) + '%'; }
-  function wr(r) { return `<span style="color:${r.win_rate>=0.53?'#40c860':r.win_rate<=0.47?'#ff5555':'var(--text2)'}">${pct(r.win_rate)} WR</span>`; }
+  function wr(r) { return `<span style="color:${r.win_rate>=0.53?'#40c860':r.win_rate<=0.47?'#ff5555':'var(--text)'}">${pct(r.win_rate)} WR</span>`; }
   function hname(r) {
     const portrait = PORTRAITS[r.name] || '';
     const icon = portrait ? `<img src="${portrait}" style="width:13px;height:16px;object-fit:cover;object-position:top;vertical-align:middle;border-radius:1px;margin-right:3px;border:1px solid var(--border2)" onerror="this.style.display='none'">` : '';
@@ -4206,16 +4208,28 @@ function generateFullBrief() {
     <div class="fb-label">Item Meta</div>
     <div class="fb-text">
       <div style="margin-bottom:10px">
-        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-weight:700">Highest WR</div>
-        <div style="display:flex;flex-wrap:wrap">${itemsByWR.slice(0,4).map(r => `${itemChipBrief(r.name)}<span style="color:#40c860;font-size:13px;margin-right:8px">${pct(r.win_rate)}</span>`).join('')}</div>
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;font-weight:700">Highest WR</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${itemsByWR.slice(0,4).map(r => `<div style="display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:3px 8px 3px 3px;white-space:nowrap">
+          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:'')})()} </span>
+          <strong style="color:${catColor(['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name))||'weapon')};font-size:15px">${r.name}</strong>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#40c860;margin-left:2px">${pct(r.win_rate)}</span>
+        </div>`).join('')}</div>
       </div>
       <div style="margin-bottom:10px">
-        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-weight:700">Rising</div>
-        <div style="display:flex;flex-wrap:wrap">${itemsRising.map(r => `${itemChipBrief(r.name)}<span style="color:#40c860;font-size:13px;margin-right:8px">${deltaStr(r)}</span>`).join('')}</div>
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;font-weight:700">Rising</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${itemsRising.map(r => `<div style="display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:3px 8px 3px 3px;white-space:nowrap">
+          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:'')})()} </span>
+          <strong style="color:${catColor(['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name))||'weapon')};font-size:15px">${r.name}</strong>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#40c860;margin-left:2px">${deltaStr(r)}</span>
+        </div>`).join('')}</div>
       </div>
       <div>
-        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-weight:700">Falling</div>
-        <div style="display:flex;flex-wrap:wrap">${itemsFalling.map(r => `${itemChipBrief(r.name)}<span style="color:#ff5555;font-size:13px;margin-right:8px">${deltaStr(r)}</span>`).join('')}</div>
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;font-weight:700">Falling</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${itemsFalling.map(r => `<div style="display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:3px 8px 3px 3px;white-space:nowrap">
+          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:'')})()} </span>
+          <strong style="color:${catColor(['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name))||'weapon')};font-size:15px">${r.name}</strong>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#ff5555;margin-left:2px">${deltaStr(r)}</span>
+        </div>`).join('')}</div>
       </div>
     </div>
   </div>`);
