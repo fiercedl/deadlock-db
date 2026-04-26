@@ -3872,11 +3872,11 @@ function renderLeaderboard() {
       const heroes = tierMap[tier.id];
       if (!heroes.length) return; // skip empty tiers
 
-      html += `<div style="display:flex;align-items:stretch;margin-bottom:6px;border:1px solid ${tier.border};border-radius:3px;overflow:hidden;background:var(--bg2)">
-        <div style="width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${tier.bg};border-right:1px solid ${tier.border}">
-          <span style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:${tier.color}">${tier.label}</span>
+      html += `<div style="display:flex;align-items:stretch;margin-bottom:4px;border:1px solid ${tier.border};border-radius:3px;overflow:hidden;background:var(--bg2)">
+        <div style="width:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${tier.bg};border-right:1px solid ${tier.border}">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:${tier.color}">${tier.label}</span>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;align-items:center">`;
+        <div style="display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;align-items:center">`;
 
       heroes.forEach(r => {
         const portrait = PORTRAITS[r.name] || '';
@@ -3887,11 +3887,11 @@ function renderLeaderboard() {
         const tip = `${r.name} · ${pick}% pick · ${wr}% WR${adjusted ? ` (raw ${rawWr}% · adjusted for sample size)` : ''}`;
         html += `<div title="${tip}"
           onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name}')||HEROES[0])"
-          style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:60px">
-          <div style="width:52px;height:62px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+          style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
+          <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
             ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
           </div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;letter-spacing:0.3px">${r.name}</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;letter-spacing:0.3px">${r.name}</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${wr>=53?'#40c860':wr<=47?'#e85040':'var(--text3)'}">${wr}%</div>
         </div>`;
       });
@@ -3903,48 +3903,13 @@ function renderLeaderboard() {
     body.innerHTML = html;
 
   } else {
-    // Items tier list
-    const itemCatMap = {};
-    ['weapon','vitality','spirit'].forEach(cat => ITEMS[cat].forEach(item => { itemCatMap[item.name] = {cat, tier: item.tier}; }));
-
-    const rows = processItemTrends(itemData).filter(r => r.matches >= 30);
-    rows.sort((a,b) => b.win_rate - a.win_rate);
-    const tierMap = assignTiers(rows);
-
-    let html = '<div style="padding:16px 24px">';
-
-    TIERS.forEach(tier => {
-      const items = tierMap[tier.id];
-      if (!items.length) return;
-
-      html += `<div style="display:flex;align-items:stretch;margin-bottom:6px;border:1px solid ${tier.border};border-radius:3px;overflow:hidden;background:var(--bg2)">
-        <div style="width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${tier.bg};border-right:1px solid ${tier.border}">
-          <span style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:${tier.color}">${tier.label}</span>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;align-items:center">`;
-
-      items.forEach(r => {
-        const meta = itemCatMap[r.name];
-        const cat = meta?.cat || '';
-        const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
-        const bUrl = meta ? backerUrl(cat, meta.tier) : '';
-        const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : 'var(--spirit)';
-        const wr = Math.round(r.win_rate * 100);
-        html += `<div title="${r.name} · ${wr}% WR" style="display:flex;flex-direction:column;align-items:center;gap:3px;width:60px">
-          <div style="width:46px;height:54px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
-            ${bUrl ? `<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : ''}
-            ${iconUrl ? `<img src="${iconUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:3px" onerror="this.style.display='none'">` : ''}
-          </div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:${catColor};text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;letter-spacing:0.3px">${r.name}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${wr>=53?'#40c860':wr<=47?'#e85040':'var(--text3)'}">${wr}%</div>
-        </div>`;
-      });
-
-      html += `</div></div>`;
-    });
-
-    html += '</div>';
-    body.innerHTML = html;
+    // Items don't have a tier list — redirect to table which is more meaningful
+    activeTrendView = 'table';
+    document.querySelectorAll('.trends-view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'table'));
+    const sortWrap = document.getElementById('trends-sort-wrap');
+    if (sortWrap) sortWrap.style.opacity = '1';
+    renderTrends();
+    return;
   }
 }
 
@@ -4222,12 +4187,36 @@ function generateFullBrief() {
   }
 
   // 7. ITEM META
+  function itemChipBrief(name) {
+    const cat = ['weapon','vitality','spirit'].find(c => ITEMS[c].find(i=>i.name===name));
+    if (!cat) return `<strong>${name}</strong>`;
+    const itemObj = ITEMS[cat].find(i=>i.name===name);
+    const iconUrl = itemIconUrl(name, cat);
+    const bUrl = itemObj ? backerUrl(cat, itemObj.tier) : '';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 4px 2px 0;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:2px 6px 2px 2px;white-space:nowrap">
+      <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">
+        ${bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:``}
+        ${iconUrl?`<img src="${iconUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:``}
+      </span>
+      <strong style="color:${catColor(cat)};font-size:15px">${name}</strong>
+    </span>`;
+  }
+
   sections.push(`<div class="fb-section">
     <div class="fb-label">Item Meta</div>
     <div class="fb-text">
-      Highest WR items: ${itemsByWR.slice(0,3).map(r => `${iname(r.name)} <span style="color:#40c860">${pct(r.win_rate)}</span>`).join(', ')}.<br>
-      Rising picks: ${itemsRising.map(r => `${iname(r.name)} ${deltaStr(r)}`).join(', ')}.<br>
-      Falling: ${itemsFalling.map(r => `${iname(r.name)} ${deltaStr(r)}`).join(', ')}.
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-weight:700">Highest WR</div>
+        <div style="display:flex;flex-wrap:wrap">${itemsByWR.slice(0,4).map(r => `${itemChipBrief(r.name)}<span style="color:#40c860;font-size:13px;margin-right:8px">${pct(r.win_rate)}</span>`).join('')}</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-weight:700">Rising</div>
+        <div style="display:flex;flex-wrap:wrap">${itemsRising.map(r => `${itemChipBrief(r.name)}<span style="color:#40c860;font-size:13px;margin-right:8px">${deltaStr(r)}</span>`).join('')}</div>
+      </div>
+      <div>
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-weight:700">Falling</div>
+        <div style="display:flex;flex-wrap:wrap">${itemsFalling.map(r => `${itemChipBrief(r.name)}<span style="color:#ff5555;font-size:13px;margin-right:8px">${deltaStr(r)}</span>`).join('')}</div>
+      </div>
     </div>
   </div>`);
 
