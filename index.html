@@ -203,7 +203,7 @@
 
   
 
-  .tab-panel { display: none; }
+  .tab-panel { display: none; position: relative; }
   .tab-panel.active { display: block; }
   .sub-tab-panel { display: none; }
   .sub-tab-panel.active { display: block; }
@@ -1651,6 +1651,16 @@
 </div>
 
 <div class="tab-panel" id="tab-trends">
+  <!-- Full Brief overlay — covers the table area -->
+  <div id="full-brief-overlay" style="display:none;position:absolute;top:0;right:0;bottom:0;width:calc(100% - 420px);background:var(--bg2);border-left:1px solid var(--border2);z-index:20;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent">
+    <div style="padding:20px 28px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border2)">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent)">Full Meta Brief</div>
+        <button onclick="toggleFullBrief()" style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕ Close</button>
+      </div>
+      <div id="full-brief-content">—</div>
+    </div>
+  </div>
   <div class="trends-layout">
     <div class="trends-toolbar">
       <div class="trends-sub-tabs">
@@ -1685,10 +1695,6 @@
             <button id="summary-btn" onclick="toggleFullBrief()">⊞ Full Brief</button>
           </div>
         </div>
-        <!-- Full Brief panel — hidden by default -->
-        <div id="full-brief-panel" style="display:none;flex:1;overflow-y:auto;padding:16px 20px;border-top:1px solid var(--border2);scrollbar-width:thin;scrollbar-color:var(--border2) transparent">
-          <div id="full-brief-content" style="color:var(--text3);font-family:'Share Tech Mono',monospace;font-size:11px">—</div>
-        </div>
         <div class="sidebar-body" id="sidebar-body">
           <div class="brief-placeholder">—</div>
         </div>
@@ -1701,6 +1707,7 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 
 
@@ -4051,14 +4058,12 @@ function generateBrief() {
 let fullBriefOpen = false;
 
 function toggleFullBrief() {
-  const panel = document.getElementById('full-brief-panel');
+  const overlay = document.getElementById('full-brief-overlay');
   const btn = document.getElementById('summary-btn');
-  const body = document.getElementById('sidebar-body');
-  if (!panel) return;
+  if (!overlay) return;
 
   fullBriefOpen = !fullBriefOpen;
-  panel.style.display = fullBriefOpen ? 'block' : 'none';
-  body.style.display = fullBriefOpen ? 'none' : 'grid';
+  overlay.style.display = fullBriefOpen ? 'block' : 'none';
   btn.classList.toggle('active', fullBriefOpen);
   btn.textContent = fullBriefOpen ? '⊟ Close Brief' : '⊞ Full Brief';
 
@@ -4109,7 +4114,7 @@ function generateFullBrief() {
   const domCat = catAvg[0];
 
   // Your heroes
-  const YOUR_HEROES = ['Bebop', 'Ivy', 'Infernus'];
+  const YOUR_HEROES = ['Bebop', 'Ivy', 'Infernus', 'Mina'];
   const yourHeroes = YOUR_HEROES.map(name => heroRows.find(r => r.name === name)).filter(Boolean);
 
   function pct(v) { return Math.round(v * 100) + '%'; }
@@ -4121,8 +4126,21 @@ function generateFullBrief() {
   }
   function iname(name) {
     const cat = ['weapon','vitality','spirit'].find(c => ITEMS[c].find(i=>i.name===name));
-    const catColor = cat==='weapon'?'var(--weapon)':cat==='vitality'?'var(--vitality)':'var(--spirit)';
-    return `<strong style="color:${catColor}">${name}</strong>`;
+    if (!cat) return `<strong>${name}</strong>`;
+    const itemObj = ITEMS[cat].find(i=>i.name===name);
+    const iconUrl = itemIconUrl(name, cat);
+    const bUrl = itemObj ? backerUrl(cat, itemObj.tier) : '';
+    const icon = `<span style="display:inline-block;width:16px;height:20px;position:relative;vertical-align:middle;border-radius:2px;overflow:hidden;margin-right:3px;border:1px solid rgba(255,255,255,0.1)">
+      ${bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:``}
+      ${iconUrl?`<img src="${iconUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:``}
+    </span>`;
+    return `${icon}<strong style="color:${catColor(cat)}">${name}</strong>`;
+  }
+  function catLabel(cat) {
+    return cat === 'weapon' ? 'Gun' : cat === 'vitality' ? 'Vitality' : 'Spirit';
+  }
+  function catColor(cat) {
+    return cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : 'var(--spirit)';
   }
   function deltaStr(r) {
     const d = Math.round(r.pick_delta * 100);
@@ -4139,7 +4157,7 @@ function generateFullBrief() {
     <div class="fb-text">
       ${hname(headlineMover)} is the biggest mover this week with ${deltaStr(headlineMover)} pick — now at ${pct(headlineMover.pick_rate)} of games.
       ${hname(headlineFaller)} is shedding the most picks at ${deltaStr(headlineFaller)}.
-      The dominant category by item WR is <strong style="color:${domCat.cat==='weapon'?'var(--weapon)':domCat.cat==='vitality'?'var(--vitality)':'var(--spirit)'}">${domCat.cat.toUpperCase()}</strong> at ${pct(domCat.avg)} average WR across all ${domCat.cat} items.
+      The dominant category by item WR is <strong style="color:${catColor(domCat.cat)}">${catLabel(domCat.cat)}</strong> at ${pct(domCat.avg)} average WR across all ${catLabel(domCat.cat).toLowerCase()} items.
     </div>
   </div>`);
 
