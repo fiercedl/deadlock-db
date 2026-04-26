@@ -925,21 +925,52 @@
   .summary-sentence .down { color: #ff5555; font-weight: 700; }
   .summary-sentence .warn { color: var(--weapon); font-weight: 700; }
   .summary-refresh {
-    display: none;
-    margin-top: 12px;
-    text-align: right;
+    padding: 6px 20px 8px;
+    flex-shrink: 0;
   }
   .summary-refresh.visible { display: block; }
   .summary-refresh button {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
     color: var(--text3);
     background: none;
-    border: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 3px 10px;
     cursor: pointer;
-    transition: color 0.15s;
+    transition: all 0.15s;
+    width: 100%;
   }
-  .summary-refresh button:hover { color: var(--text2); }
+  .summary-refresh button:hover { color: var(--accent); border-color: var(--accent2); }
+  .summary-refresh button.active { color: var(--accent); border-color: var(--accent2); background: rgba(200,169,110,0.06); }
+
+  /* Full brief */
+  .fb-section {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .fb-section:last-child { border-bottom: none; margin-bottom: 0; }
+  .fb-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .fb-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.65;
+  }
+  .fb-text strong { font-weight: 700; color: #fff; }
 
   /* Data sections — no scroll, 2-col grid */
   .sidebar-body {
@@ -1651,8 +1682,12 @@
             <div class="summary-placeholder">Loading…</div>
           </div>
           <div class="summary-refresh" id="summary-refresh">
-            <button id="summary-btn">↺ refresh summary</button>
+            <button id="summary-btn" onclick="toggleFullBrief()">⊞ Full Brief</button>
           </div>
+        </div>
+        <!-- Full Brief panel — hidden by default -->
+        <div id="full-brief-panel" style="display:none;flex:1;overflow-y:auto;padding:16px 20px;border-top:1px solid var(--border2);scrollbar-width:thin;scrollbar-color:var(--border2) transparent">
+          <div id="full-brief-content" style="color:var(--text3);font-family:'Share Tech Mono',monospace;font-size:11px">—</div>
         </div>
         <div class="sidebar-body" id="sidebar-body">
           <div class="brief-placeholder">—</div>
@@ -4013,6 +4048,179 @@ function generateBrief() {
   generateSummary();
 }
 
+let fullBriefOpen = false;
+
+function toggleFullBrief() {
+  const panel = document.getElementById('full-brief-panel');
+  const btn = document.getElementById('summary-btn');
+  const body = document.getElementById('sidebar-body');
+  if (!panel) return;
+
+  fullBriefOpen = !fullBriefOpen;
+  panel.style.display = fullBriefOpen ? 'block' : 'none';
+  body.style.display = fullBriefOpen ? 'none' : 'grid';
+  btn.classList.toggle('active', fullBriefOpen);
+  btn.textContent = fullBriefOpen ? '⊟ Close Brief' : '⊞ Full Brief';
+
+  if (fullBriefOpen && trendsCache) {
+    generateFullBrief();
+  }
+}
+
+function generateFullBrief() {
+  const el = document.getElementById('full-brief-content');
+  if (!el || !trendsCache) return;
+
+  const { heroData, itemData } = trendsCache;
+  const heroRows = processHeroTrends(heroData).filter(r => r.matches >= 20);
+  const itemRows = processItemTrends(itemData).filter(r => r.matches >= 30 && r.pick_rate >= 0.05);
+
+  const maxPick = Math.max(...heroRows.map(r => r.pick_rate));
+
+  // Sort helpers
+  const byWR = [...heroRows].sort((a,b) => b.win_rate - a.win_rate);
+  const byPickDelta = [...heroRows].sort((a,b) => b.pick_delta - a.pick_delta);
+  const byPickDeltaDown = [...heroRows].sort((a,b) => a.pick_delta - b.pick_delta);
+  const byPick = [...heroRows].sort((a,b) => b.pick_rate - a.pick_rate);
+
+  // Key data points
+  const top3WR = byWR.slice(0,3);
+  const top3Pick = byPick.slice(0,3);
+  const rising = byPickDelta.filter(r => r.pick_delta > 0).slice(0,3);
+  const falling = byPickDeltaDown.filter(r => r.pick_delta < 0).slice(0,3);
+  const traps = [...heroRows].filter(r => r.pick_rate > maxPick * 0.4 && r.win_rate < 0.50).sort((a,b) => a.win_rate - b.win_rate).slice(0,2);
+  const hidden = byWR.filter(r => r.pick_rate < maxPick * 0.3).slice(0,2);
+
+  // Item data
+  const itemsByWR = [...itemRows].sort((a,b) => b.win_rate - a.win_rate);
+  const itemsRising = [...itemRows].sort((a,b) => b.pick_delta - a.pick_delta).slice(0,3);
+  const itemsFalling = [...itemRows].sort((a,b) => a.pick_delta - b.pick_delta).slice(0,3);
+
+  // Category breakdown
+  const catWR = { weapon:[], vitality:[], spirit:[] };
+  itemRows.forEach(r => {
+    for (const cat of ['weapon','vitality','spirit']) {
+      if (ITEMS[cat].find(i => i.name === r.name)) { catWR[cat].push(r.win_rate); break; }
+    }
+  });
+  const catAvg = Object.entries(catWR).map(([cat, wrs]) => ({
+    cat, avg: wrs.length ? wrs.reduce((a,b)=>a+b,0)/wrs.length : 0
+  })).sort((a,b) => b.avg - a.avg);
+  const domCat = catAvg[0];
+
+  // Your heroes
+  const YOUR_HEROES = ['Bebop', 'Ivy', 'Infernus'];
+  const yourHeroes = YOUR_HEROES.map(name => heroRows.find(r => r.name === name)).filter(Boolean);
+
+  function pct(v) { return Math.round(v * 100) + '%'; }
+  function wr(r) { return `<span style="color:${r.win_rate>=0.53?'#40c860':r.win_rate<=0.47?'#ff5555':'var(--text2)'}">${pct(r.win_rate)} WR</span>`; }
+  function hname(r) {
+    const portrait = PORTRAITS[r.name] || '';
+    const icon = portrait ? `<img src="${portrait}" style="width:13px;height:16px;object-fit:cover;object-position:top;vertical-align:middle;border-radius:1px;margin-right:3px;border:1px solid var(--border2)" onerror="this.style.display='none'">` : '';
+    return `${icon}<strong>${r.name}</strong>`;
+  }
+  function iname(name) {
+    const cat = ['weapon','vitality','spirit'].find(c => ITEMS[c].find(i=>i.name===name));
+    const catColor = cat==='weapon'?'var(--weapon)':cat==='vitality'?'var(--vitality)':'var(--spirit)';
+    return `<strong style="color:${catColor}">${name}</strong>`;
+  }
+  function deltaStr(r) {
+    const d = Math.round(r.pick_delta * 100);
+    return d > 0 ? `<span style="color:#40c860">+${d}%</span>` : `<span style="color:#ff5555">${d}%</span>`;
+  }
+
+  const sections = [];
+
+  // 1. META OVERVIEW
+  const headlineMover = byPickDelta[0];
+  const headlineFaller = byPickDeltaDown[0];
+  sections.push(`<div class="fb-section">
+    <div class="fb-label">Meta Overview</div>
+    <div class="fb-text">
+      ${hname(headlineMover)} is the biggest mover this week with ${deltaStr(headlineMover)} pick — now at ${pct(headlineMover.pick_rate)} of games.
+      ${hname(headlineFaller)} is shedding the most picks at ${deltaStr(headlineFaller)}.
+      The dominant category by item WR is <strong style="color:${domCat.cat==='weapon'?'var(--weapon)':domCat.cat==='vitality'?'var(--vitality)':'var(--spirit)'}">${domCat.cat.toUpperCase()}</strong> at ${pct(domCat.avg)} average WR across all ${domCat.cat} items.
+    </div>
+  </div>`);
+
+  // 2. HEROES TO PLAY
+  sections.push(`<div class="fb-section">
+    <div class="fb-label">Heroes to Play</div>
+    <div class="fb-text">
+      ${top3WR.map((r,i) => `${i+1}. ${hname(r)} — ${wr(r)}, ${pct(r.pick_rate)} pick${r.pick_rate < maxPick*0.25 ? ' <span style="color:var(--text3);font-size:10px">(niche, specialist-favoured)</span>' : ''}.`).join('<br>')}
+    </div>
+  </div>`);
+
+  // 3. HEROES TO AVOID
+  if (traps.length) {
+    sections.push(`<div class="fb-section">
+      <div class="fb-label">Trap Heroes — High Pick, Low WR</div>
+      <div class="fb-text">
+        ${traps.map(r => `${hname(r)} is heavily picked at ${pct(r.pick_rate)} but only winning ${wr(r)}. Most players would be better off on something else.`).join('<br>')}
+      </div>
+    </div>`);
+  }
+
+  // 4. RISING THREATS
+  if (rising.length) {
+    sections.push(`<div class="fb-section">
+      <div class="fb-label">Rising This Week</div>
+      <div class="fb-text">
+        ${rising.map(r => `${hname(r)} up ${deltaStr(r)} pick — ${wr(r)}.`).join('<br>')}
+        ${rising.some(r=>r.win_rate>=0.52) ? 'Worth learning now before these become must-bans.' : 'Pick rate climbing but WR not yet confirming — watch this space.'}
+      </div>
+    </div>`);
+  }
+
+  // 5. FALLING — potential buys
+  if (falling.length) {
+    sections.push(`<div class="fb-section">
+      <div class="fb-label">Falling From Favour</div>
+      <div class="fb-text">
+        ${falling.map(r => `${hname(r)} down ${deltaStr(r)} — ${wr(r)}.`).join('<br>')}
+        ${falling.filter(r=>r.win_rate>=0.51).length ? 'Some of these still have solid WR — may be underrated right now.' : 'WR confirms the decline.'}
+      </div>
+    </div>`);
+  }
+
+  // 6. HIDDEN GEMS
+  if (hidden.length) {
+    sections.push(`<div class="fb-section">
+      <div class="fb-label">Low Pick, High Performance</div>
+      <div class="fb-text">
+        ${hidden.map(r => `${hname(r)} at only ${pct(r.pick_rate)} pick but ${wr(r)}.`).join('<br>')}
+        Low pick means opponents won't be prepped against these.
+      </div>
+    </div>`);
+  }
+
+  // 7. ITEM META
+  sections.push(`<div class="fb-section">
+    <div class="fb-label">Item Meta</div>
+    <div class="fb-text">
+      Highest WR items: ${itemsByWR.slice(0,3).map(r => `${iname(r.name)} <span style="color:#40c860">${pct(r.win_rate)}</span>`).join(', ')}.<br>
+      Rising picks: ${itemsRising.map(r => `${iname(r.name)} ${deltaStr(r)}`).join(', ')}.<br>
+      Falling: ${itemsFalling.map(r => `${iname(r.name)} ${deltaStr(r)}`).join(', ')}.
+    </div>
+  </div>`);
+
+  // 8. YOUR HEROES
+  if (yourHeroes.length) {
+    sections.push(`<div class="fb-section">
+      <div class="fb-label">Your Heroes — Bebop / Ivy / Infernus</div>
+      <div class="fb-text">
+        ${yourHeroes.map(r => {
+          const trend = r.pick_delta > 0.01 ? '↑ rising' : r.pick_delta < -0.01 ? '↓ falling' : '→ stable';
+          const verdict = r.win_rate >= 0.53 ? 'Strong pick this week.' : r.win_rate <= 0.48 ? 'Struggling — consider whether the meta suits this hero.' : 'Performing around average.';
+          return `${hname(r)}: ${wr(r)}, ${pct(r.pick_rate)} pick, ${trend}. ${verdict}`;
+        }).join('<br>')}
+      </div>
+    </div>`);
+  }
+
+  el.innerHTML = sections.join('');
+}
+
 function generateSummary() {
   const snap = window.__briefSnapshot__;
   if (!snap) return;
@@ -4080,7 +4288,7 @@ function generateSummary() {
   if (refresh) refresh.classList.add('visible');
 }
 
-document.getElementById('summary-btn').addEventListener('click', generateSummary);
+  // Full brief button handled via onclick in HTML
 
 // TRENDS TAB SWITCHING
 document.querySelectorAll('.trends-sub-btn').forEach(btn => {
@@ -4108,22 +4316,21 @@ function navigateToTab(tabName, callback) {
 
 // Navigate to Shop tab and open a specific item
 function navigateToItem(itemName) {
-  let foundCat = null, foundItem = null;
+  let foundCat = null;
   for (const cat of ['weapon', 'vitality', 'spirit']) {
-    const item = ITEMS[cat].find(i => i.name === itemName);
-    if (item) { foundCat = cat; foundItem = item; break; }
+    if (ITEMS[cat].find(i => i.name === itemName)) { foundCat = cat; break; }
   }
   if (!foundCat) return;
 
   navigateToTab('shop', () => {
-    // Switch to correct sub-tab
-    const subBtn = document.querySelector(`.sub-tab-btn[data-subtab="${foundCat}"]`);
-    if (subBtn) subBtn.click();
+    // Use the "All" tab so detail-panel-all is always the active container
+    const allBtn = document.querySelector(`.sub-tab-btn[data-subtab="all"]`);
+    if (allBtn) allBtn.click();
 
-    // Try to find and click the tile — retry a few times as render may be async
     let attempts = 0;
     const tryClick = () => {
-      const tiles = document.querySelectorAll('.item-tile');
+      // Look for the tile in the all-view panels only
+      const tiles = document.querySelectorAll('#subtab-all .item-tile');
       for (const tile of tiles) {
         const name = tile.querySelector('.item-tile-name')?.textContent?.trim();
         if (name === itemName) {
@@ -4134,7 +4341,7 @@ function navigateToItem(itemName) {
           return;
         }
       }
-      if (attempts++ < 5) setTimeout(tryClick, 200);
+      if (attempts++ < 8) setTimeout(tryClick, 200);
     };
     setTimeout(tryClick, 300);
   });
