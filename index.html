@@ -3476,8 +3476,8 @@ function processHeroTrends(heroData) {
     const prevRecentPick = prevRecent.matches / prevRecentTotal;
 
     // Bayesian WR adjustment — pull heroes with few games toward 50% average
-    // At Asc+, even "low pick" heroes have thousands of games, so weight must be high
-    const BAYES_WEIGHT = 5000;
+    // Weight of 500: heroes need ~500 games before their WR is fully trusted
+    const BAYES_WEIGHT = 500;
     const PRIOR_WR = 0.50;
     const adjWin = (curr.wins + PRIOR_WR * BAYES_WEIGHT) / (curr.matches + BAYES_WEIGHT);
 
@@ -3932,10 +3932,10 @@ function generateBrief() {
     .sort((a,b) => a.win_rate - b.win_rate);
 
   // Hot items — rising pick delta, max 3
-  const hotItems = [...itemRows].sort((a,b) => b.pick_delta - a.pick_delta).slice(0,3);
+  const hotItems = [...itemRows].filter(r => r.pick_rate >= 0.05).sort((a,b) => b.pick_delta - a.pick_delta).slice(0,3);
 
   // Cooling items — falling, max 3
-  const coolingItems = [...itemRows].sort((a,b) => a.pick_delta - b.pick_delta).slice(0,3);
+  const coolingItems = [...itemRows].filter(r => r.pick_rate >= 0.05).sort((a,b) => a.pick_delta - b.pick_delta).slice(0,3);
 
   function fmtDeltaVal(v, cls) {
     const sign = v > 0 ? '+' : '';
