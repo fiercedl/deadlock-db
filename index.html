@@ -4108,7 +4108,6 @@ function navigateToTab(tabName, callback) {
 
 // Navigate to Shop tab and open a specific item
 function navigateToItem(itemName) {
-  // Find which category the item belongs to
   let foundCat = null, foundItem = null;
   for (const cat of ['weapon', 'vitality', 'spirit']) {
     const item = ITEMS[cat].find(i => i.name === itemName);
@@ -4121,47 +4120,51 @@ function navigateToItem(itemName) {
     const subBtn = document.querySelector(`.sub-tab-btn[data-subtab="${foundCat}"]`);
     if (subBtn) subBtn.click();
 
-    setTimeout(() => {
-      // Find and click the item tile
+    // Try to find and click the tile — retry a few times as render may be async
+    let attempts = 0;
+    const tryClick = () => {
       const tiles = document.querySelectorAll('.item-tile');
       for (const tile of tiles) {
-        if (tile.querySelector('.item-tile-name')?.textContent?.trim() === itemName) {
-          tile.click();
+        const name = tile.querySelector('.item-tile-name')?.textContent?.trim();
+        if (name === itemName) {
           tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Flash highlight
+          tile.click();
           tile.style.outline = '2px solid var(--accent)';
-          setTimeout(() => { tile.style.outline = ''; }, 1500);
-          break;
+          setTimeout(() => { tile.style.outline = ''; }, 2000);
+          return;
         }
       }
-    }, 200);
+      if (attempts++ < 5) setTimeout(tryClick, 200);
+    };
+    setTimeout(tryClick, 300);
   });
 }
 
 // Navigate to Trends tab and highlight a hero row
 function navigateToHeroTrends(heroName) {
   navigateToTab('trends', () => {
-    if (!trendsCache) {
-      loadTrends();
-      return;
-    }
+    if (!trendsCache) { loadTrends(); return; }
+
     // Switch to hero table view
     activeTrendSection = 'heroes';
     activeTrendView = 'table';
+    // Sort by win rate so the hero is findable
+    activeTrendSort = 'win_rate';
+    trendSortAsc = false;
     document.querySelectorAll('.trends-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.trend === 'heroes'));
     document.querySelectorAll('.trends-view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'table'));
+    document.querySelectorAll('.trends-sort-btn').forEach(b => b.classList.toggle('active', b.dataset.sort === 'win_rate'));
     renderTrendsView();
 
     setTimeout(() => {
-      // Find hero row and highlight
       const rows = document.querySelectorAll('.trends-table tbody tr');
       for (const row of rows) {
         const name = row.querySelector('.trend-name')?.textContent?.trim();
         if (name === heroName) {
           row.scrollIntoView({ behavior: 'smooth', block: 'center' });
           row.style.background = 'rgba(200,169,110,0.12)';
-          row.style.outline = '1px solid var(--accent2)';
-          setTimeout(() => { row.style.background = ''; row.style.outline = ''; }, 2000);
+          row.style.outline = '1px solid var(--accent)';
+          setTimeout(() => { row.style.background = ''; row.style.outline = ''; }, 3000);
           break;
         }
       }
