@@ -385,15 +385,15 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 3px 4px 3px;
+    padding: 4px 4px 4px;
     background: rgba(0,0,0,0.72);
     font-family: 'Rajdhani', sans-serif;
-    font-size: 10px;
+    font-size: 15px;
     font-weight: 600;
     color: #fff;
     text-align: center;
     line-height: 1.2;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -517,12 +517,12 @@
   }
   .detail-cost {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
+    font-size: 15px;
     color: var(--text2);
   }
   .detail-tier-badge {
     font-family: 'Rajdhani', sans-serif;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -534,7 +534,7 @@
   }
   .detail-active-badge {
     font-family: 'Rajdhani', sans-serif;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -551,7 +551,7 @@
   }
   .detail-section-label {
     font-family: 'Rajdhani', sans-serif;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -559,18 +559,18 @@
     margin-bottom: 6px;
   }
   .detail-stats {
-    font-size: 12px;
+    font-size: 16px;
     color: var(--text);
     line-height: 1.7;
   }
   .detail-effect {
-    font-size: 11px;
+    font-size: 15px;
     color: var(--text2);
     line-height: 1.6;
   }
   .detail-component {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
+    font-size: 13px;
     color: var(--text3);
     line-height: 1.6;
   }
@@ -3427,38 +3427,9 @@ mergeLiveData();
 // ═══════════════════════════════════════════════════════════
 // PRO DATA — fill in after each Night Shift episode
 // ═══════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════
-// PRO DATA — live from edl.gg
-// ═══════════════════════════════════════════════════════════
-let proCache = null; // { byName: {name: {...row}}, fetchedAt }
-
-async function loadProData() {
-  try {
-    const res = await fetch('https://api.edl.gg/api/players/hero-leaderboard?days=30');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const byName = {};
-    data.forEach(r => { if (r.name) byName[r.name] = r; });
-    // Normalise name differences
-    if (byName['The Doorman'] && !byName['Doorman']) byName['Doorman'] = byName['The Doorman'];
-    if (byName['Mo and Krill'] && !byName['Mo & Krill']) byName['Mo & Krill'] = byName['Mo and Krill'];
-    proCache = { byName, fetchedAt: Date.now() };
-    console.log('[DB] Pro data loaded —', Object.keys(byName).length, 'heroes from edl.gg');
-  } catch(e) {
-    console.warn('[DB] Pro data failed:', e.message);
-  }
-}
-
+// PRO column — no live source available (edl.gg blocks CORS)
 function proHtmlForHero(name) {
-  if (!proCache) return '<span style="color:var(--text3);font-size:10px">—</span>';
-  const p = proCache.byName[name];
-  if (!p) return '<span style="color:var(--text3);font-size:10px">—</span>';
-  const presence = p.presence != null ? Math.round(p.presence) + '%' : null;
-  const wr = p.winrate != null ? Math.round(p.winrate) + '% WR' : null;
-  const wrColor = p.winrate >= 53 ? '#40c860' : p.winrate <= 47 ? '#ff5555' : 'var(--text)';
-  return `<span class="pro-badge">PRO</span>`
-    + (presence ? `<span class="pro-note">${presence} pres</span>` : '')
-    + (wr ? ` <span class="pro-note" style="color:${wrColor}">${wr}</span>` : '');
+  return '<span style="color:var(--text3);font-size:10px">—</span>';
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3515,7 +3486,6 @@ async function loadTrends(force = false) {
     const [heroData, itemData] = await Promise.all([heroRes.json(), itemRes.json()]);
 
     trendsCache = { heroData, itemData, fetchedAt: Date.now() };
-    loadProData(); // fire and forget — populates proCache async
     statusEl.textContent = 'Asc+ · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     statusEl.className = 'trends-status';
   } catch(e) {
