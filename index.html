@@ -3427,65 +3427,38 @@ mergeLiveData();
 // ═══════════════════════════════════════════════════════════
 // PRO DATA — fill in after each Night Shift episode
 // ═══════════════════════════════════════════════════════════
-const PRO_DATA = [
-  // Example structure — add entries after each Night Shift:
-  // {
-  //   episode: "Night Shift #47",
-  //   patch: "2026-04-10",
-  //   matches: [
-  //     {
-  //       picks_t1: ["Bebop", "Ivy", "Infernus", "McGinnis", "Dynamo"],
-  //       picks_t2: ["Haze", "Seven", "Lash", "Wraith", "Abrams"],
-  //       bans: ["Calico", "Shiv", "Grey Talon", "Viscous"],
-  //       winner: 1,
-  //       items: { "Bebop": ["Restorative Locket", "Return Fire"], "Dynamo": ["Rescue Beam"] },
-  //       note: "Bebop lane bully build"
-  //     }
-  //   ]
-  // },
-];
+// ═══════════════════════════════════════════════════════════
+// PRO DATA — live from edl.gg
+// ═══════════════════════════════════════════════════════════
+let proCache = null; // { byName: {name: {...row}}, fetchedAt }
 
-// Derive pro stats from PRO_DATA
-function buildProStats() {
-  const heroStats = {}; // name -> { picks, bans, wins, items: {name: count} }
-  const itemStats = {}; // name -> { picks }
-  let totalMatches = 0;
+async function loadProData() {
+  try {
+    const res = await fetch('https://api.edl.gg/api/players/hero-leaderboard?days=30');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const byName = {};
+    data.forEach(r => { if (r.name) byName[r.name] = r; });
+    // Normalise name differences
+    if (byName['The Doorman'] && !byName['Doorman']) byName['Doorman'] = byName['The Doorman'];
+    if (byName['Mo and Krill'] && !byName['Mo & Krill']) byName['Mo & Krill'] = byName['Mo and Krill'];
+    proCache = { byName, fetchedAt: Date.now() };
+    console.log('[DB] Pro data loaded —', Object.keys(byName).length, 'heroes from edl.gg');
+  } catch(e) {
+    console.warn('[DB] Pro data failed:', e.message);
+  }
+}
 
-  PRO_DATA.forEach(episode => {
-    episode.matches.forEach(m => {
-      totalMatches++;
-      const allPicks = [...(m.picks_t1 || []), ...(m.picks_t2 || [])];
-      const bans = m.bans || [];
-      const winner = m.winner; // 1 or 2
-
-      allPicks.forEach((hero, idx) => {
-        if (!heroStats[hero]) heroStats[hero] = { picks: 0, bans: 0, wins: 0, items: {} };
-        heroStats[hero].picks++;
-        const onTeam1 = (m.picks_t1 || []).includes(hero);
-        if ((onTeam1 && winner === 1) || (!onTeam1 && winner === 2)) heroStats[hero].wins++;
-        // items
-        if (m.items && m.items[hero]) {
-          m.items[hero].forEach(item => {
-            heroStats[hero].items[item] = (heroStats[hero].items[item] || 0) + 1;
-          });
-        }
-      });
-      bans.forEach(hero => {
-        if (!heroStats[hero]) heroStats[hero] = { picks: 0, bans: 0, wins: 0, items: {} };
-        heroStats[hero].bans++;
-      });
-      // item stats
-      if (m.items) {
-        Object.values(m.items).forEach(itemList => {
-          itemList.forEach(item => {
-            if (!itemStats[item]) itemStats[item] = { picks: 0 };
-            itemStats[item].picks++;
-          });
-        });
-      }
-    });
-  });
-  return { heroStats, itemStats, totalMatches };
+function proHtmlForHero(name) {
+  if (!proCache) return '<span style="color:var(--text3);font-size:10px">—</span>';
+  const p = proCache.byName[name];
+  if (!p) return '<span style="color:var(--text3);font-size:10px">—</span>';
+  const presence = p.presence != null ? Math.round(p.presence) + '%' : null;
+  const wr = p.winrate != null ? Math.round(p.winrate) + '% WR' : null;
+  const wrColor = p.winrate >= 53 ? '#40c860' : p.winrate <= 47 ? '#ff5555' : 'var(--text)';
+  return `<span class="pro-badge">PRO</span>`
+    + (presence ? `<span class="pro-note">${presence} pres</span>` : '')
+    + (wr ? ` <span class="pro-note" style="color:${wrColor}">${wr}</span>` : '');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3542,6 +3515,7 @@ async function loadTrends(force = false) {
     const [heroData, itemData] = await Promise.all([heroRes.json(), itemRes.json()]);
 
     trendsCache = { heroData, itemData, fetchedAt: Date.now() };
+    loadProData(); // fire and forget — populates proCache async
     statusEl.textContent = 'Asc+ · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     statusEl.className = 'trends-status';
   } catch(e) {
@@ -3701,7 +3675,6 @@ function fmtDelta(v) {
 function renderTrends() {
   if (!trendsCache) return;
   const { heroData, itemData } = trendsCache;
-  const proStats = buildProStats();
   const body = document.getElementById('trends-body');
 
   let rows;
@@ -3734,14 +3707,7 @@ function renderTrends() {
       const hero = HEROES.find(h => h.name === r.name);
       const portrait = hero ? (PORTRAITS[r.name] || '') : '';
       const tags = hero ? hero.tags.join(' · ') : '';
-      const ps = proStats.heroStats[r.name];
-      let proHtml = '<span style="color:var(--text3);font-size:10px">—</span>';
-      if (ps && proStats.totalMatches > 0) {
-        const presence = ((ps.picks + ps.bans) / proStats.totalMatches * 100).toFixed(0);
-        const wr = ps.picks > 0 ? (ps.wins / ps.picks * 100).toFixed(0) + '% WR' : '';
-        const topItems = Object.entries(ps.items).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]).join(', ');
-        proHtml = `<span class="pro-badge">PRO</span><span class="pro-note">${presence}% presence${wr ? ' · ' + wr : ''}${topItems ? '<br><span style="font-size:10px;color:var(--text3)">' + topItems + '</span>' : ''}</span>`;
-      }
+      const proHtml = proHtmlForHero(r.name);
       const rc = r.rank_change || 0;
       const rcHtml = rc === 0
         ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
@@ -3816,12 +3782,7 @@ function renderTrends() {
           <img class="trend-item-backer" src="${backerU}" alt="" onerror="this.style.display='none'">
           <img class="trend-item-icon" src="${iconUrl}" alt="${r.name}" onerror="this.style.display='none'">
         </div>` : '';
-      const ps = proStats.itemStats[r.name];
-      let proHtml = '<span style="color:var(--text3);font-size:10px">—</span>';
-      if (ps && proStats.totalMatches > 0) {
-        const presence = (ps.picks / proStats.totalMatches * 100).toFixed(0);
-        proHtml = `<span class="pro-badge">PRO</span><span class="pro-note">${presence}% presence</span>`;
-      }
+      const proHtml = '<span style="color:var(--text3);font-size:10px">—</span>';
       const rc = r.rank_change || 0;
       const rcHtml = rc === 0
         ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
