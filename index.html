@@ -1224,25 +1224,29 @@
   }
   .th-tip::after {
     content: attr(data-tip);
-    position: absolute;
-    bottom: calc(100% + 6px);
+    position: fixed;
+    bottom: auto;
+    top: 48px;
     left: 50%;
     transform: translateX(-50%);
     background: var(--bg4);
-    border: 1px solid var(--border2);
+    border: 1px solid var(--accent2);
     color: var(--text);
     font-family: 'Rajdhani', sans-serif;
-    font-size: 11px;
-    font-weight: 400;
+    font-size: 13px;
+    font-weight: 500;
     letter-spacing: 0;
     text-transform: none;
-    white-space: nowrap;
-    padding: 5px 8px;
+    white-space: normal;
+    max-width: 320px;
+    padding: 7px 12px;
     border-radius: 3px;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s;
-    z-index: 100;
+    z-index: 9998;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    line-height: 1.5;
   }
   .th-tip:hover::after { opacity: 1; }
 
@@ -1562,7 +1566,7 @@
     padding:3px 10px;
     border-radius:2px;
     border:1px solid rgba(200,169,110,0.15);
-    color:var(--text3);
+    color:var(--text2);
     white-space:nowrap;
     letter-spacing:1px;
     background:rgba(255,255,255,0.02);
@@ -1667,7 +1671,7 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--border2);flex-shrink:0">
         <div>
           <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent)">Full Meta Brief</div>
-          <div id="full-brief-date" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:1px">Asc+</div>
+          <div id="full-brief-date" style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);margin-top:3px;letter-spacing:1px">Asc+</div>
         </div>
         <button onclick="toggleFullBrief()" style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕ Close</button>
       </div>
@@ -1703,7 +1707,7 @@
         <div class="sidebar-header">
           <div class="sidebar-title">Meta Brief</div>
           <div class="sidebar-date" id="sidebar-date">—</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);margin-top:3px;letter-spacing:0.5px" title="Pro data scraped from edl.gg/hero-stats (30-day window). Ranked data live from deadlock-api.com.">ranked: live · pro: edl.gg 2026-06-05</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);margin-top:3px;letter-spacing:0.5px" title="Pro data scraped from edl.gg/hero-stats (30-day window). Ranked data live from deadlock-api.com.">ranked: live · pro: edl.gg 2026-06-05</div>
         </div>
         <div class="sidebar-summary-wrap">
           <div class="summary-output" id="summary-output">
@@ -2866,7 +2870,7 @@ async function renderOverlayApiSections(hero, heroId) {
           if (names.length < 2) return '';
           const wr = Math.round(r.wins / Math.max(r.matches,1) * 100);
           return `<div style="margin-bottom:4px">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:3px">#${pairIdx+1} · ${wr}% WR · ${r.matches.toLocaleString()} matches</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:4px">#${pairIdx+1} · ${wr}% WR · ${r.matches.toLocaleString()} matches</div>
             <div class="ov-item-row">${names.map(n => itemChipHTML(n, '')).join('')}</div>
           </div>`;
         }).filter(Boolean).join('') || '<span style="color:var(--text3);font-size:12px">No data at Asc+</span>';
@@ -3442,7 +3446,7 @@ const EDL_PRO_DATA = {"Silver":[46,97,76,21,76],"Pocket":[72,94,29,65,29],"Doorm
 
 function proHtmlForHero(name) {
   const p = EDL_PRO_DATA[name];
-  if (!p) return '<span style="color:var(--text3);font-size:10px">—</span>';
+  if (!p) return '<span style="color:var(--text2);font-size:13px">—</span>';
   const [wr, presence] = p;
   const wrColor = wr >= 55 ? '#40c860' : wr <= 45 ? '#ff5555' : 'var(--text)';
   return `<span class="pro-badge">PRO</span> `
@@ -3516,7 +3520,7 @@ async function loadTrends(force = false) {
       <div class="trends-placeholder">
         <div class="big">⚠</div>
         <div>Could not reach api.deadlock-api.com</div>
-        <div style="color:var(--text3);font-size:10px;margin-top:4px">Works when served from GitHub Pages (HTTPS). Doesn't work from local file://</div>
+        <div style="color:var(--text2);font-size:12px;margin-top:4px">Works when served from GitHub Pages (HTTPS). Doesn't work from local file://</div>
       </div>`;
     trendsLoading = false;
     refreshBtn.disabled = false;
@@ -3702,8 +3706,8 @@ function renderTrends() {
         <th class="num th-tip" data-col="pro_presence" data-tip="Pro play data from edl.gg (30d). Shows: presence% · pro WR%. Orange/blue chip = 10%+ divergence from ranked WR.">Pro ↕</th>
       </tr>
       <tr style="background:var(--bg3)">
-        <td colspan="5" style="padding:2px 16px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.5px">↑↓ click column headers to sort · click any row to open hero detail</td>
-        <td style="padding:2px 8px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);text-align:right;white-space:nowrap">presence · WR <span style="color:rgba(74,158,255,0.6)">+pro</span><span style="color:rgba(255,153,85,0.6)">−pro</span></td>
+        <td colspan="5" style="padding:2px 16px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);letter-spacing:0.5px">↑↓ click column headers to sort · click any row to open hero detail</td>
+        <td style="padding:2px 8px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);text-align:right;white-space:nowrap">presence · WR <span style="color:rgba(74,158,255,0.6)">+pro</span><span style="color:rgba(255,153,85,0.6)">−pro</span></td>
       </tr></thead><tbody>`;
     rows.forEach(r => {
       const hero = HEROES.find(h => h.name === r.name);
@@ -3712,20 +3716,20 @@ function renderTrends() {
       const p = EDL_PRO_DATA[r.name];
       let proHtml;
       if (!p) {
-        proHtml = '<span style="color:var(--text3);font-size:10px">—</span>';
+        proHtml = '<span style="color:var(--text3);font-size:13px">—</span>';
       } else {
         const [proWR, presence] = p;
         const rankedWR = Math.round(r.win_rate * 100);
-        const wrColor = proWR >= 55 ? '#40c860' : proWR <= 45 ? '#ff5555' : 'var(--text2)';
+        const wrColor = proWR >= 55 ? '#40e870' : proWR <= 45 ? '#ff6060' : '#c5cdd4';
         const diverge = proWR - rankedWR;
         const divergeChip = Math.abs(diverge) >= 10
-          ? ` <span style="font-family:'Share Tech Mono',monospace;font-size:10px;padding:1px 4px;border-radius:2px;background:${diverge > 0 ? 'rgba(74,158,255,0.15)' : 'rgba(255,153,85,0.15)'};color:${diverge > 0 ? '#4a9eff' : '#ff9955'}">${diverge > 0 ? '+' : ''}${diverge}%</span>`
+          ? ` <span style="font-family:'Share Tech Mono',monospace;font-size:12px;padding:1px 5px;border-radius:2px;font-weight:700;background:${diverge > 0 ? 'rgba(74,158,255,0.2)' : 'rgba(255,153,85,0.2)'};color:${diverge > 0 ? '#6ab8ff' : '#ffbb66'}">${diverge > 0 ? '+' : ''}${diverge}%</span>`
           : '';
-        proHtml = `<span class="pro-badge">PRO</span> <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2)">${presence}%</span> <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${wrColor}">${proWR}%</span>${divergeChip}`;
+        proHtml = `<span class="pro-badge">PRO</span> <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#a0b4c0">${presence}%</span> <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:${wrColor};font-weight:700">${proWR}%</span>${divergeChip}`;
       }
       const rc = r.rank_change || 0;
       const rcHtml = rc === 0
-        ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
+        ? `<span style="color:var(--text2);font-size:12px;font-family:'Share Tech Mono',monospace">—</span>`
         : rc > 0
           ? `<span style="color:#40e870;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▲${rc}</span>`
           : `<span style="color:#ff5555;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▼${Math.abs(rc)}</span>`;
@@ -3788,7 +3792,7 @@ function renderTrends() {
     rows.forEach(r => {
       const cat = itemCatMap[r.name] || '';
       const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text3)';
-      const catLabel = cat ? `<span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${catColor};text-transform:uppercase;font-weight:600;display:block;margin-top:1px;line-height:1">${cat}</span>` : '';
+      const catLabel = cat ? `<span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${catColor};text-transform:uppercase;font-weight:600;display:block;margin-top:1px;line-height:1">${cat}</span>` : '';
       const iconUrl = cat ? itemIconUrl(r.name, cat) : '';
       const backerU = cat ? (() => { const itemObj = ITEMS[cat]?.find(i => i.name === r.name); return itemObj ? backerUrl(cat, itemObj.tier) : ''; })() : '';
       const iconHtml = iconUrl ? `
@@ -3798,7 +3802,7 @@ function renderTrends() {
         </div>` : '';
       const rc = r.rank_change || 0;
       const rcHtml = rc === 0
-        ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
+        ? `<span style="color:var(--text2);font-size:12px;font-family:'Share Tech Mono',monospace">—</span>`
         : rc > 0
           ? `<span style="color:#40e870;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▲${rc}</span>`
           : `<span style="color:#ff5555;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▼${Math.abs(rc)}</span>`;
@@ -3886,20 +3890,20 @@ function renderLeaderboard() {
   }
 
   function heroCard(r, scoreStr, borderColor, tip) {
-    const portrait = PORTRAITS[r.name] || '';
-    return `<div title="${tip}" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
-      <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${borderColor};position:relative;background:var(--bg4)">
-        ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+    const portrait = PORTRAITS[r.name] || "";
+    return `<div title="${tip}" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:72px">
+      <div style="width:64px;height:78px;border-radius:3px;overflow:hidden;border:1px solid ${borderColor};position:relative;background:var(--bg4)">
+        ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ""}
       </div>
-      <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${scoreStr}</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8f0fa;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2)">${scoreStr}</div>
     </div>`;
   }
 
   function renderTierList(rows, tierDefs, scoreFn, cardFn, subtitle) {
     const tierMap = assignTiers(rows, tierDefs, scoreFn);
     let html = `<div style="padding:16px 24px">`;
-    if (subtitle) html += `<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:12px;letter-spacing:0.5px">${subtitle}</div>`;
+    if (subtitle) html += `<div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text3);margin-bottom:12px;letter-spacing:0.5px">${subtitle}</div>`;
     tierDefs.forEach(tier => {
       const heroes = tierMap[tier.id];
       if (!heroes.length) return;
@@ -3936,12 +3940,12 @@ function renderLeaderboard() {
       r => r.pro_presence / 100,
       (r, tier) => {
         const wrColor = r.pro_wr >= 55 ? '#40c860' : r.pro_wr <= 45 ? '#ff5555' : 'var(--text3)';
-        return `<div title="${r.name} · ${r.pro_presence}% presence · ${r.pro_wr}% WR in ${EDL_PRO_DATA[r.name]?.[4] ?? '?'} pro games" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
-          <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+        return `<div title="${r.name} · ${r.pro_presence}% presence · ${r.pro_wr}% WR in ${EDL_PRO_DATA[r.name]?.[4] ?? '?'} pro games" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:72px">
+          <div style="width:64px;height:78px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
             ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
           </div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${r.pro_presence}% <span style="color:${wrColor}">${r.pro_wr}%</span></div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8f0fa;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2)">${r.pro_presence}% <span style="color:${wrColor}">${r.pro_wr}%</span></div>
         </div>`;
       },
       'Tiered by competitive presence (edl.gg, 30d). Number below each hero = presence% · pro WR%. Heroes not appearing in pro play are excluded. Data may be stale — check sidebar for last update date.'
@@ -3956,24 +3960,24 @@ function renderLeaderboard() {
         const rankedWR = Math.round(r.win_rate * 100);
         const hasPro = EDL_PRO_DATA[r.name];
         if (!hasPro) {
-          return `<div title="${r.name} · ${rankedWR}% ranked · no pro data" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px;opacity:0.6">
-            <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+          return `<div title="${r.name} · ${rankedWR}% ranked · no pro data" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:72px;opacity:0.6">
+            <div style="width:64px;height:78px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
               ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
             </div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${rankedWR}%</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8f0fa;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2)">${rankedWR}%</div>
           </div>`;
         }
         const diverge = r.pro_wr - rankedWR;
         const divergeStr = Math.abs(diverge) >= 10
           ? `<span style="color:${diverge > 0 ? '#4a9eff' : '#ff9955'}">${diverge > 0 ? '+' : ''}${diverge}</span>`
           : '';
-        return `<div title="${r.name} · ${rankedWR}% ranked · ${r.pro_wr}% pro · ${r.pro_presence}% presence" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
-          <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+        return `<div title="${r.name} · ${rankedWR}% ranked · ${r.pro_wr}% pro · ${r.pro_presence}% presence" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:72px">
+          <div style="width:64px;height:78px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
             ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
           </div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${rankedWR}·${r.pro_wr}%${divergeStr}</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8f0fa;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2)">${rankedWR}·${r.pro_wr}%${divergeStr}</div>
         </div>`;
       },
       'Ranked WR as base score, with a small boost from pro presence and pro WR. Shows: ranked%·pro%. Orange/blue = divergence ≥10%. Dimmed heroes have no pro data and are scored on ranked WR only.'
@@ -4220,7 +4224,7 @@ function generateFullBrief() {
   sections.push(`<div class="fb-section">
     <div class="fb-label">Heroes to Play</div>
     <div class="fb-text">
-      ${top3WR.map((r,i) => `${i+1}. ${hname(r)} — ${wr(r)}, ${pct(r.pick_rate)} pick${r.pick_rate < maxPick*0.25 ? ' <span style="color:var(--text3);font-size:10px">(niche, specialist-favoured)</span>' : ''}.`).join('<br>')}
+      ${top3WR.map((r,i) => `${i+1}. ${hname(r)} — ${wr(r)}, ${pct(r.pick_rate)} pick${r.pick_rate < maxPick*0.25 ? ' <span style="color:var(--text3);font-size:12px">(niche, specialist-favoured)</span>' : ''}.`).join('<br>')}
     </div>
   </div>`);
 
