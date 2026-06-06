@@ -1003,10 +1003,12 @@
     padding-bottom: 2px;
     border-bottom: 1px solid var(--border);
   }
-  .brief-section-label.rising   { color: #40e870; }
-  .brief-section-label.falling  { color: #ff5555; }
-  .brief-section-label.dominant { color: var(--accent); }
-  .brief-section-label.contested{ color: var(--weapon); }
+  .brief-section-label.rising    { color: #40e870; }
+  .brief-section-label.falling   { color: #ff5555; }
+  .brief-section-label.dominant  { color: var(--accent); }
+  .brief-section-label.consensus { color: var(--teal); }
+  .brief-section-label.wr        { color: #40e870; }
+  .brief-section-label.contested { color: var(--weapon); }
   .brief-section-label.items    { color: var(--spirit); }
 
   .brief-portrait {
@@ -3583,10 +3585,11 @@ function processHeroTrends(heroData) {
       _prevPick: prevRecentPick,
       pro_presence: (EDL_PRO_DATA[name] ? EDL_PRO_DATA[name][1] : -1),
       pro_wr: (EDL_PRO_DATA[name] ? EDL_PRO_DATA[name][0] : -1),
-      // merged_score: avg of ranked WR and pro-adjusted WR (presence-weighted toward pro)
+      // merged_score: ranked WR as base, boosted by pro performance when present
+      // Heroes without pro data are scored on ranked WR alone (no penalty)
       merged_score: EDL_PRO_DATA[name]
-        ? (adjWin * 0.5 + (EDL_PRO_DATA[name][0] / 100) * 0.3 + (EDL_PRO_DATA[name][1] / 100) * 0.2)
-        : adjWin * 0.5,
+        ? adjWin * 0.6 + (EDL_PRO_DATA[name][0] / 100) * 0.25 + (EDL_PRO_DATA[name][1] / 100) * 0.15
+        : adjWin * 0.6,
     });
   });
 
@@ -3707,12 +3710,12 @@ function renderTrends() {
       } else {
         const [proWR, presence] = p;
         const rankedWR = Math.round(r.win_rate * 100);
-        const wrColor = proWR >= 55 ? '#40c860' : proWR <= 45 ? '#ff5555' : 'var(--text)';
+        const wrColor = proWR >= 55 ? '#40c860' : proWR <= 45 ? '#ff5555' : 'var(--text2)';
         const diverge = proWR - rankedWR;
-        const divergeHtml = Math.abs(diverge) >= 10
-          ? ` <span style="color:${diverge > 0 ? '#4a9eff' : '#ff9955'};font-size:10px" title="Pro WR ${diverge > 0 ? '+' : ''}${diverge}% vs ranked">${diverge > 0 ? '↑' : '↓'}pro</span>`
+        const divergeChip = Math.abs(diverge) >= 10
+          ? ` <span style="font-family:'Share Tech Mono',monospace;font-size:10px;padding:1px 4px;border-radius:2px;background:${diverge > 0 ? 'rgba(74,158,255,0.15)' : 'rgba(255,153,85,0.15)'};color:${diverge > 0 ? '#4a9eff' : '#ff9955'}">${diverge > 0 ? '+' : ''}${diverge}%</span>`
           : '';
-        proHtml = `<span class="pro-badge">PRO</span> <span class="pro-note">${presence}% <span style="color:${wrColor}">${proWR}%</span>${divergeHtml}</span>`;
+        proHtml = `<span class="pro-badge">PRO</span> <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2)">${presence}%</span> <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${wrColor}">${proWR}%</span>${divergeChip}`;
       }
       const rc = r.rank_change || 0;
       const rcHtml = rc === 0
@@ -3766,7 +3769,7 @@ function renderTrends() {
     });
 
     let html = `<table class="trends-table">
-      <colgroup><col><col style="width:60px"><col><col><col><col><col></colgroup>
+      <colgroup><col><col style="width:60px"><col><col><col><col></colgroup>
       <thead><tr>
         <th>Item</th>
         <th class="num th-tip" style="width:60px" data-tip="Pick rate rank change vs last week">↕ Pos</th>
@@ -3774,7 +3777,6 @@ function renderTrends() {
         <th class="num th-tip" data-col="pick_rate" data-tip="Current pick rate at Asc+">Pick %</th>
         <th class="num th-tip" data-col="win_rate" data-tip="Current win rate at Asc+">Win %</th>
         <th class="num th-tip" data-col="win_delta" data-tip="Win rate change week-on-week">Win Δ</th>
-        <th>Pro</th>
       </tr></thead><tbody>`;
 
     rows.forEach(r => {
@@ -3788,7 +3790,6 @@ function renderTrends() {
           <img class="trend-item-backer" src="${backerU}" alt="" onerror="this.style.display='none'">
           <img class="trend-item-icon" src="${iconUrl}" alt="${r.name}" onerror="this.style.display='none'">
         </div>` : '';
-      const proHtml = '<span style="color:var(--text3);font-size:10px">—</span>';
       const rc = r.rank_change || 0;
       const rcHtml = rc === 0
         ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
@@ -3805,7 +3806,6 @@ function renderTrends() {
         <td class="num">${fmtPct(r.pick_rate)}</td>
         <td class="num">${fmtPct(r.win_rate)}</td>
         <td class="num">${fmtDelta(r.win_delta)}</td>
-        <td>${proHtml}</td>
       </tr>`;
     });
     html += '</tbody></table>';
@@ -3940,23 +3940,33 @@ function renderLeaderboard() {
     );
 
   } else if (activeTrendView === 'leaderboard-merged') {
-    // Merged: only heroes with pro data, tiers based on merged_score
-    const mergedRows = allRows.filter(r => r.pro_presence > 0);
+    // Merged: heroes with pro data scored on consensus, others on ranked WR only
+    // All heroes included — pro-absent ones appear but can't reach S+ tiers
     body.innerHTML = renderTierList(
-      mergedRows, TIERS,
+      allRows, TIERS,
       r => r.merged_score,
       (r, tier) => {
         const rankedWR = Math.round(r.win_rate * 100);
-        const diverge = Math.abs(rankedWR - r.pro_wr);
-        const divergeStr = diverge >= 10
-          ? ` <span style="color:${r.pro_wr > rankedWR ? '#4a9eff' : '#ff9955'}">±${diverge}%</span>`
+        const hasPro = EDL_PRO_DATA[r.name];
+        if (!hasPro) {
+          return `<div title="${r.name} · ${rankedWR}% ranked · no pro data" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px;opacity:0.6">
+            <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+              ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+            </div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${rankedWR}%</div>
+          </div>`;
+        }
+        const diverge = r.pro_wr - rankedWR;
+        const divergeStr = Math.abs(diverge) >= 10
+          ? `<span style="color:${diverge > 0 ? '#4a9eff' : '#ff9955'}">${diverge > 0 ? '+' : ''}${diverge}</span>`
           : '';
         return `<div title="${r.name} · ${rankedWR}% ranked · ${r.pro_wr}% pro · ${r.pro_presence}% presence" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
           <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
             ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
           </div>
           <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${rankedWR}%·${r.pro_wr}%${divergeStr}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${rankedWR}·${r.pro_wr}%${divergeStr}</div>
         </div>`;
       }
     );
@@ -4056,36 +4066,32 @@ function generateBrief() {
 
   bodyEl.innerHTML = `
     ${consensus.length ? `<div class="brief-section">
-      <div class="brief-section-label dominant">⚡ Consensus</div>
+      <div class="brief-section-label consensus">⚡ Consensus</div>
       ${consensus.map(r => {
         const p = EDL_PRO_DATA[r.name];
-        const val = `<span class="brief-val neutral">${Math.round(r.win_rate*100)}%·${p[1]}%</span>`;
+        const val = `<span class="brief-val" style="color:var(--teal)">${Math.round(r.win_rate*100)}%<span style="color:var(--text3)">·</span>${p[1]}%</span>`;
         return heroRowHTML(r, val);
       }).join('')}
     </div>` : ''}
     <div class="brief-section">
-      <div class="brief-section-label rising">↑ Pick Rising</div>
+      <div class="brief-section-label rising">↑ Rising</div>
       ${rising.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'up'))).join('')}
     </div>
     <div class="brief-section">
-      <div class="brief-section-label falling">↓ Pick Falling</div>
+      <div class="brief-section-label falling">↓ Falling</div>
       ${falling.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'down'))).join('')}
     </div>
     <div class="brief-section">
-      <div class="brief-section-label dominant">👑 Highest WR</div>
-      ${dominant.map(r => heroRowHTML(r, `<span class="brief-val neutral">${Math.round(r.win_rate*100)}%</span>`)).join('')}
+      <div class="brief-section-label wr">👑 Highest WR</div>
+      ${dominant.map(r => heroRowHTML(r, `<span class="brief-val up">${Math.round(r.win_rate*100)}%</span>`)).join('')}
     </div>
     ${contested.length ? `<div class="brief-section">
-      <div class="brief-section-label contested">⚠ High Pick / Low WR</div>
+      <div class="brief-section-label contested">⚠ Trap</div>
       ${contested.map(r => heroRowHTML(r, `<span class="brief-val warn">${Math.round(r.win_rate*100)}%</span>`)).join('')}
     </div>` : ''}
     <div class="brief-section">
-      <div class="brief-section-label items">🔥 Items Rising</div>
+      <div class="brief-section-label items">🔥 Items</div>
       ${hotItems.map(r => itemRowHTML(r, fmtDeltaVal(r.pick_delta,'up'))).join('')}
-    </div>
-    <div class="brief-section">
-      <div class="brief-section-label falling">❄ Items Falling</div>
-      ${coolingItems.map(r => itemRowHTML(r, fmtDeltaVal(r.pick_delta,'down'))).join('')}
     </div>
   `;
 
@@ -4416,6 +4422,19 @@ document.querySelectorAll('.trends-sub-btn').forEach(btn => {
     activeTrendSection = btn.dataset.trend;
     document.querySelectorAll('.trends-sub-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    const isHero = activeTrendSection === 'heroes';
+    // Hide pro/merged controls when on items tab
+    document.querySelectorAll('.trends-sort-btn[data-sort="pro_presence"], .trends-sort-btn[data-sort="merged_score"]')
+      .forEach(b => b.style.display = isHero ? '' : 'none');
+    document.querySelectorAll('.trends-view-btn[data-view="leaderboard-ranked"], .trends-view-btn[data-view="leaderboard-pro"], .trends-view-btn[data-view="leaderboard-merged"]')
+      .forEach(b => b.style.display = isHero ? '' : 'none');
+    // If on a leaderboard view and switching to items, go back to table
+    if (!isHero && activeTrendView.startsWith('leaderboard')) {
+      activeTrendView = 'table';
+      document.querySelectorAll('.trends-view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'table'));
+      const sortWrap = document.getElementById('trends-sort-wrap');
+      if (sortWrap) sortWrap.style.opacity = '1';
+    }
     if (trendsCache) renderTrendsView();
   });
 });
