@@ -1002,6 +1002,7 @@
     margin-bottom: 3px;
     padding-bottom: 2px;
     border-bottom: 1px solid var(--border);
+    cursor: help;
   }
   .brief-section-label.rising    { color: #40e870; }
   .brief-section-label.falling   { color: #ff5555; }
@@ -1554,8 +1555,8 @@
 <body>
 
 <header>
-  <div class="logo">DEADLOCK <span>HERO DB · v2026.06.04</span></div>
-  <div id="live-data-badge" style="
+  <div class="logo" title="Deadlock Hero Reference Database · Ranked data: deadlock-api.com (Ascendant+) · Pro data: edl.gg (30d) · Patch notes: manually updated">DEADLOCK <span>HERO DB · v2026.06.04</span></div>
+  <div id="live-data-badge" title="Assets API status. Online = hero/item data refreshed from deadlock-api.com. Offline = using hardcoded fallback values (still accurate, just not live-updated)." style="
     font-family:'Share Tech Mono',monospace;
     font-size:10px;
     padding:3px 10px;
@@ -1680,19 +1681,19 @@
         <button class="trends-sub-btn" data-trend="items">Item</button>
       </div>
       <div class="trends-view-tabs">
-        <button class="trends-view-btn active" data-view="table" title="Table view">Table</button>
-        <button class="trends-view-btn" data-view="leaderboard-ranked" title="Ranked tier list">Ranked</button>
-        <button class="trends-view-btn" data-view="leaderboard-pro" title="Pro tier list">Pro</button>
-        <button class="trends-view-btn" data-view="leaderboard-merged" title="Consensus tier list">Merged</button>
+        <button class="trends-view-btn active" data-view="table" title="Table view — sortable stats for all heroes">Table</button>
+        <button class="trends-view-btn" data-view="leaderboard-ranked" title="Ranked tier list — heroes tiered by Ascendant+ win rate only">Ranked</button>
+        <button class="trends-view-btn" data-view="leaderboard-pro" title="Pro tier list — heroes tiered by presence in competitive play (edl.gg, 30d). Shows pro WR under each card.">Pro</button>
+        <button class="trends-view-btn" data-view="leaderboard-merged" title="Merged tier list — ranked WR as the base, with a small boost for heroes validated by high pro presence and pro WR. Heroes with no pro data appear dimmed.">Merged</button>
       </div>
       <div class="trends-sort-wrap" id="trends-sort-wrap">
         <span class="trends-sort-label">Sort</span>
-        <button class="trends-sort-btn active" data-sort="pick_delta">Pick Δ</button>
-        <button class="trends-sort-btn" data-sort="pick_rate">Pick %</button>
-        <button class="trends-sort-btn" data-sort="win_rate">Win %</button>
-        <button class="trends-sort-btn" data-sort="win_delta">Win Δ</button>
-        <button class="trends-sort-btn" data-sort="pro_presence">Pro</button>
-        <button class="trends-sort-btn" data-sort="merged_score">Merged</button>
+        <button class="trends-sort-btn active" data-sort="pick_delta" title="Sort by pick rate change over 4 weeks">Pick Δ</button>
+        <button class="trends-sort-btn" data-sort="pick_rate" title="Sort by current pick rate at Ascendant+">Pick %</button>
+        <button class="trends-sort-btn" data-sort="win_rate" title="Sort by Bayesian-adjusted win rate at Ascendant+">Win %</button>
+        <button class="trends-sort-btn" data-sort="win_delta" title="Sort by win rate change over 4 weeks">Win Δ</button>
+        <button class="trends-sort-btn" data-sort="pro_presence" title="Sort by competitive presence % (edl.gg, 30d) — heroes not in pro play sort to bottom">Pro</button>
+        <button class="trends-sort-btn" data-sort="merged_score" title="Sort by merged score — ranked WR boosted by pro validation">Merged</button>
       </div>
       <span class="trends-status" id="trends-status">—</span>
       <button class="trends-refresh-btn" id="trends-refresh-btn">⟳ Refresh</button>
@@ -1702,6 +1703,7 @@
         <div class="sidebar-header">
           <div class="sidebar-title">Meta Brief</div>
           <div class="sidebar-date" id="sidebar-date">—</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);margin-top:3px;letter-spacing:0.5px" title="Pro data scraped from edl.gg/hero-stats (30-day window). Ranked data live from deadlock-api.com.">ranked: live · pro: edl.gg 2026-06-05</div>
         </div>
         <div class="sidebar-summary-wrap">
           <div class="summary-output" id="summary-output">
@@ -2711,15 +2713,15 @@ function openHeroOverlay(hero) {
   ovTags.innerHTML = hero.tags.map(t => `<span class="ov-tag">${t}</span>`).join('');
 
   const statDefs = [
-    { l:'HP',    v: hero.stats.hp,       c:'vitality' },
-    { l:'MS',    v: hero.stats.ms,       c:'' },
-    { l:'DPS',   v: hero.stats.dps,      c:'weapon' },
-    { l:'SP',    v: hero.stats.sp||'—',  c:'spirit' },
-    { l:'BDMG',  v: hero.stats.bdmg||'—', c:'weapon' },
-    { l:'RANGE', v: hero.stats.falloff||'—', c:'' },
+    { l:'HP',    v: hero.stats.hp,         c:'vitality', tip:'Base health + per boon' },
+    { l:'MS',    v: hero.stats.ms,         c:'',         tip:'Move speed (m/s)' },
+    { l:'DPS',   v: hero.stats.dps,        c:'weapon',   tip:'Damage per second at base stats' },
+    { l:'SP',    v: hero.stats.sp||'—',    c:'spirit',   tip:'Spirit power base + per boon' },
+    { l:'BDMG',  v: hero.stats.bdmg||'—',  c:'weapon',   tip:'Bullet damage base + per boon' },
+    { l:'RANGE', v: hero.stats.falloff||'—',c:'',        tip:'Bullet falloff range (start→end)' },
   ];
   ovStats.innerHTML = statDefs.map(s =>
-    `<div class="stat-pill"><span class="stat-label">${s.l}</span><span class="stat-value ${s.c}">${s.v}</span></div>`
+    `<div class="stat-pill" title="${s.tip}"><span class="stat-label">${s.l}</span><span class="stat-value ${s.c}">${s.v}</span></div>`
   ).join('');
 
   // Body — build static sections immediately, API sections with loading state
@@ -3143,7 +3145,7 @@ function showDetail(item, category, panel) {
     </div>`;
   if (item.stats) html += `<div class="detail-section"><div class="detail-section-label">Stats</div><div class="detail-stats">${item.stats.replace(/, /g,'<br>')}</div></div>`;
   if (item.effect) html += `<div class="detail-section"><div class="detail-section-label">${item.active ? 'Active / Passive' : 'Passive'}</div><div class="detail-effect">${item.effect.replace(' | ','<br>')}</div></div>`;
-  if (item.component) html += `<div class="detail-section"><div class="detail-section-label">Component</div><div class="detail-component">${item.component}</div></div>`;
+  if (item.component) html += `<div class="detail-section"><div class="detail-section-label" title="Items this upgrades from (←) or into (→)">Upgrades</div><div class="detail-component">${item.component}</div></div>`;
   panel.innerHTML = html;
   panel.classList.remove('empty');
   panel.classList.add('active');
@@ -3585,11 +3587,12 @@ function processHeroTrends(heroData) {
       _prevPick: prevRecentPick,
       pro_presence: (EDL_PRO_DATA[name] ? EDL_PRO_DATA[name][1] : -1),
       pro_wr: (EDL_PRO_DATA[name] ? EDL_PRO_DATA[name][0] : -1),
-      // merged_score: ranked WR as base, boosted by pro performance when present
-      // Heroes without pro data are scored on ranked WR alone (no penalty)
+      // merged_score: ranked WR as the primary signal, boosted by pro validation when present
+      // Non-pro heroes score purely on ranked WR with no cap or penalty
+      // Pro heroes get a bonus proportional to presence and pro WR alignment
       merged_score: EDL_PRO_DATA[name]
-        ? adjWin * 0.6 + (EDL_PRO_DATA[name][0] / 100) * 0.25 + (EDL_PRO_DATA[name][1] / 100) * 0.15
-        : adjWin * 0.6,
+        ? adjWin + (EDL_PRO_DATA[name][1] / 100) * 0.04 + Math.max(0, (EDL_PRO_DATA[name][0] / 100) - 0.5) * 0.04
+        : adjWin,
     });
   });
 
@@ -3692,13 +3695,16 @@ function renderTrends() {
       <thead><tr>
         <th>Hero</th>
         <th class="num th-tip" style="width:60px" data-tip="Pick rate rank change vs last week">↕ Pos</th>
-        <th class="num th-tip sorted${trendSortAsc ? ' asc':''}" data-col="pick_delta" data-tip="Pick rate change over 4 weeks (percentage points, per game)">Pick Δ</th>
-        <th class="num th-tip" data-col="pick_rate" data-tip="% of Asc+ games this hero appeared in">Pick %</th>
-        <th class="num th-tip" data-col="win_rate" data-tip="Current win rate at Asc+">Win %</th>
-        <th class="num th-tip" data-col="win_delta" data-tip="Win rate change over 4 weeks">Win Δ</th>
-        <th class="num th-tip" data-col="pro_presence" data-tip="Pro presence % · edl.gg 30d">Pro ↕</th>
+        <th class="num th-tip sorted${trendSortAsc ? ' asc':''}" data-col="pick_delta" data-tip="Pick rate change over 4 weeks. How much more or less this hero is being picked.">Pick Δ</th>
+        <th class="num th-tip" data-col="pick_rate" data-tip="% of Asc+ games this hero appeared in this week.">Pick %</th>
+        <th class="num th-tip" data-col="win_rate" data-tip="Bayesian-adjusted win rate at Ascendant+. Adjusted toward 50% for heroes with few games.">Win %</th>
+        <th class="num th-tip" data-col="win_delta" data-tip="Win rate change over 4 weeks.">Win Δ</th>
+        <th class="num th-tip" data-col="pro_presence" data-tip="Pro play data from edl.gg (30d). Shows: presence% · pro WR%. Orange/blue chip = 10%+ divergence from ranked WR.">Pro ↕</th>
+      </tr>
+      <tr style="background:var(--bg3)">
+        <td colspan="5" style="padding:2px 16px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.5px">↑↓ click column headers to sort · click any row to open hero detail</td>
+        <td style="padding:2px 8px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);text-align:right;white-space:nowrap">presence · WR <span style="color:rgba(74,158,255,0.6)">+pro</span><span style="color:rgba(255,153,85,0.6)">−pro</span></td>
       </tr></thead><tbody>`;
-
     rows.forEach(r => {
       const hero = HEROES.find(h => h.name === r.name);
       const portrait = hero ? (PORTRAITS[r.name] || '') : '';
@@ -3890,9 +3896,10 @@ function renderLeaderboard() {
     </div>`;
   }
 
-  function renderTierList(rows, tierDefs, scoreFn, cardFn) {
+  function renderTierList(rows, tierDefs, scoreFn, cardFn, subtitle) {
     const tierMap = assignTiers(rows, tierDefs, scoreFn);
-    let html = '<div style="padding:16px 24px">';
+    let html = `<div style="padding:16px 24px">`;
+    if (subtitle) html += `<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:12px;letter-spacing:0.5px">${subtitle}</div>`;
     tierDefs.forEach(tier => {
       const heroes = tierMap[tier.id];
       if (!heroes.length) return;
@@ -3918,30 +3925,30 @@ function renderLeaderboard() {
         const wr = Math.round(r.win_rate * 100);
         const proP = r.pro_presence > 0 ? ` · ${r.pro_presence}% pro` : '';
         return heroCard(r, wr + '%', tier.border, `${r.name} · ${wr}% ranked WR${proP}`);
-      }
+      },
+      'Tiered by Bayesian-adjusted win rate at Ascendant+. S+ ≥57% · S ≥54% · A ≥52% · B ≥50% · C ≥48% · D below. Hover a hero for details.'
     );
 
   } else if (activeTrendView === 'leaderboard-pro') {
-    // Only heroes with pro data, tiered by presence, show WR as sub-label
     const proRows = allRows.filter(r => r.pro_presence > 0);
     body.innerHTML = renderTierList(
       proRows, PRO_TIERS,
       r => r.pro_presence / 100,
       (r, tier) => {
         const wrColor = r.pro_wr >= 55 ? '#40c860' : r.pro_wr <= 45 ? '#ff5555' : 'var(--text3)';
-        return `<div title="${r.name} · ${r.pro_presence}% presence · ${r.pro_wr}% WR" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
+        return `<div title="${r.name} · ${r.pro_presence}% presence · ${r.pro_wr}% WR in ${EDL_PRO_DATA[r.name]?.[4] ?? '?'} pro games" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
           <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
             ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
           </div>
           <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${r.pro_presence}% <span style="color:${wrColor}">${r.pro_wr}%</span></div>
         </div>`;
-      }
+      },
+      'Tiered by competitive presence (edl.gg, 30d). Number below each hero = presence% · pro WR%. Heroes not appearing in pro play are excluded. Data may be stale — check sidebar for last update date.'
     );
 
   } else if (activeTrendView === 'leaderboard-merged') {
     // Merged: heroes with pro data scored on consensus, others on ranked WR only
-    // All heroes included — pro-absent ones appear but can't reach S+ tiers
     body.innerHTML = renderTierList(
       allRows, TIERS,
       r => r.merged_score,
@@ -3968,7 +3975,8 @@ function renderLeaderboard() {
           <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${rankedWR}·${r.pro_wr}%${divergeStr}</div>
         </div>`;
-      }
+      },
+      'Ranked WR as base score, with a small boost from pro presence and pro WR. Shows: ranked%·pro%. Orange/blue = divergence ≥10%. Dimmed heroes have no pro data and are scored on ranked WR only.'
     );
   }
 }
@@ -4066,31 +4074,31 @@ function generateBrief() {
 
   bodyEl.innerHTML = `
     ${consensus.length ? `<div class="brief-section">
-      <div class="brief-section-label consensus">⚡ Consensus</div>
+      <div class="brief-section-label consensus" title="Heroes validated by both ranked and pro play. Shows: ranked WR · pro presence%. Best bets this week.">⚡ Consensus</div>
       ${consensus.map(r => {
         const p = EDL_PRO_DATA[r.name];
-        const val = `<span class="brief-val" style="color:var(--teal)">${Math.round(r.win_rate*100)}%<span style="color:var(--text3)">·</span>${p[1]}%</span>`;
+        const val = `<span class="brief-val" style="color:var(--teal)" title="${r.name}: ${Math.round(r.win_rate*100)}% ranked WR · ${p[1]}% pro presence">${Math.round(r.win_rate*100)}%<span style="color:var(--text3)">·</span>${p[1]}%</span>`;
         return heroRowHTML(r, val);
       }).join('')}
     </div>` : ''}
     <div class="brief-section">
-      <div class="brief-section-label rising">↑ Rising</div>
+      <div class="brief-section-label rising" title="Heroes with the biggest pick rate increase over the past 4 weeks.">↑ Rising</div>
       ${rising.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'up'))).join('')}
     </div>
     <div class="brief-section">
-      <div class="brief-section-label falling">↓ Falling</div>
+      <div class="brief-section-label falling" title="Heroes with the biggest pick rate decrease over the past 4 weeks.">↓ Falling</div>
       ${falling.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'down'))).join('')}
     </div>
     <div class="brief-section">
-      <div class="brief-section-label wr">👑 Highest WR</div>
-      ${dominant.map(r => heroRowHTML(r, `<span class="brief-val up">${Math.round(r.win_rate*100)}%</span>`)).join('')}
+      <div class="brief-section-label wr" title="Highest Bayesian-adjusted win rate at Ascendant+ this week, minimum 20% pick rate.">👑 Highest WR</div>
+      ${dominant.map(r => heroRowHTML(r, `<span class="brief-val up" title="${r.name}: ${Math.round(r.win_rate*100)}% WR">${Math.round(r.win_rate*100)}%</span>`)).join('')}
     </div>
     ${contested.length ? `<div class="brief-section">
-      <div class="brief-section-label contested">⚠ Trap</div>
-      ${contested.map(r => heroRowHTML(r, `<span class="brief-val warn">${Math.round(r.win_rate*100)}%</span>`)).join('')}
+      <div class="brief-section-label contested" title="High pick rate but below 51% win rate — popular but underperforming. Consider alternatives or learn the counter.">⚠ Trap</div>
+      ${contested.map(r => heroRowHTML(r, `<span class="brief-val warn" title="${r.name}: ${Math.round(r.win_rate*100)}% WR despite high pick">${Math.round(r.win_rate*100)}%</span>`)).join('')}
     </div>` : ''}
     <div class="brief-section">
-      <div class="brief-section-label items">🔥 Items</div>
+      <div class="brief-section-label items" title="Items with the biggest relative pick rate increase this week at Ascendant+.">🔥 Items</div>
       ${hotItems.map(r => itemRowHTML(r, fmtDeltaVal(r.pick_delta,'up'))).join('')}
     </div>
   `;
