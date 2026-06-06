@@ -1679,7 +1679,9 @@
       </div>
       <div class="trends-view-tabs">
         <button class="trends-view-btn active" data-view="table" title="Table view">Table</button>
-        <button class="trends-view-btn" data-view="leaderboard" title="Leaderboard view">Leaderboard</button>
+        <button class="trends-view-btn" data-view="leaderboard-ranked" title="Ranked tier list">Ranked</button>
+        <button class="trends-view-btn" data-view="leaderboard-pro" title="Pro tier list">Pro</button>
+        <button class="trends-view-btn" data-view="leaderboard-merged" title="Consensus tier list">Merged</button>
       </div>
       <div class="trends-sort-wrap" id="trends-sort-wrap">
         <span class="trends-sort-label">Sort</span>
@@ -1687,6 +1689,8 @@
         <button class="trends-sort-btn" data-sort="pick_rate">Pick %</button>
         <button class="trends-sort-btn" data-sort="win_rate">Win %</button>
         <button class="trends-sort-btn" data-sort="win_delta">Win Δ</button>
+        <button class="trends-sort-btn" data-sort="pro_presence">Pro</button>
+        <button class="trends-sort-btn" data-sort="merged_score">Merged</button>
       </div>
       <span class="trends-status" id="trends-status">—</span>
       <button class="trends-refresh-btn" id="trends-refresh-btn">⟳ Refresh</button>
@@ -3427,9 +3431,17 @@ mergeLiveData();
 // ═══════════════════════════════════════════════════════════
 // PRO DATA — fill in after each Night Shift episode
 // ═══════════════════════════════════════════════════════════
-// PRO column — no live source available (edl.gg blocks CORS)
+// PRO DATA — scraped from edl.gg/hero-stats (30d) · 2026-06-05
+// Format: [winrate%, presence%, pick%, ban%, games]
+const EDL_PRO_DATA = {"Silver":[46,97,76,21,76],"Pocket":[72,94,29,65,29],"Doorman":[50,92,51,41,52],"Shiv":[52,88,71,17,71],"Lash":[49,88,69,19,70],"Victor":[57,75,63,12,63],"Paradox":[52,71,60,11,61],"Venator":[56,69,57,12,57],"Billy":[47,69,59,10,59],"Celeste":[42,69,53,16,53],"Mirage":[29,62,48,14,48],"Abrams":[59,59,49,10,49],"Grey Talon":[57,58,54,4,54],"Rem":[56,56,43,13,43],"Yamato":[32,42,38,4,38],"Bebop":[50,41,28,13,28],"Viscous":[49,40,35,5,35],"Vyper":[31,40,27,13,26],"Wraith":[57,38,35,3,35],"Warden":[67,37,33,4,33],"Ivy":[52,35,27,8,27],"McGinnis":[62,34,21,13,21],"Apollo":[45,31,28,3,29],"Mina":[47,28,19,9,19],"Sinclair":[32,26,19,7,19],"Graves":[44,23,16,7,16],"Kelvin":[50,22,8,14,8],"Haze":[73,21,16,5,15],"Mo & Krill":[43,19,14,5,14],"Lady Geist":[56,17,16,1,16],"Infernus":[50,16,14,2,14],"Vindicta":[25,14,12,2,12],"Holliday":[40,5,5,0,5],"Seven":[50,2,2,0,2],"Calico":[50,2,2,0,2]};
+
 function proHtmlForHero(name) {
-  return '<span style="color:var(--text3);font-size:10px">—</span>';
+  const p = EDL_PRO_DATA[name];
+  if (!p) return '<span style="color:var(--text3);font-size:10px">—</span>';
+  const [wr, presence] = p;
+  const wrColor = wr >= 55 ? '#40c860' : wr <= 45 ? '#ff5555' : 'var(--text)';
+  return `<span class="pro-badge">PRO</span> `
+    + `<span class="pro-note">${presence}% pres · <span style="color:${wrColor}">${wr}% WR</span></span>`;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3559,11 +3571,17 @@ function processHeroTrends(heroData) {
       name,
       pick_rate: currPick,
       pick_delta: currPick - prevPick,
-      win_rate: adjWin,        // adjusted WR used for tiers and display
-      win_rate_raw: currWin,   // raw WR kept for reference
+      win_rate: adjWin,
+      win_rate_raw: currWin,
       win_delta: currWin - prevWin,
       matches: curr.matches,
       _prevPick: prevRecentPick,
+      pro_presence: (EDL_PRO_DATA[name] ? EDL_PRO_DATA[name][1] : -1),
+      pro_wr: (EDL_PRO_DATA[name] ? EDL_PRO_DATA[name][0] : -1),
+      // merged_score: avg of ranked WR and pro-adjusted WR (presence-weighted toward pro)
+      merged_score: EDL_PRO_DATA[name]
+        ? (adjWin * 0.5 + (EDL_PRO_DATA[name][0] / 100) * 0.3 + (EDL_PRO_DATA[name][1] / 100) * 0.2)
+        : adjWin * 0.5,
     });
   });
 
@@ -3670,14 +3688,27 @@ function renderTrends() {
         <th class="num th-tip" data-col="pick_rate" data-tip="% of Asc+ games this hero appeared in">Pick %</th>
         <th class="num th-tip" data-col="win_rate" data-tip="Current win rate at Asc+">Win %</th>
         <th class="num th-tip" data-col="win_delta" data-tip="Win rate change over 4 weeks">Win Δ</th>
-        <th>Pro</th>
+        <th class="num th-tip" data-col="pro_presence" data-tip="Pro presence % · edl.gg 30d">Pro ↕</th>
       </tr></thead><tbody>`;
 
     rows.forEach(r => {
       const hero = HEROES.find(h => h.name === r.name);
       const portrait = hero ? (PORTRAITS[r.name] || '') : '';
       const tags = hero ? hero.tags.join(' · ') : '';
-      const proHtml = proHtmlForHero(r.name);
+      const p = EDL_PRO_DATA[r.name];
+      let proHtml;
+      if (!p) {
+        proHtml = '<span style="color:var(--text3);font-size:10px">—</span>';
+      } else {
+        const [proWR, presence] = p;
+        const rankedWR = Math.round(r.win_rate * 100);
+        const wrColor = proWR >= 55 ? '#40c860' : proWR <= 45 ? '#ff5555' : 'var(--text)';
+        const diverge = proWR - rankedWR;
+        const divergeHtml = Math.abs(diverge) >= 10
+          ? ` <span style="color:${diverge > 0 ? '#4a9eff' : '#ff9955'};font-size:10px" title="Pro WR ${diverge > 0 ? '+' : ''}${diverge}% vs ranked">${diverge > 0 ? '↑' : '↓'}pro</span>`
+          : '';
+        proHtml = `<span class="pro-badge">PRO</span> <span class="pro-note">${presence}% <span style="color:${wrColor}">${proWR}%</span>${divergeHtml}</span>`;
+      }
       const rc = r.rank_change || 0;
       const rcHtml = rc === 0
         ? `<span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace">—</span>`
@@ -3797,95 +3828,139 @@ let lbSort = 'pick_rate'; // 'pick_rate' or 'win_rate'
 
 function renderLeaderboard() {
   if (!trendsCache) return;
-  const { heroData, itemData } = trendsCache;
+  const { heroData } = trendsCache;
   const body = document.getElementById('trends-body');
   const sortWrap = document.getElementById('trends-sort-wrap');
   if (sortWrap) sortWrap.style.opacity = '0.3';
 
   const isHero = activeTrendSection === 'heroes';
 
-  // Tiers based purely on win rate — no pick rate influence
-  // S+ only appears if any hero genuinely clears the bar
+  if (!isHero) {
+    activeTrendView = 'table';
+    document.querySelectorAll('.trends-view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'table'));
+    if (sortWrap) sortWrap.style.opacity = '1';
+    renderTrends();
+    return;
+  }
+
   const TIERS = [
-    { id: 'S+', label: 'S+', color: '#e8c96e', bg: 'rgba(232,201,110,0.08)', border: 'rgba(232,201,110,0.3)',  minWR: 0.57 },
-    { id: 'S',  label: 'S',  color: '#e87040', bg: 'rgba(232,112,64,0.08)',  border: 'rgba(232,112,64,0.3)',   minWR: 0.54 },
-    { id: 'A',  label: 'A',  color: '#40c860', bg: 'rgba(64,200,96,0.06)',   border: 'rgba(64,200,96,0.2)',    minWR: 0.52 },
-    { id: 'B',  label: 'B',  color: '#4a9eff', bg: 'rgba(74,158,255,0.06)',  border: 'rgba(74,158,255,0.2)',   minWR: 0.50 },
-    { id: 'C',  label: 'C',  color: '#7a90a8', bg: 'rgba(122,144,168,0.04)', border: 'rgba(122,144,168,0.15)', minWR: 0.48 },
-    { id: 'D',  label: 'D',  color: '#e85040', bg: 'rgba(232,80,64,0.04)',   border: 'rgba(232,80,64,0.15)',   minWR: 0    },
+    { id: 'S+', label: 'S+', color: '#e8c96e', bg: 'rgba(232,201,110,0.08)', border: 'rgba(232,201,110,0.3)',  min: 0.57 },
+    { id: 'S',  label: 'S',  color: '#e87040', bg: 'rgba(232,112,64,0.08)',  border: 'rgba(232,112,64,0.3)',   min: 0.54 },
+    { id: 'A',  label: 'A',  color: '#40c860', bg: 'rgba(64,200,96,0.06)',   border: 'rgba(64,200,96,0.2)',    min: 0.52 },
+    { id: 'B',  label: 'B',  color: '#4a9eff', bg: 'rgba(74,158,255,0.06)',  border: 'rgba(74,158,255,0.2)',   min: 0.50 },
+    { id: 'C',  label: 'C',  color: '#7a90a8', bg: 'rgba(122,144,168,0.04)', border: 'rgba(122,144,168,0.15)', min: 0.48 },
+    { id: 'D',  label: 'D',  color: '#e85040', bg: 'rgba(232,80,64,0.04)',   border: 'rgba(232,80,64,0.15)',   min: 0    },
   ];
 
-  function assignTiers(rows) {
-    const tierMap = {};
-    TIERS.forEach(t => { tierMap[t.id] = []; });
+  // Pro tiers use presence (0–100) mapped to same 0–1 scale
+  const PRO_TIERS = [
+    { id: 'S+', label: 'S+', color: '#e8c96e', bg: 'rgba(232,201,110,0.08)', border: 'rgba(232,201,110,0.3)',  min: 0.75 },
+    { id: 'S',  label: 'S',  color: '#e87040', bg: 'rgba(232,112,64,0.08)',  border: 'rgba(232,112,64,0.3)',   min: 0.55 },
+    { id: 'A',  label: 'A',  color: '#40c860', bg: 'rgba(64,200,96,0.06)',   border: 'rgba(64,200,96,0.2)',    min: 0.35 },
+    { id: 'B',  label: 'B',  color: '#4a9eff', bg: 'rgba(74,158,255,0.06)',  border: 'rgba(74,158,255,0.2)',   min: 0.15 },
+    { id: 'C',  label: 'C',  color: '#7a90a8', bg: 'rgba(122,144,168,0.04)', border: 'rgba(122,144,168,0.15)', min: 0.05 },
+    { id: 'D',  label: 'D',  color: '#e85040', bg: 'rgba(232,80,64,0.04)',   border: 'rgba(232,80,64,0.15)',   min: 0    },
+  ];
 
+  function assignTiers(rows, tierDefs, scoreFn) {
+    const tierMap = {};
+    tierDefs.forEach(t => { tierMap[t.id] = []; });
     rows.forEach(r => {
-      for (const tier of TIERS) {
-        if (r.win_rate >= tier.minWR) {
-          tierMap[tier.id].push(r);
-          break;
-        }
+      const score = scoreFn(r);
+      for (const tier of tierDefs) {
+        if (score >= tier.min) { tierMap[tier.id].push(r); break; }
       }
     });
-
     return tierMap;
   }
 
-  if (isHero) {
-    const rows = processHeroTrends(heroData).filter(r => r.matches >= 20);
-    rows.sort((a,b) => b.win_rate - a.win_rate);
-    const tierMap = assignTiers(rows);
+  function heroCard(r, scoreStr, borderColor, tip) {
+    const portrait = PORTRAITS[r.name] || '';
+    return `<div title="${tip}" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
+      <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${borderColor};position:relative;background:var(--bg4)">
+        ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+      </div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${scoreStr}</div>
+    </div>`;
+  }
 
+  function renderTierList(rows, tierDefs, scoreFn, cardFn) {
+    const tierMap = assignTiers(rows, tierDefs, scoreFn);
     let html = '<div style="padding:16px 24px">';
-
-    TIERS.forEach(tier => {
+    tierDefs.forEach(tier => {
       const heroes = tierMap[tier.id];
-      if (!heroes.length) return; // skip empty tiers
-
+      if (!heroes.length) return;
+      heroes.sort((a,b) => scoreFn(b) - scoreFn(a));
       html += `<div style="display:flex;align-items:stretch;margin-bottom:4px;border:1px solid ${tier.border};border-radius:3px;overflow:hidden;background:var(--bg2)">
         <div style="width:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${tier.bg};border-right:1px solid ${tier.border}">
           <span style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:${tier.color}">${tier.label}</span>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;align-items:center">`;
-
-      heroes.forEach(r => {
-        const portrait = PORTRAITS[r.name] || '';
-        const wr = Math.round(r.win_rate * 100);
-        const rawWr = Math.round((r.win_rate_raw || r.win_rate) * 100);
-        const pick = Math.round(r.pick_rate * 100);
-        const adjusted = Math.abs(wr - rawWr) >= 1;
-        const tip = `${r.name} · ${pick}% pick · ${wr}% WR${adjusted ? ` (raw ${rawWr}% · adjusted for sample size)` : ''}`;
-        html += `<div title="${tip}"
-          onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name}')||HEROES[0])"
-          style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
-          <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
-            ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
-          </div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;letter-spacing:0.3px">${r.name}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:${wr>=53?'#40c860':wr<=47?'#e85040':'var(--text)'}">${wr}%</div>
-        </div>`;
-      });
-
-      html += `</div></div>`;
+        <div style="display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;align-items:center">
+          ${heroes.map(r => cardFn(r, tier)).join('')}
+        </div></div>`;
     });
+    return html + '</div>';
+  }
 
-    html += '</div>';
-    body.innerHTML = html;
+  const allRows = processHeroTrends(heroData).filter(r => r.matches >= 20);
 
-  } else {
-    // Items don't have a tier list — redirect to table which is more meaningful
-    activeTrendView = 'table';
-    document.querySelectorAll('.trends-view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'table'));
-    const sortWrap = document.getElementById('trends-sort-wrap');
-    if (sortWrap) sortWrap.style.opacity = '1';
-    renderTrends();
-    return;
+  if (activeTrendView === 'leaderboard-ranked') {
+    body.innerHTML = renderTierList(
+      allRows, TIERS,
+      r => r.win_rate,
+      (r, tier) => {
+        const wr = Math.round(r.win_rate * 100);
+        const proP = r.pro_presence > 0 ? ` · ${r.pro_presence}% pro` : '';
+        return heroCard(r, wr + '%', tier.border, `${r.name} · ${wr}% ranked WR${proP}`);
+      }
+    );
+
+  } else if (activeTrendView === 'leaderboard-pro') {
+    // Only heroes with pro data, tiered by presence, show WR as sub-label
+    const proRows = allRows.filter(r => r.pro_presence > 0);
+    body.innerHTML = renderTierList(
+      proRows, PRO_TIERS,
+      r => r.pro_presence / 100,
+      (r, tier) => {
+        const wrColor = r.pro_wr >= 55 ? '#40c860' : r.pro_wr <= 45 ? '#ff5555' : 'var(--text3)';
+        return `<div title="${r.name} · ${r.pro_presence}% presence · ${r.pro_wr}% WR" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
+          <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+            ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+          </div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${r.pro_presence}% <span style="color:${wrColor}">${r.pro_wr}%</span></div>
+        </div>`;
+      }
+    );
+
+  } else if (activeTrendView === 'leaderboard-merged') {
+    // Merged: only heroes with pro data, tiers based on merged_score
+    const mergedRows = allRows.filter(r => r.pro_presence > 0);
+    body.innerHTML = renderTierList(
+      mergedRows, TIERS,
+      r => r.merged_score,
+      (r, tier) => {
+        const rankedWR = Math.round(r.win_rate * 100);
+        const diverge = Math.abs(rankedWR - r.pro_wr);
+        const divergeStr = diverge >= 10
+          ? ` <span style="color:${r.pro_wr > rankedWR ? '#4a9eff' : '#ff9955'}">±${diverge}%</span>`
+          : '';
+        return `<div title="${r.name} · ${rankedWR}% ranked · ${r.pro_wr}% pro · ${r.pro_presence}% presence" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;width:54px">
+          <div style="width:48px;height:58px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
+            ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+          </div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;color:var(--text2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)">${rankedWR}%·${r.pro_wr}%${divergeStr}</div>
+        </div>`;
+      }
+    );
   }
 }
 
 
 function renderTrendsView() {
-  if (activeTrendView === 'leaderboard') {
+  if (activeTrendView.startsWith('leaderboard')) {
     renderLeaderboard();
   } else {
     renderTrends();
@@ -3965,7 +4040,24 @@ function generateBrief() {
     return `<span class="brief-val ${cls}">${sign}${v > 0 ? '' : '-'}${str}%</span>`;
   }
 
+  // Consensus: heroes where ranked WR ≥52% AND pro presence ≥35%
+  const consensus = heroRows
+    .filter(r => {
+      const p = EDL_PRO_DATA[r.name];
+      return p && r.win_rate >= 0.52 && p[1] >= 35;
+    })
+    .sort((a, b) => b.merged_score - a.merged_score)
+    .slice(0, 3);
+
   bodyEl.innerHTML = `
+    ${consensus.length ? `<div class="brief-section">
+      <div class="brief-section-label dominant">⚡ Consensus</div>
+      ${consensus.map(r => {
+        const p = EDL_PRO_DATA[r.name];
+        const val = `<span class="brief-val neutral">${Math.round(r.win_rate*100)}%·${p[1]}%</span>`;
+        return heroRowHTML(r, val);
+      }).join('')}
+    </div>` : ''}
     <div class="brief-section">
       <div class="brief-section-label rising">↑ Pick Rising</div>
       ${rising.map(r => heroRowHTML(r, fmtDeltaVal(r.pick_delta,'up'))).join('')}
@@ -4416,7 +4508,7 @@ document.querySelectorAll('.trends-view-btn').forEach(btn => {
     document.querySelectorAll('.trends-view-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     const sortWrap = document.getElementById('trends-sort-wrap');
-    if (sortWrap) sortWrap.style.opacity = activeTrendView === 'leaderboard' ? '0.3' : '1';
+    if (sortWrap) sortWrap.style.opacity = activeTrendView.startsWith('leaderboard') ? '0.3' : '1';
     if (trendsCache) renderTrendsView();
   });
 });
@@ -4424,7 +4516,7 @@ document.querySelectorAll('.trends-view-btn').forEach(btn => {
 // TRENDS SORT BUTTONS
 document.querySelectorAll('.trends-sort-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    if (activeTrendView === 'leaderboard') return; // sort disabled in leaderboard
+    if (activeTrendView.startsWith('leaderboard')) return; // sort disabled in leaderboard
     const sort = btn.dataset.sort;
     if (activeTrendSort === sort) { trendSortAsc = !trendSortAsc; }
     else { activeTrendSort = sort; trendSortAsc = false; }
