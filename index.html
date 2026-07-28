@@ -4941,16 +4941,18 @@ function generateQuestion(rng, usedQ) {
   }
   if (cat === 'item_tier') {
     const tier = pick([1,2,3,4], rng);
-    const pool = ITEMS.filter(i=>i.tier===tier&&i.name);
+    const allItems = [...(ITEMS.weapon||[]), ...(ITEMS.vitality||[]), ...(ITEMS.spirit||[])];
+    const pool = allItems.filter(i => i.tier === tier && i.name);
     if (!pool.length) return generateQuestion(rng, usedQ);
     const item = pick(pool, rng);
-    const wrongTiers = [1,2,3,4].filter(t=>t!==tier);
+    const cat2 = ITEMS.weapon?.includes(item) ? 'weapon' : ITEMS.vitality?.includes(item) ? 'vitality' : 'spirit';
+    const wrongTiers = [1,2,3,4].filter(t => t !== tier);
     return {
       q: `What tier is ${item.name}?`,
       a: `Tier ${tier}`, opts: shuffle([`Tier ${tier}`, ...wrongTiers.map(t=>`Tier ${t}`)], rng),
       cat:'Items', diff:'Easy',
       fact: `${item.name} is a Tier ${tier} item${item.cost ? ' costing ' + item.cost + ' souls' : ''}.${item.component ? ' Upgrades: ' + item.component + '.' : ''}`,
-      subject: { type:'item', item, category: Object.keys(ITEMS).find(k=>ITEMS[k].includes(item))||'weapon' }
+      subject: { type:'item', item, category: cat2 }
     };
   }
   if (cat === 'stamina_count') {
