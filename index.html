@@ -4876,17 +4876,20 @@ function shuffle(arr, rng) {
 }
 
 const CAT_WEIGHTS = [
-  { cat: 'ability_name',  w: 4 },
-  { cat: 'weapon_type',   w: 4 },
-  { cat: 'hero_tag',      w: 3 },
-  { cat: 'item_tier',     w: 3 },
-  { cat: 'stamina_count', w: 3 },
-  { cat: 'move_bucket',   w: 3 },
-  { cat: 'sprint_bucket', w: 3 },
-  { cat: 'stamina_cd',    w: 2 },
-  { cat: 'ability_cd',    w: 2 },
-  { cat: 'bullet_velocity', w: 1 },
-  { cat: 'reload',        w: 1 },
+  // Easy recognition
+  { cat: 'ability_name',  w: 2 },
+  { cat: 'weapon_type',   w: 1 },
+  { cat: 'hero_tag',      w: 1 },
+  { cat: 'item_tier',     w: 2 },
+  // Medium
+  { cat: 'stamina_count', w: 4 },
+  { cat: 'move_bucket',   w: 4 },
+  { cat: 'sprint_bucket', w: 4 },
+  { cat: 'stamina_cd',    w: 3 },
+  { cat: 'ability_cd',    w: 3 },
+  // Hard
+  { cat: 'bullet_velocity', w: 2 },
+  { cat: 'reload',        w: 2 },
 ];
 const TOTAL_WEIGHT = CAT_WEIGHTS.reduce((s, c) => s + c.w, 0);
 
