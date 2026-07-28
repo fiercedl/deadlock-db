@@ -1250,8 +1250,109 @@
   }
   .th-tip:hover::after { opacity: 1; }
 
-  /* Leaderboard sort toggle */
-  .lb-sort-wrap {
+  /* Advanced stats toggle */
+  .adv-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0 0 0;
+    padding: 5px 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text2);
+    user-select: none;
+    transition: border-color 0.15s;
+  }
+  .adv-toggle:hover { border-color: var(--accent); color: var(--text); }
+  .adv-toggle .adv-arrow { font-size: 10px; transition: transform 0.15s; }
+  .adv-toggle.open .adv-arrow { transform: rotate(90deg); }
+  .adv-body {
+    display: none;
+    margin-top: 6px;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  .adv-body.open { display: block; }
+  .adv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px 12px;
+  }
+  .adv-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .adv-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #8ab0c0;
+    white-space: nowrap;
+  }
+  .adv-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: #e0e8f0;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .adv-buckets {
+    margin-top: 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .adv-row-full {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    flex-wrap: wrap;
+  }
+    margin-top: 6px;
+    font-size: 12px;
+    color: #a0b8c8;
+    line-height: 1.5;
+  }
+  .adv-altfire {
+    margin-top: 6px;
+    padding: 5px 8px;
+    background: var(--bg4);
+    border-radius: 2px;
+    border-left: 2px solid var(--weapon);
+  }
+  .adv-altfire-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--weapon);
+    margin-bottom: 2px;
+  }
+  .adv-altfire-val {
+    font-size: 13px;
+    color: #e0e8f0;
+  }
     display: flex;
     gap: 6px;
     padding: 8px 24px;
@@ -1559,7 +1660,7 @@
 <body>
 
 <header>
-  <div class="logo" title="Deadlock Hero Reference Database · Ranked data: deadlock-api.com (Ascendant+) · Pro data: edl.gg (30d) · Patch notes: manually updated">DEADLOCK <span>HERO DB · v2026.06.04</span></div>
+  <div class="logo" title="Deadlock Hero Reference Database · Ranked data: deadlock-api.com (Ascendant+) · Pro data: edl.gg (30d) · Patch notes: manually updated">DEADLOCK <span>HERO DB · v2026.07.25</span></div>
   <div id="live-data-badge" title="Assets API status. Online = hero/item data refreshed from deadlock-api.com. Offline = using hardcoded fallback values (still accurate, just not live-updated)." style="
     font-family:'Share Tech Mono',monospace;
     font-size:10px;
@@ -1588,6 +1689,7 @@
   <button class="tab-btn active" data-tab="heroes">Hero</button>
   <button class="tab-btn" data-tab="shop">Shop</button>
   <button class="tab-btn" data-tab="trends">Trends</button>
+  <button class="tab-btn" data-tab="quiz">Quiz</button>
 </nav>
 
 <div class="tab-panel active" id="tab-heroes">
@@ -1617,6 +1719,7 @@
       </div>
       <button class="ov-close" id="ov-close">✕</button>
     </div>
+    <div id="ov-adv-stats" style="flex-shrink:0;padding:0 24px;background:var(--bg3);border-bottom:1px solid var(--border2)"></div>
     <div class="ov-body" id="ov-body"></div>
   </div>
 </div>
@@ -1731,6 +1834,11 @@
   </div>
 </div>
 
+<!-- Quiz Tab -->
+<div class="tab-panel" id="tab-quiz" style="flex:1;overflow-y:auto;padding:32px 24px;max-width:680px;margin:0 auto;width:100%">
+  <div id="quiz-container"></div>
+</div>
+
 
 <script>
 const HEROES = [
@@ -1806,7 +1914,7 @@ const HEROES = [
     tags: ["tank", "initiator"],
     weapon: "Biquette",
     stats: { hp: "790+43", ms: "7.0", dps: "74.1", sp: "0+1.1", bdmg: "6.3+0.142", falloff: "14→32m", bv: "513" },
-    notes: "SMG. Crit −20%. Light melees faster, don't interrupt reload. Melee restores ammo (heavy=100%, light=35%). May22: HP/boon +48→+59, bullet dmg/boon 0.165→0.142.",
+    notes: "SMG. Crit −20%. Innate: light melees faster (shorter recovery), don't slow movement, don't interrupt reload. Melee restores ammo (heavy=100%, light=35%). May22: HP/boon +48→+59, bullet dmg/boon 0.165→0.142.",
     abilities: [
       { num: 1, name: "Bashdown", cd: "35s (8s charge)",
         stats: [{ l:"melee", v:"55 ×1.1", t:"melee" }, { l:"spirit", v:"35 ×1.1", t:"spirit" }],
@@ -2007,7 +2115,7 @@ const HEROES = [
     name: "Holliday",
     tags: ["assassin"],
     weapon: "Doc's Orders",
-    stats: { hp: "750+41", ms: "8.2", dps: "39.8", sp: "0+1.1", bdmg: "19.7+1.14", falloff: "20→58m", bv: "1160" },
+    stats: { hp: "750+41", ms: "8.2", dps: "39.8", sp: "0+1.6", bdmg: "19.7+1.14", falloff: "20→58m", bv: "1160" },
     notes: "Revolver. BV updated to 1160 April 10 (undocumented). Stamina 2. May22: base bullet dmg 18.8→19.7, HP regen 1→2.",
     abilities: [
       { num: 1, name: "Powder Keg", cd: "28s (3.5s charge)",
@@ -2028,7 +2136,7 @@ const HEROES = [
     name: "Infernus",
     tags: ["assassin", "disruptor"],
     weapon: "Incendiary Remarks",
-    stats: { hp: "840+51", ms: "6.7", dps: "52.4", sp: "0+1.1", bdmg: "5.5+0.088", falloff: "18→55m", bv: "660" },
+    stats: { hp: "840+51", ms: "6.7", dps: "52.4", sp: "0+0.5", bdmg: "5.5+0.088", falloff: "18→55m", bv: "660" },
     notes: "SMG. Abilities refresh Afterburn timer. Afterburn first with bullets. May22: bullet size 3→4.",
     abilities: [
       { num: 1, name: "Napalm", cd: "25s (6s charge)",
@@ -2052,7 +2160,7 @@ const HEROES = [
     tags: ["support", "disruptor"],
     weapon: "Protector's Hand",
     stats: { hp: "765+57", ms: "7.2", dps: "60.5", sp: "0+1.2", bdmg: "4.45+0.08", falloff: "20→58m", bv: "572" },
-    notes: "SMG. SP/boon 1.2. −10% gravity. Stamina 4.",
+    notes: "SMG. SP/boon 1.2. −10% Gravity Scale. Stamina 4.",
     abilities: [
       { num: 1, name: "Entangling Thorns", cd: "32s (5s charge)",
         stats: [{ l:"DPS", v:"40 ×0.45", t:"spirit" }, { l:"T2", v:"×0.95 total", t:"spirit" }, { l:"slow", v:"−35%", t:"" }],
@@ -2098,7 +2206,7 @@ const HEROES = [
     name: "Lady Geist",
     tags: ["assassin"],
     weapon: "Johann's Gift",
-    stats: { hp: "890+64", ms: "6.3", dps: "46.4", sp: "0+1.1", bdmg: "20.7+1.0", falloff: "17→48m", bv: "828" },
+    stats: { hp: "890+64", ms: "6.3", dps: "46.4", sp: "0+1.3", bdmg: "20.7+1.0", falloff: "17→48m", bv: "828" },
     notes: "April 10: bdmg 20.7+1.0 (was 21.9+0.946). Ammo 9. Self-dmg from abilities is spirit type.",
     abilities: [
       { num: 1, name: "Essence Bomb", cd: "14s",
@@ -2122,7 +2230,7 @@ const HEROES = [
     name: "Lash",
     tags: ["initiator"],
     weapon: "Tale of The Tape",
-    stats: { hp: "750+50", ms: "7.2", dps: "49.3", sp: "0+1.1", bdmg: "8.46+0.31", falloff: "20→58m", bv: "635" },
+    stats: { hp: "750+50", ms: "7.2", dps: "49.3", sp: "0+1.2", bdmg: "8.46+0.31", falloff: "20→58m", bv: "635" },
     notes: "Burst fire. 10% innate SR. May22: bullet dmg/boon 0.341→0.31.",
     abilities: [
       { num: 1, name: "Ground Strike", cd: "21s",
@@ -2312,7 +2420,7 @@ const HEROES = [
     tags: ["support"],
     weapon: "Long Night",
     stats: { hp: "690+39", ms: "7.2", dps: "—", sp: "0+1.1", bdmg: "16+0.34", falloff: "20→58m", bv: "160" },
-    notes: "Highest sprint 4m/s. Crit −20%. Melee resist −5%.",
+    notes: "Innate: can enter map vents by crouching (not in combat). Highest sprint 4m/s. Crit −20%. Melee resist −5%.",
     abilities: [
       { num: 1, name: "Pillow Toss", cd: "25s (8s charge)",
         stats: [{ l:"dmg", v:"75 ×1.6", t:"spirit" }],
@@ -2424,7 +2532,7 @@ const HEROES = [
     name: "Venator",
     tags: ["assassin"],
     weapon: "51:20",
-    stats: { hp: "790+50", ms: "6.4", dps: "63.5", sp: "0+1.1", bdmg: "8+0.27", falloff: "20→51m", bv: "1588" },
+    stats: { hp: "790+50", ms: "6.4", dps: "63.5", sp: "0+1.3", bdmg: "8+0.27", falloff: "20→51m", bv: "1588" },
     notes: "SMG. Highest BV. Abilities deal weapon dmg. BR+SR both scale ×0.122 SP.",
     abilities: [
       { num: 1, name: "Consecrating Grenade", cd: "25s",
@@ -2534,7 +2642,7 @@ const HEROES = [
     name: "Warden",
     tags: ["initiator", "tank"],
     weapon: "Freedom's Cost",
-    stats: { hp: "815+73", ms: "6.3", dps: "66.1", sp: "0+1.1", bdmg: "17.3+0.34", falloff: "20→58m", bv: "290" },
+    stats: { hp: "815+73", ms: "6.3", dps: "66.1", sp: "0+1.3", bdmg: "17.3+0.34", falloff: "20→58m", bv: "290" },
     notes: "FR scales ×0.01 SP. May22: bullet dmg/boon 0.38→0.34.",
     abilities: [
       { num: 1, name: "Alchemical Flask", cd: "12s",
@@ -2727,6 +2835,58 @@ function openHeroOverlay(hero) {
   ovStats.innerHTML = statDefs.map(s =>
     `<div class="stat-pill" title="${s.tip}"><span class="stat-label">${s.l}</span><span class="stat-value ${s.c}">${s.v}</span></div>`
   ).join('');
+
+  // Advanced stats toggle
+  const adv = ADVANCED_STATS[hero.name];
+  const advContainer = document.getElementById('ov-adv-stats');
+  if (advContainer) {
+    if (!adv) {
+      advContainer.innerHTML = '';
+    } else {
+      const rows = [
+        ['Bullet Velocity', adv.bv ? adv.bv + ' m/s' : null],
+        ['Light Melee', adv.lm],
+        ['Heavy Melee', adv.hm],
+        ['Reload Time', adv.reload],
+        ['Pellets / Shot', adv.pellets],
+      ].filter(([,v]) => v);
+
+      // Named buckets
+      const MS_BUCKETS = {"6.2":"B1 — slowest","6.3":"B2","6.4":"B3","6.5":"B4","6.7":"B5","6.8":"B6","6.9":"B7","7.0":"B8","7.2":"B9","7.9":"B10","8.0":"B11","8.2":"B12 — fastest"};
+      const SP_BUCKETS = {"1.1":"B1 — very low","1.5":"B2 — low","1.6":"B3 — standard","1.8":"B4","2.1":"B5","2.2":"B6","2.4":"B7","3.5":"B8 — high","4.0":"B9 — very high"};
+      const ST_BUCKETS = {"2/4.2s":"2 charges, 4.2s CD","2/4.5s":"2 charges, 4.5s CD","3/4.5s":"3 charges, 4.5s CD (standard)","3/5.5s":"3 charges, 5.5s CD","4/4.5s":"4 charges, 4.5s CD","4/5.0s":"4 charges, 5.0s CD"};
+
+      const msVal = parseFloat(hero.stats.ms);
+      const msKey = String(msVal);
+      const spKey = adv.sprintSpd;
+      const stKey = adv.stamina + '/' + adv.stamCD;
+
+      const bucketRow = (label, val, bucket) =>
+        `<div class="adv-row adv-row-full">
+          <span class="adv-label">${label}</span>
+          <span class="adv-val">${val}</span>
+          ${bucket ? `<span style="font-family:'Rajdhani',sans-serif;font-size:12px;color:#6a8a9a;margin-left:6px">Bucket ${bucket}</span>` : ''}
+        </div>`;
+
+      advContainer.innerHTML = `
+        <div class="adv-toggle" id="adv-toggle-btn" onclick="this.classList.toggle('open');document.getElementById('adv-body').classList.toggle('open')">
+          <span class="adv-arrow">▶</span>
+          <span>Advanced Stats</span>
+        </div>
+        <div class="adv-body" id="adv-body">
+          <div class="adv-grid">
+            ${rows.map(([l, v]) => `<div class="adv-row"><span class="adv-label">${l}</span><span class="adv-val">${v}</span></div>`).join('')}
+          </div>
+          <div class="adv-buckets">
+            ${bucketRow('Move Speed', msVal + ' m/s', MS_BUCKETS[msKey])}
+            ${bucketRow('Sprint Bonus', '+' + adv.sprintSpd + ' m/s', SP_BUCKETS[spKey])}
+            ${bucketRow('Stamina', ST_BUCKETS[stKey] || (adv.stamina + ' charges / ' + adv.stamCD), null)}
+          </div>
+          ${adv.altFire ? `<div class="adv-altfire"><div class="adv-altfire-label">Alt Fire</div><div class="adv-altfire-val">${adv.altFire}</div></div>` : ''}
+          ${hero.notes ? `<div class="adv-note">${hero.notes}</div>` : adv.note ? `<div class="adv-note">${adv.note}</div>` : ''}
+        </div>`;
+    }
+  }
 
   // Body — build static sections immediately, API sections with loading state
   const heroId = getHeroIdByName(hero.name);
@@ -3321,6 +3481,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
       updateShopCount(tot, tot);
     } else if (isHeroes) {
       filterAndRender();
+    } else if (tab === 'quiz') {
+      if (!quizState) initQuiz(); else renderQuiz();
     }
   });
 });
@@ -3465,6 +3627,113 @@ let HERO_ID_MAP = {};
 let ITEM_ID_MAP = {};
 
 // Fallback hardcoded IDs in case API is unavailable
+// ═══════════════════════════════════════════════════════════
+// ADVANCED STATS — scraped from deadlock.wiki 2026-07-25
+// bv=bullet velocity(m/s), lm=light melee, hm=heavy melee,
+// stamina=count, stamCD=cooldown, pellets=per shot,
+// reload=time(s), dashSpd/sprintSpd(m/s), altFire=string or null
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// MOVEMENT & STAMINA BUCKETS — heroes grouped by stat tier
+// ═══════════════════════════════════════════════════════════
+const MOVE_SPEED_BUCKETS = {
+  "6.2":  ["Celeste"],
+  "6.3":  ["Grey Talon","Lady Geist","Victor","Warden"],
+  "6.4":  ["Abrams","Venator"],
+  "6.5":  ["Bebop","Mina","Shiv"],
+  "6.7":  ["Dynamo","Infernus","Kelvin","McGinnis","Paradox","Seven","Silver"],
+  "6.8":  ["Calico"],
+  "6.9":  ["Drifter","Paige","Vyper"],
+  "7.0":  ["Billy","Graves","Mirage"],
+  "7.2":  ["Apollo","Ivy","Lash","Pocket","Rem","Sinclair","Viscous","Wraith"],
+  "7.9":  ["Doorman","Vindicta"],
+  "8.0":  ["Mo & Krill"],
+  "8.2":  ["Haze","Holliday","Yamato"],
+};
+
+const SPRINT_SPEED_BUCKETS = {
+  "1.1":  ["Kelvin","Victor"],
+  "1.5":  ["Silver","Venator"],
+  "1.6":  ["Abrams","Apollo","Billy","Calico","Celeste","Doorman","Drifter","Dynamo","Grey Talon","Haze","Holliday","Infernus","Ivy","McGinnis","Mina","Mirage","Mo & Krill","Paradox","Pocket","Shiv","Sinclair","Vindicta","Viscous","Vyper","Warden","Wraith","Yamato"],
+  "1.8":  ["Seven"],
+  "2.1":  ["Lash"],
+  "2.2":  ["Graves"],
+  "2.4":  ["Lady Geist"],
+  "3.5":  ["Paige"],
+  "4.0":  ["Bebop","Rem"],
+};
+
+const STAMINA_BUCKETS = {
+  "2/4.2s": ["Mina"],
+  "2/4.5s": ["Graves","Holliday","McGinnis","Silver","Vindicta"],
+  "3/4.5s": ["Abrams","Apollo","Billy","Calico","Doorman","Drifter","Dynamo","Haze","Infernus","Lady Geist","Lash","Mirage","Mo & Krill","Paige","Paradox","Pocket","Rem","Seven","Sinclair","Venator","Victor","Viscous","Warden","Wraith","Yamato"],
+  "3/5.5s": ["Bebop","Kelvin","Shiv"],
+  "4/4.5s": ["Grey Talon","Ivy","Vyper"],
+  "4/5.0s": ["Celeste"],
+};
+
+function getBucketPeers(hero, stat) {
+  const name = hero.name;
+  const adv = ADVANCED_STATS[name];
+  if (!adv) return null;
+  let bucket, buckets;
+  if (stat === 'move') {
+    const ms = parseFloat(hero.stats.ms);
+    bucket = String(ms);
+    buckets = MOVE_SPEED_BUCKETS;
+  } else if (stat === 'sprint') {
+    bucket = adv.sprintSpd;
+    buckets = SPRINT_SPEED_BUCKETS;
+  } else if (stat === 'stamina') {
+    bucket = adv.stamina + '/' + adv.stamCD;
+    buckets = STAMINA_BUCKETS;
+  }
+  const peers = (buckets[bucket] || []).filter(n => n !== name);
+  return { bucket, peers };
+}
+
+const ADVANCED_STATS = {
+  "Abrams":     {bv:"610",lm:"50+1.74",hm:"116+4.03",stamina:"3",stamCD:"4.5s",pellets:"9",reload:"0.353s",dashSpd:"14.3",sprintSpd:"1.6",altFire:null},
+  "Apollo":     {bv:"127",lm:"63+1.58",hm:"116+2.91",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.5s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null},
+  "Bebop":      {bv:"508",lm:"63+1.58",hm:"116+2.91",stamina:"3",stamCD:"5.5s",pellets:null,reload:"2.35s",dashSpd:"14.3",sprintSpd:"4.0",altFire:null,note:"Beam weapon — no falloff. Crit −20%. BR 0%+0.3/boon"},
+  "Billy":      {bv:"513",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.9s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null},
+  "Calico":     {bv:"318",lm:"63+1.58",hm:"116+2.91",stamina:"3",stamCD:"4.5s",pellets:"9",reload:"2.6s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null,note:"Crit −25%. Melee restores ammo"},
+  "Celeste":    {bv:"50",lm:"50+1.58",hm:"116+3.67",stamina:"4",stamCD:"5.0s",pellets:null,reload:"2.0s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null,note:"Hard max range, no falloff. −25% gravity, +44% air control. No headshots. Cannot buy headshot items"},
+  "Doorman":    {bv:"203",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.4s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null},
+  "Drifter":    {bv:"508",lm:"51.5+1.58",hm:"120+3.68",stamina:"3",stamCD:"4.5s",pellets:"3",reload:"2.44s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null},
+  "Dynamo":     {bv:"320",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.35s",dashSpd:"14.3",sprintSpd:"1.6",altFire:null},
+  "Graves":     {bv:"635",lm:"50+1.58",hm:"116+3.67",stamina:"2",stamCD:"4.5s",pellets:null,reload:"2.8s",dashSpd:"14.7",sprintSpd:"2.2",altFire:null,note:"Beam weapon — no falloff, no headshots, no crit"},
+  "Grey Talon": {bv:"495",lm:"50+1.58",hm:"116+3.67",stamina:"4",stamCD:"4.5s",pellets:null,reload:"2.35s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null,note:"No headshots. Cannot buy headshot items"},
+  "Haze":       {bv:"762",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.35s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null,note:"No crit. Ammo scales ×0.5 SP"},
+  "Holliday":   {bv:"1160",lm:"50+1.58",hm:"116+3.67",stamina:"2",stamCD:"4.5s",pellets:null,reload:"2.75s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null},
+  "Infernus":   {bv:"660",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.25s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null},
+  "Ivy":        {bv:"572",lm:"50+1.58",hm:"116+3.67",stamina:"4",stamCD:"4.5s",pellets:null,reload:"2.44s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null},
+  "Kelvin":     {bv:"160",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"5.5s",pellets:null,reload:"2.59s",dashSpd:"14.3",sprintSpd:"1.1",altFire:null},
+  "Lady Geist": {bv:"828",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.59s",dashSpd:"14.3",sprintSpd:"2.4",altFire:null},
+  "Lash":       {bv:"635",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.35s",dashSpd:"14.7",sprintSpd:"2.1",altFire:null,note:"Burst fire. 10% innate Spirit Resist"},
+  "McGinnis":   {bv:"650",lm:"50+1.58",hm:"116+3.67",stamina:"2",stamCD:"4.5s",pellets:null,reload:"3.29s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null,note:"Machine gun spin-up 5→12.5 bullets/s over 2s"},
+  "Mina":       {bv:"762",lm:"50+1.58",hm:"116+3.67",stamina:"2",stamCD:"4.2s",pellets:null,reload:"1.7s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null,note:"Burst fire. −8% innate Debuff Resist"},
+  "Mirage":     {bv:"828",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.6s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null},
+  "Mo & Krill": {bv:"320",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:"4",reload:"2.82s",dashSpd:"14.3",sprintSpd:"1.6",altFire:null,note:"Crit −20%"},
+  "Paige":      {bv:"43",lm:"42+1.2",hm:"120+3.43",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.5s",dashSpd:"14.3",sprintSpd:"3.5",altFire:null,note:"Grenade launcher. No crit, but procs headshot items"},
+  "Paradox":    {bv:"525",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.59s",dashSpd:"16.1",sprintSpd:"1.6",altFire:null,note:"5-bullet burst"},
+  "Pocket":     {bv:"559",lm:"60+1.58",hm:"116+3.05",stamina:"3",stamCD:"4.5s",pellets:"7",reload:"2.82s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null,note:"Shotgun. −15% innate Spirit Resist"},
+  "Rem":        {bv:"160",lm:"58+1.58",hm:"116+3.16",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.0s",dashSpd:"14.7",sprintSpd:"4.0",altFire:null},
+  "Seven":      {bv:"635",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.35s",dashSpd:"14.7",sprintSpd:"1.8",altFire:null,note:"3-round burst. Crit −55%"},
+  "Shiv":       {bv:"610",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"5.5s",pellets:"6",reload:"2.8s",dashSpd:"14.3",sprintSpd:"1.6",altFire:"4 ammo/shot, applies bonus melee dmg to next hit"},
+  "Silver":     {bv:"254",lm:"50+1.58",hm:"116+3.67",stamina:"2",stamCD:"4.5s",pellets:"7",reload:null,dashSpd:"14.7",sprintSpd:"1.5",altFire:null,note:"Auto-reload only"},
+  "Sinclair":   {bv:"300",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.5s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null},
+  "Venator":    {bv:"1590",lm:"50+1.7",hm:"125+4.25",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.8s",dashSpd:"14.3",sprintSpd:"1.5",altFire:null},
+  "Victor":     {bv:"203",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.4s",dashSpd:"14.3",sprintSpd:"1.1",altFire:null,note:"Spin-up 1.67s"},
+  "Vindicta":   {bv:"660",lm:"50+1.58",hm:"116+3.67",stamina:"2",stamCD:"4.5s",pellets:null,reload:"2.91s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null,note:"Headshots only — no body crit multiplier"},
+  "Viscous":    {bv:"254",lm:"63+1.58",hm:"116+2.91",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.5s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null},
+  "Vyper":      {bv:"412",lm:"50+1.58",hm:"116+3.67",stamina:"4",stamCD:"4.5s",pellets:null,reload:"1.6s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null,note:"Infinite ammo while sliding (Slither). Crit −30%. MS scales ×0.0138 SP"},
+  "Warden":     {bv:"290",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.91s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null},
+  "Wraith":     {bv:"572",lm:"50+1.58",hm:"116+3.67",stamina:"3",stamCD:"4.5s",pellets:null,reload:"2.82s",dashSpd:"14.7",sprintSpd:"1.6",altFire:null,note:"Sprint speed scales ×0.05 SP"},
+  "Yamato":     {bv:"254",lm:"55+1.58",hm:"128+3.68",stamina:"3",stamCD:"4.5s",pellets:"5",reload:"2.44s",dashSpd:"14.7",sprintSpd:"1.6",altFire:"50+0.7/boon dmg, costs 3 ammo"},
+};
+
 const HERO_ID_FALLBACK = {
   1:"Infernus",2:"Seven",3:"Vindicta",4:"Lady Geist",6:"Abrams",7:"Wraith",
   8:"McGinnis",10:"Paradox",11:"Dynamo",12:"Kelvin",13:"Haze",14:"Holliday",
@@ -4577,6 +4846,477 @@ _origTabSwitch.forEach(btn => {
     }
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// QUIZ ENGINE
+// ═══════════════════════════════════════════════════════════
+
+function seededRng(seed) {
+  let s = seed >>> 0;
+  return function() {
+    s ^= s << 13; s ^= s >> 17; s ^= s << 5;
+    return ((s >>> 0) / 0xffffffff);
+  };
+}
+
+function getDaySeed() {
+  const d = new Date();
+  return (d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate()) | 0;
+}
+
+function pick(arr, rng) { return arr[Math.floor(rng() * arr.length)]; }
+
+function shuffle(arr, rng) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(rng() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const CAT_WEIGHTS = [
+  { cat: 'ability_name',  w: 4 },
+  { cat: 'weapon_type',   w: 4 },
+  { cat: 'hero_tag',      w: 3 },
+  { cat: 'item_tier',     w: 3 },
+  { cat: 'stamina_count', w: 3 },
+  { cat: 'move_bucket',   w: 3 },
+  { cat: 'sprint_bucket', w: 3 },
+  { cat: 'stamina_cd',    w: 2 },
+  { cat: 'ability_cd',    w: 2 },
+  { cat: 'bullet_velocity', w: 1 },
+  { cat: 'reload',        w: 1 },
+];
+const TOTAL_WEIGHT = CAT_WEIGHTS.reduce((s, c) => s + c.w, 0);
+
+function pickCategory(rng) {
+  let r = rng() * TOTAL_WEIGHT;
+  for (const { cat, w } of CAT_WEIGHTS) { r -= w; if (r <= 0) return cat; }
+  return CAT_WEIGHTS[0].cat;
+}
+
+const MS_LABELS = {"6.2":"B1 — slowest","6.3":"B2","6.4":"B3","6.5":"B4","6.7":"B5","6.8":"B6","6.9":"B7","7.0":"B8","7.2":"B9","7.9":"B10","8.0":"B11","8.2":"B12 — fastest"};
+const SP_LABELS = {"1.1":"B1 — very low","1.5":"B2 — low","1.6":"B3 — standard","1.8":"B4","2.1":"B5","2.2":"B6","2.4":"B7","3.5":"B8 — high","4.0":"B9 — very high"};
+
+function generateQuestion(rng, usedQ) {
+  const cat = pickCategory(rng);
+  const heroPool = HEROES.filter(h => ADVANCED_STATS[h.name]);
+  const hero = pick(heroPool, rng);
+  const adv = ADVANCED_STATS[hero.name];
+
+  if (cat === 'ability_name') {
+    const ab = pick(hero.abilities, rng);
+    const wrongs = shuffle(heroPool.filter(h => h.name !== hero.name), rng).slice(0,3);
+    return {
+      q: `Which hero has an ability called "${ab.name}"?`,
+      a: hero.name, opts: shuffle([hero.name, ...wrongs.map(h=>h.name)], rng),
+      cat:'Recognition', diff:'Easy',
+      fact: `${hero.name}'s ${ab.name} ${ab.cd !== 'passive' ? 'has a ' + ab.cd + ' cooldown' : 'is a passive ability'}.`,
+      subject: { type:'hero', hero, ability: ab, hidePortrait: true }
+    };
+  }
+  if (cat === 'weapon_type') {
+    const wrongs = shuffle(heroPool.filter(h=>h.name!==hero.name&&h.weapon!==hero.weapon), rng).slice(0,3);
+    return {
+      q: `What weapon does ${hero.name} use?`,
+      a: hero.weapon, opts: shuffle([hero.weapon, ...wrongs.map(h=>h.weapon)], rng),
+      cat:'Recognition', diff:'Easy',
+      fact: `${hero.name} uses the ${hero.weapon}.${hero.notes ? ' ' + hero.notes.split('.')[0] + '.' : ''}`,
+      subject: { type:'hero', hero }
+    };
+  }
+  if (cat === 'hero_tag') {
+    if (!hero.tags?.length) return generateQuestion(rng, usedQ);
+    const tag = pick(hero.tags, rng);
+    const wrongs = shuffle(heroPool.filter(h=>h.name!==hero.name&&!(h.tags||[]).includes(tag)), rng).slice(0,3);
+    const others = heroPool.filter(h=>h.name!==hero.name&&(h.tags||[]).includes(tag)).map(h=>h.name);
+    return {
+      q: `Which hero is tagged as "${tag}"?`,
+      a: hero.name, opts: shuffle([hero.name, ...wrongs.map(h=>h.name)], rng),
+      cat:'Recognition', diff:'Easy',
+      fact: `${tag} heroes: ${[hero.name, ...others].join(', ')}.`,
+      subject: { type:'hero', hero, hidePortrait: true }
+    };
+  }
+  if (cat === 'item_tier') {
+    const tier = pick([1,2,3,4], rng);
+    const pool = ITEMS.filter(i=>i.tier===tier&&i.name);
+    if (!pool.length) return generateQuestion(rng, usedQ);
+    const item = pick(pool, rng);
+    const wrongTiers = [1,2,3,4].filter(t=>t!==tier);
+    return {
+      q: `What tier is ${item.name}?`,
+      a: `Tier ${tier}`, opts: shuffle([`Tier ${tier}`, ...wrongTiers.map(t=>`Tier ${t}`)], rng),
+      cat:'Items', diff:'Easy',
+      fact: `${item.name} is a Tier ${tier} item${item.cost ? ' costing ' + item.cost + ' souls' : ''}.${item.component ? ' Upgrades: ' + item.component + '.' : ''}`,
+      subject: { type:'item', item, category: Object.keys(ITEMS).find(k=>ITEMS[k].includes(item))||'weapon' }
+    };
+  }
+  if (cat === 'stamina_count') {
+    const counts = ['2','3','4'].filter(x=>x!==adv.stamina);
+    const peersCount = heroPool.filter(h=>ADVANCED_STATS[h.name]?.stamina===adv.stamina&&h.name!==hero.name).map(h=>h.name);
+    return {
+      q: `How many stamina charges does ${hero.name} have?`,
+      a: adv.stamina, opts: shuffle([adv.stamina, ...counts], rng),
+      cat:'Movement', diff:'Medium',
+      fact: `${hero.name} has ${adv.stamina} stamina charges (${adv.stamCD} cooldown).${peersCount.length ? ' Shared with: ' + peersCount.slice(0,4).join(', ') + '.' : ''}`,
+      subject: { type:'hero', hero }
+    };
+  }
+  if (cat === 'move_bucket') {
+    const ms = parseFloat(hero.stats.ms);
+    const allMS = [...new Set(heroPool.map(h=>parseFloat(h.stats.ms)))].sort((a,b)=>a-b);
+    const wrongMS = shuffle(allMS.filter(v=>v!==ms), rng).slice(0,3);
+    const fmt = v => `${v} m/s · ${MS_LABELS[String(v)]||v}`;
+    const peers = heroPool.filter(h=>parseFloat(h.stats.ms)===ms&&h.name!==hero.name).map(h=>h.name);
+    return {
+      q: `What move speed bucket is ${hero.name} in?`,
+      a: fmt(ms), opts: shuffle([fmt(ms), ...wrongMS.map(fmt)], rng),
+      cat:'Movement', diff:'Medium',
+      fact: `${hero.name} moves at ${ms} m/s (${MS_LABELS[String(ms)]||ms}).${peers.length ? ' Same bucket: ' + peers.slice(0,4).join(', ') + '.' : ''}`,
+      subject: { type:'hero', hero }
+    };
+  }
+  if (cat === 'sprint_bucket') {
+    const sp = adv.sprintSpd;
+    const allSP = [...new Set(Object.values(ADVANCED_STATS).map(a=>a.sprintSpd).filter(Boolean))];
+    const wrongSP = shuffle(allSP.filter(v=>v!==sp), rng).slice(0,3);
+    const fmt = v => `+${v} m/s · ${SP_LABELS[v]||v}`;
+    const peers = heroPool.filter(h=>ADVANCED_STATS[h.name]?.sprintSpd===sp&&h.name!==hero.name).map(h=>h.name);
+    return {
+      q: `What sprint speed bucket is ${hero.name} in?`,
+      a: fmt(sp), opts: shuffle([fmt(sp), ...wrongSP.map(fmt)], rng),
+      cat:'Movement', diff:'Medium',
+      fact: `${hero.name} has +${sp} m/s sprint (${SP_LABELS[sp]||sp}).${peers.length ? ' Same bucket: ' + peers.slice(0,4).join(', ') + '.' : ' Unique bucket.'}`,
+      subject: { type:'hero', hero }
+    };
+  }
+  if (cat === 'stamina_cd') {
+    const wrongCDs = ['4.2s','4.5s','5.0s','5.5s'].filter(x=>x!==adv.stamCD);
+    return {
+      q: `What is ${hero.name}'s stamina cooldown?`,
+      a: adv.stamCD, opts: shuffle([adv.stamCD, ...shuffle(wrongCDs,rng).slice(0,3)], rng),
+      cat:'Movement', diff:'Medium',
+      fact: `${hero.name}'s stamina cooldown is ${adv.stamCD} with ${adv.stamina} charges.`,
+      subject: { type:'hero', hero }
+    };
+  }
+  if (cat === 'ability_cd') {
+    const validAbs = hero.abilities.filter(a=>a.cd&&a.cd!=='passive'&&/^\d/.test(a.cd));
+    if (!validAbs.length) return generateQuestion(rng, usedQ);
+    const ab = pick(validAbs, rng);
+    const num = parseFloat(ab.cd);
+    const wrongs = shuffle([num-5,num+5,num+10,num-10].filter(x=>x>0&&x!==num), rng).slice(0,3);
+    return {
+      q: `What is the base cooldown of ${hero.name}'s ${ab.name}?`,
+      a: ab.cd, opts: shuffle([ab.cd, ...wrongs.map(x=>x+'s')], rng),
+      cat:'Abilities', diff:'Hard',
+      fact: `${hero.name}'s ${ab.name} has a ${ab.cd} base cooldown.${ab.stats?.length ? ' Base dmg: ' + ab.stats[0].v + '.' : ''}`,
+      subject: { type:'hero', hero, ability: ab, hidePortrait: true }
+    };
+  }
+  if (cat === 'bullet_velocity') {
+    if (!adv.bv) return generateQuestion(rng, usedQ);
+    const allBVs = [...new Set(Object.values(ADVANCED_STATS).map(a=>a.bv).filter(Boolean))];
+    const wrongs = shuffle(allBVs.filter(v=>v!==adv.bv), rng).slice(0,3);
+    return {
+      q: `What is ${hero.name}'s bullet velocity?`,
+      a: adv.bv+' m/s', opts: shuffle([adv.bv+' m/s', ...wrongs.map(v=>v+' m/s')], rng),
+      cat:'Weapon', diff:'Hard',
+      fact: `${hero.name}'s bullets travel at ${adv.bv} m/s.`,
+      subject: { type:'hero', hero }
+    };
+  }
+  if (cat === 'reload') {
+    if (!adv.reload) return generateQuestion(rng, usedQ);
+    const heroesWithReload = heroPool.filter(h=>ADVANCED_STATS[h.name]?.reload);
+    const allReloads = [...new Set(heroesWithReload.map(h=>ADVANCED_STATS[h.name].reload))];
+    const wrongs = shuffle(allReloads.filter(v=>v!==adv.reload), rng).slice(0,3);
+    return {
+      q: `What is ${hero.name}'s reload time?`,
+      a: adv.reload, opts: shuffle([adv.reload, ...wrongs], rng),
+      cat:'Weapon', diff:'Hard',
+      fact: `${hero.name} reloads in ${adv.reload}.`,
+      subject: { type:'hero', hero }
+    };
+  }
+  return generateQuestion(rng, usedQ);
+}
+
+function generateDailyQuestions() {
+  const seed = getDaySeed();
+  const rng = seededRng(seed);
+  const used = new Set();
+  const questions = [];
+  let attempts = 0;
+  while (questions.length < 3 && attempts < 100) {
+    attempts++;
+    const q = generateQuestion(rng, used);
+    if (!used.has(q.q)) { used.add(q.q); questions.push(q); }
+  }
+  return questions;
+}
+
+// ── Streak tracking ────────────────────────────────────────
+function getStreak() {
+  const data = JSON.parse(localStorage.getItem('dl_quiz_streak') || '{"streak":0,"lastDay":0}');
+  const today = getDaySeed();
+  const yesterday = (() => { const d = new Date(); d.setDate(d.getDate()-1); return (d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate())|0; })();
+  if (data.lastDay === today) return data.streak;
+  if (data.lastDay === yesterday) return data.streak; // still active, not yet completed today
+  return 0; // streak broken
+}
+
+function updateStreak() {
+  const today = getDaySeed();
+  const yesterday = (() => { const d = new Date(); d.setDate(d.getDate()-1); return (d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate())|0; })();
+  const data = JSON.parse(localStorage.getItem('dl_quiz_streak') || '{"streak":0,"lastDay":0}');
+  if (data.lastDay === today) return; // already updated today
+  const newStreak = (data.lastDay === yesterday) ? data.streak + 1 : 1;
+  localStorage.setItem('dl_quiz_streak', JSON.stringify({streak: newStreak, lastDay: today}));
+}
+
+function getMsUntilMidnight() {
+  const now = new Date();
+  const midnight = new Date(now); midnight.setHours(24,0,0,0);
+  return midnight - now;
+}
+
+let quizState = null;
+
+function initQuiz() {
+  const seed = getDaySeed();
+  const saved = JSON.parse(localStorage.getItem('dl_quiz_v4_' + seed) || 'null');
+  quizState = {
+    questions: generateDailyQuestions(),
+    current: saved ? saved.current : 0,
+    score: saved ? saved.score : 0,
+    answered: saved ? saved.answered : false,
+    history: saved ? saved.history : [],
+    seed,
+  };
+  renderQuiz();
+}
+
+function saveQuiz() {
+  if (!quizState) return;
+  localStorage.setItem('dl_quiz_v4_' + quizState.seed, JSON.stringify({
+    current: quizState.current,
+    score: quizState.score,
+    answered: quizState.answered,
+    history: quizState.history,
+  }));
+}
+
+// ── Countdown display ──────────────────────────────────────
+function startCountdown(el) {
+  function update() {
+    const ms = getMsUntilMidnight();
+    const h = Math.floor(ms/3600000);
+    const m = Math.floor((ms%3600000)/60000);
+    const s = Math.floor((ms%60000)/1000);
+    el.textContent = `New questions in ${h}h ${m}m ${s}s`;
+  }
+  update();
+  return setInterval(update, 1000);
+}
+
+let countdownInterval = null;
+
+function renderQuiz() {
+  const container = document.getElementById('quiz-container');
+  if (!container) return;
+
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+
+  // Not yet started
+  if (!quizState) {
+    const streak = getStreak();
+    container.innerHTML = `
+      <div style="text-align:center;padding:32px 0 24px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#6a8a9a;margin-bottom:6px">Daily Quiz</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;color:var(--accent);line-height:1">3</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#8ab0c0;margin-top:4px">questions · resets at midnight</div>
+        ${streak > 0 ? `<div style="margin-top:16px;font-family:'Rajdhani',sans-serif;font-size:16px;color:#e8c96e">🔥 ${streak} day streak</div>` : ''}
+        <div style="margin-top:8px;font-family:'Rajdhani',sans-serif;font-size:12px;color:#6a8a9a">Recognition · Movement · Abilities · Items</div>
+      </div>
+      <button onclick="initQuiz()" style="
+        display:block;width:100%;padding:16px;margin-top:16px;
+        background:var(--accent);border:none;border-radius:4px;
+        font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;
+        letter-spacing:2px;text-transform:uppercase;color:#000;cursor:pointer">
+        Start
+      </button>`;
+    return;
+  }
+
+  const { questions, current, score, history } = quizState;
+  const total = questions.length;
+
+  // Finished
+  if (current >= total) {
+    updateStreak();
+    const streak = getStreak();
+    const shareText = `🎯 ${score}/${total} on the Deadlock DB Daily Quiz`;
+
+    container.innerHTML = `
+      <div style="text-align:center;padding:32px 0 24px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#6a8a9a;margin-bottom:8px">Daily Complete</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:80px;font-weight:700;color:var(--accent);line-height:1">${score}<span style="font-size:40px;color:#6a8a9a"> / ${total}</span></div>
+        ${streak > 0 ? `<div style="margin-top:12px;font-family:'Rajdhani',sans-serif;font-size:18px;color:#e8c96e">🔥 ${streak} day streak</div>` : ''}
+        <div id="quiz-countdown" style="margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:12px;color:#6a8a9a"></div>
+      </div>
+
+      <!-- Review -->
+      <div style="margin-top:24px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6a8a9a;margin-bottom:4px">Review</div>
+        ${history.map((h, i) => `
+          <div style="padding:12px 14px;background:var(--bg3);border:1px solid ${h.correct ? 'rgba(64,200,96,0.3)' : 'rgba(232,80,64,0.3)'};border-radius:4px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;color:#a0b8c8;margin-bottom:4px">${questions[i].q}</div>
+            ${!h.correct ? `<div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#ff6060;margin-bottom:2px">You: ${h.chosen}</div>` : ''}
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#40e870">✓ ${questions[i].a}</div>
+            ${questions[i].fact ? `<div style="font-size:12px;color:#6a8a9a;margin-top:6px;line-height:1.5">${questions[i].fact}</div>` : ''}
+          </div>`).join('')}
+      </div>
+
+`;
+
+    const cdEl = document.getElementById('quiz-countdown');
+    if (cdEl) countdownInterval = startCountdown(cdEl);
+    return;
+  }
+
+  const q = questions[current];
+  const catColors = { Recognition:'#4a9eff', Movement:'#40c860', Items:'#e8c96e', Abilities:'#b06fff', Weapon:'#e87040' };
+  const diffColors = { Easy:'#40c860', Medium:'#e8c96e', Hard:'#e85040' };
+
+  container.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#6a8a9a">${current+1} / ${total}</span>
+      <div style="display:flex;gap:6px">
+        <span style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${catColors[q.cat]||'#8ab0c0'};padding:2px 7px;border:1px solid ${catColors[q.cat]||'#8ab0c0'};border-radius:2px">${q.cat}</span>
+        <span style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${diffColors[q.diff]||'#8ab0c0'};padding:2px 7px;border:1px solid ${diffColors[q.diff]||'#8ab0c0'};border-radius:2px">${q.diff}</span>
+      </div>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#40c860">${score} pts</span>
+    </div>
+    <div style="width:100%;height:3px;background:var(--bg4);border-radius:2px;margin-bottom:28px">
+      <div style="width:${(current/total)*100}%;height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+      ${q.subject?.type === 'hero' && !q.subject.hidePortrait ? `
+        <div style="flex-shrink:0;width:64px;height:78px;border-radius:4px;overflow:hidden;border:1px solid var(--border2);background:var(--bg4)">
+          <img src="${PORTRAITS[q.subject.hero.name]||''}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">
+        </div>` : q.subject?.type === 'item' ? `
+        <div style="flex-shrink:0;width:64px;height:64px;border-radius:4px;overflow:hidden;border:1px solid var(--border2);background:var(--bg4);position:relative">
+          <img src="${backerUrl(q.subject.category, q.subject.item.tier)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+          <img src="${itemIconUrl(q.subject.item.name, q.subject.category)}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:80%;object-fit:contain" onerror="this.style.display='none'">
+        </div>` : ''}
+      <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:600;color:#e0e8f0;line-height:1.4">${q.q}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="quiz-opts">
+      ${q.opts.map((opt,i) => `
+        <button onclick="answerQuiz(${i})" style="
+          text-align:left;padding:14px 18px;
+          background:var(--bg3);border:1px solid var(--border2);border-radius:4px;
+          font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;
+          color:#c5cdd4;cursor:pointer;display:flex;align-items:center;gap:14px;width:100%"
+          onmouseover="if(!this.dataset.done)this.style.borderColor='var(--accent)'"
+          onmouseout="if(!this.dataset.done)this.style.borderColor='var(--border2)'">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#6a8a9a;flex-shrink:0;width:16px">${['A','B','C','D'][i]}</span>${opt}
+        </button>`).join('')}
+    </div>
+    <div id="quiz-feedback" style="margin-top:16px;min-height:24px"></div>`;
+}
+
+function answerQuiz(idx) {
+  if (!quizState || quizState.answered) return;
+  quizState.answered = true;
+
+  const q = quizState.questions[quizState.current];
+  const chosen = q.opts[idx];
+  const correct = chosen === q.a;
+  if (correct) quizState.score++;
+
+  quizState.history.push({ correct, chosen });
+
+  document.querySelectorAll('#quiz-opts button').forEach((btn, i) => {
+    btn.dataset.done = true;
+    btn.style.cursor = 'default';
+    btn.onmouseover = null; btn.onmouseout = null;
+    if (q.opts[i] === q.a) {
+      btn.style.background = 'rgba(64,200,96,0.12)';
+      btn.style.borderColor = '#40c860';
+      btn.style.color = '#40e870';
+    } else if (i === idx) {
+      btn.style.background = 'rgba(232,80,64,0.12)';
+      btn.style.borderColor = '#e85040';
+      btn.style.color = '#ff6060';
+    }
+  });
+
+  const fb = document.getElementById('quiz-feedback');
+  const isLast = quizState.current >= quizState.questions.length - 1;
+
+  // Build reveal HTML
+  let revealHtml = '';
+  const subj = q.subject;
+  if (subj?.type === 'hero' && subj.ability && subj.ability !== true) {
+    const ab = subj.ability;
+    const portraitHtml = subj.hidePortrait ? `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:40px;height:48px;border-radius:3px;overflow:hidden;flex-shrink:0;border:1px solid var(--border2)">
+          <img src="${PORTRAITS[subj.hero.name]||''}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">
+        </div>
+        <span style="font-family:'Rajdhani',sans-serif;font-size:14px;color:#8ab0c0">${subj.hero.name}</span>
+      </div>` : '';
+    const stats = ab.stats ? ab.stats.map(s => `<span style="color:#c5cdd4;font-family:'Share Tech Mono',monospace;font-size:12px">${s.l}: <b>${s.v}</b></span>`).join('  ') : '';
+    const upgrades = ab.upgrades ? ab.upgrades.map((u,i) => `<div style="font-size:12px;color:#a0b8c8;padding:3px 0"><span style="color:#e8c96e;font-family:'Share Tech Mono',monospace;font-size:10px;margin-right:6px">T${i+1}</span>${u}</div>`).join('') : '';
+    revealHtml = `
+      <div style="margin-top:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;border-left:2px solid var(--spirit)">
+        ${portraitHtml}
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#e0e8f0">${ab.name}</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#6a8a9a">${ab.cd || 'passive'}</span>
+        </div>
+        ${stats ? `<div style="margin-bottom:6px;display:flex;flex-wrap:wrap;gap:10px">${stats}</div>` : ''}
+        ${upgrades}
+      </div>`;
+  } else if (subj?.type === 'item') {
+    const item = subj.item;
+    const cat = subj.category;
+    const iconU = itemIconUrl(item.name, cat);
+    const backU = backerUrl(cat, item.tier);
+    const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : 'var(--spirit)';
+    revealHtml = `
+      <div style="margin-top:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;border-left:2px solid ${catColor}">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <div style="width:40px;height:40px;border-radius:3px;overflow:hidden;position:relative;flex-shrink:0">
+            <img src="${backU}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+            <img src="${iconU}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:80%;object-fit:contain" onerror="this.style.display='none'">
+          </div>
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#e0e8f0">${item.name}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#6a8a9a">Tier ${item.tier}${item.cost ? ' · ' + item.cost + ' souls' : ''}</div>
+          </div>
+        </div>
+        ${item.stats ? `<div style="font-size:12px;color:#c5cdd4;margin-bottom:4px">${item.stats}</div>` : ''}
+        ${item.effect ? `<div style="font-size:12px;color:#a0b8c8;line-height:1.5">${item.effect}</div>` : ''}
+      </div>`;
+  }
+
+  fb.innerHTML = `
+    <div style="color:${correct?'#40e870':'#ff6060'};font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;margin-bottom:${q.fact?'8px':'0'}">${correct ? '✓ Correct' : '✗ Answer: ' + q.a}</div>
+    ${q.fact ? `<div style="font-size:13px;color:#8ab0c0;line-height:1.5;padding:8px 12px;background:var(--bg3);border-radius:3px;border-left:2px solid var(--accent2)">${q.fact}</div>` : ''}
+    ${revealHtml}`;
+
+  const btn = document.createElement('button');
+  btn.textContent = isLast ? 'See Results' : 'Next →';
+  btn.style.cssText = "margin-top:14px;padding:12px 28px;background:var(--accent);border:none;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#000;cursor:pointer;width:100%";
+  btn.onclick = () => { quizState.current++; quizState.answered = false; saveQuiz(); renderQuiz(); };
+  fb.appendChild(btn);
+}
+
 </script>
 </body>
 </html>
