@@ -2710,6 +2710,17 @@ const HEROES = [
 ];
 
 const BASE = "https://game.deadlock.coach/vpk/panorama/images/heroes/";
+const BASE2 = "https://cdn.deadlock-api.com/vpk/panorama/images/heroes/";
+
+// Portrait with fallback
+function portraitSrc(name) {
+  return PORTRAITS[name] || '';
+}
+function portraitHTML(name, style='') {
+  const src = PORTRAITS[name] || '';
+  const src2 = src.replace('game.deadlock.coach', 'cdn.deadlock-api.com');
+  return src ? `<img src="${src}" style="${style}" onerror="this.src='${src2}';this.onerror=null">` : '';
+}
 const PORTRAITS = {
   "Abrams":      BASE + "bull_vertical.webp",
   "Apollo":      BASE + "fencer_vertical.webp",
@@ -2787,7 +2798,7 @@ function renderHeroGrid() {
     tile.dataset.role = hero.tags.join(' ');
     const portrait = PORTRAITS[hero.name] || '';
     tile.innerHTML = `
-      ${portrait ? `<img class="hero-tile-portrait" src="${portrait}" alt="${hero.name}" loading="lazy" onerror="this.style.background='var(--bg4)'">` : ''}
+      ${portrait ? `<img class="hero-tile-portrait" src="${portrait}" alt="${hero.name}" loading="lazy" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.background='var(--bg4)'}">` : ''}
       <div class="hero-tile-name">${hero.name}</div>`;
     tile.addEventListener('click', () => openHeroOverlay(hero));
     grid.appendChild(tile);
@@ -2978,8 +2989,8 @@ async function renderOverlayApiSections(hero, heroId) {
     return `<div class="ov-item-chip" title="View ${name} in Shop" onclick="navigateToItem('${name.replace(/'/g, "\\'")}')" style="cursor:pointer">
       ${rankHtml}
       <div class="ov-item-chip-icon-wrap">
-        ${bUrl ? `<img class="ov-item-chip-backer" src="${bUrl}" alt="" onerror="this.style.display='none'">` : ''}
-        ${iconUrl ? `<img class="ov-icon-main" src="${iconUrl}" alt="${name}" onerror="this.style.display='none'">` : ''}
+        ${bUrl ? `<img class="ov-item-chip-backer" src="${bUrl}" alt="" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
+        ${iconUrl ? `<img class="ov-icon-main" src="${iconUrl}" alt="${name}" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
       </div>
       <div class="ov-item-chip-info">
         <div class="ov-item-chip-name">${name}</div>
@@ -3236,6 +3247,7 @@ const ITEMS = {
 };
 
 const CDN = 'https://game.deadlock.coach/vpk/panorama/images';
+const CDN2 = 'https://cdn.deadlock-api.com/vpk/panorama/images';
 const TIER_LABELS  = { 1:"Tier 1", 2:"Tier 2", 3:"Tier 3", 4:"Tier 4" };
 const TIER_ROMAN   = { 1:"I", 2:"II", 3:"III", 4:"IV" };
 const TIER_COSTS   = { 1:"800", 2:"1,600", 3:"3,200", 4:"6,400" };
@@ -4004,7 +4016,7 @@ function renderTrends() {
           : `<span style="color:#ff5555;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700">▼${Math.abs(rc)}</span>`;
       html += `<tr style="cursor:pointer" onclick="(function(){const h=HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}');if(h)openHeroOverlay(h);})()">
         <td><div class="trend-name-cell">
-          ${portrait ? `<img class="trend-portrait" src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
+          ${portrait ? `<img class="trend-portrait" src="${portrait}" alt="" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
           <div><div class="trend-name">${r.name}</div><div class="trend-tags">${tags}</div></div>
         </div></td>
         <td class="num">${rcHtml}</td>
@@ -4066,8 +4078,8 @@ function renderTrends() {
       const backerU = cat ? (() => { const itemObj = ITEMS[cat]?.find(i => i.name === r.name); return itemObj ? backerUrl(cat, itemObj.tier) : ''; })() : '';
       const iconHtml = iconUrl ? `
         <div class="trend-item-icon-wrap">
-          <img class="trend-item-backer" src="${backerU}" alt="" onerror="this.style.display='none'">
-          <img class="trend-item-icon" src="${iconUrl}" alt="${r.name}" onerror="this.style.display='none'">
+          <img class="trend-item-backer" src="${backerU}" alt="" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">
+          <img class="trend-item-icon" src="${iconUrl}" alt="${r.name}" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">
         </div>` : '';
       const rc = r.rank_change || 0;
       const rcHtml = rc === 0
@@ -4162,7 +4174,7 @@ function renderLeaderboard() {
     const portrait = PORTRAITS[r.name] || "";
     return `<div title="${tip}" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:72px">
       <div style="width:64px;height:78px;border-radius:3px;overflow:hidden;border:1px solid ${borderColor};position:relative;background:var(--bg4)">
-        ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ""}
+        ${portrait ? `<img src="${portrait}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ""}
       </div>
       <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8f0fa;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2)">${scoreStr}</div>
@@ -4211,7 +4223,7 @@ function renderLeaderboard() {
         const wrColor = r.pro_wr >= 55 ? '#40c860' : r.pro_wr <= 45 ? '#ff5555' : 'var(--text3)';
         return `<div title="${r.name} · ${r.pro_presence}% presence · ${r.pro_wr}% WR in ${EDL_PRO_DATA[r.name]?.[4] ?? '?'} pro games" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:72px">
           <div style="width:64px;height:78px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
-            ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+            ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
           </div>
           <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8f0fa;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2)">${r.pro_presence}% <span style="color:${wrColor}">${r.pro_wr}%</span></div>
@@ -4231,7 +4243,7 @@ function renderLeaderboard() {
         if (!hasPro) {
           return `<div title="${r.name} · ${rankedWR}% ranked · no pro data" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:72px;opacity:0.6">
             <div style="width:64px;height:78px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
-              ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+              ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
             </div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8f0fa;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
             <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2)">${rankedWR}%</div>
@@ -4243,7 +4255,7 @@ function renderLeaderboard() {
           : '';
         return `<div title="${r.name} · ${rankedWR}% ranked · ${r.pro_wr}% pro · ${r.pro_presence}% presence" onclick="openHeroOverlay(HEROES.find(h=>h.name==='${r.name.replace(/'/g,"\\'")}'))" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:72px">
           <div style="width:64px;height:78px;border-radius:3px;overflow:hidden;border:1px solid ${tier.border};position:relative;background:var(--bg4)">
-            ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">` : ''}
+            ${PORTRAITS[r.name] ? `<img src="${PORTRAITS[r.name]}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
           </div>
           <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#e8f0fa;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">${r.name}</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2)">${rankedWR}·${r.pro_wr}%${divergeStr}</div>
@@ -4282,7 +4294,7 @@ function generateBrief() {
     const portrait = PORTRAITS[r.name] || '';
     return `<div class="brief-row">
       <div class="brief-hero-icon">
-        ${portrait ? `<img src="${portrait}" alt="" onerror="this.style.display='none'">` : ''}
+        ${portrait ? `<img src="${portrait}" alt="" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
       </div>
       <span class="brief-name">${r.name}</span>
       ${valHtml}
@@ -4297,8 +4309,8 @@ function generateBrief() {
     const catColor = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text3)';
     return `<div class="brief-row">
       <div class="brief-item-icon">
-        ${bUrl ? `<img style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" src="${bUrl}" onerror="this.style.display='none'">` : ''}
-        ${iconUrl ? `<img style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:2px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))" src="${iconUrl}" onerror="this.style.display='none'">` : ''}
+        ${bUrl ? `<img style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" src="${bUrl}" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
+        ${iconUrl ? `<img style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:2px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))" src="${iconUrl}" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : ''}
       </div>
       <span class="brief-name" style="color:${catColor}">${r.name}</span>
       ${valHtml}
@@ -4449,7 +4461,7 @@ function generateFullBrief() {
   function wr(r) { return `<span style="color:${r.win_rate>=0.53?'#40c860':r.win_rate<=0.47?'#ff5555':'var(--text)'}">${pct(r.win_rate)} WR</span>`; }
   function hname(r) {
     const portrait = PORTRAITS[r.name] || '';
-    const icon = portrait ? `<img src="${portrait}" style="width:13px;height:16px;object-fit:cover;object-position:top;vertical-align:middle;border-radius:1px;margin-right:3px;border:1px solid var(--border2)" onerror="this.style.display='none'">` : '';
+    const icon = portrait ? `<img src="${portrait}" style="width:13px;height:16px;object-fit:cover;object-position:top;vertical-align:middle;border-radius:1px;margin-right:3px;border:1px solid var(--border2)" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : '';
     return `${icon}<strong>${r.name}</strong>`;
   }
   function iname(name) {
@@ -4459,8 +4471,8 @@ function generateFullBrief() {
     const iconUrl = itemIconUrl(name, cat);
     const bUrl = itemObj ? backerUrl(cat, itemObj.tier) : '';
     const icon = `<span style="display:inline-block;width:16px;height:20px;position:relative;vertical-align:middle;border-radius:2px;overflow:hidden;margin-right:3px;border:1px solid rgba(255,255,255,0.1)">
-      ${bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:``}
-      ${iconUrl?`<img src="${iconUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:``}
+      ${bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:``}
+      ${iconUrl?`<img src="${iconUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:``}
     </span>`;
     return `${icon}<strong style="color:${catColor(cat)}">${name}</strong>`;
   }
@@ -4549,8 +4561,8 @@ function generateFullBrief() {
     const bUrl = itemObj ? backerUrl(cat, itemObj.tier) : '';
     return `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 4px 2px 0;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:2px 6px 2px 2px;white-space:nowrap">
       <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">
-        ${bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:``}
-        ${iconUrl?`<img src="${iconUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:``}
+        ${bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:``}
+        ${iconUrl?`<img src="${iconUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:``}
       </span>
       <strong style="color:${catColor(cat)};font-size:15px">${name}</strong>
     </span>`;
@@ -4562,7 +4574,7 @@ function generateFullBrief() {
       <div style="margin-bottom:10px">
         <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;font-weight:700">Highest WR</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">${itemsByWR.slice(0,4).map(r => `<div style="display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:3px 8px 3px 3px;white-space:nowrap">
-          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:'')})()} </span>
+          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:'')})()} </span>
           <strong style="color:${catColor(['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name))||'weapon')};font-size:15px">${r.name}</strong>
           <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#40c860;margin-left:2px">${pct(r.win_rate)}</span>
         </div>`).join('')}</div>
@@ -4570,7 +4582,7 @@ function generateFullBrief() {
       <div style="margin-bottom:10px">
         <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;font-weight:700">Rising</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">${itemsRising.map(r => `<div style="display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:3px 8px 3px 3px;white-space:nowrap">
-          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:'')})()} </span>
+          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:'')})()} </span>
           <strong style="color:${catColor(['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name))||'weapon')};font-size:15px">${r.name}</strong>
           <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#40c860;margin-left:2px">${deltaStr(r)}</span>
         </div>`).join('')}</div>
@@ -4578,7 +4590,7 @@ function generateFullBrief() {
       <div>
         <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;font-weight:700">Falling</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">${itemsFalling.map(r => `<div style="display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:2px;padding:3px 8px 3px 3px;white-space:nowrap">
-          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.style.display='none'">`:'')})()} </span>
+          <span style="display:inline-block;width:20px;height:24px;position:relative;border-radius:1px;overflow:hidden;flex-shrink:0">${(()=>{const cat=['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name));const itemObj=cat?ITEMS[cat].find(i=>i.name===r.name):null;const bUrl=itemObj?backerUrl(cat,itemObj.tier):'';const iUrl=cat?itemIconUrl(r.name,cat):'';return (bUrl?`<img src="${bUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:'')+(iUrl?`<img src="${iUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:1px" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">`:'')})()} </span>
           <strong style="color:${catColor(['weapon','vitality','spirit'].find(c=>ITEMS[c].find(i=>i.name===r.name))||'weapon')};font-size:15px">${r.name}</strong>
           <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#ff5555;margin-left:2px">${deltaStr(r)}</span>
         </div>`).join('')}</div>
@@ -4602,7 +4614,7 @@ function generateFullBrief() {
           const verdictColor = r.win_rate >= 0.53 ? '#40c860' : r.win_rate <= 0.48 ? '#ff9955' : '#8ab0c0';
           const medal = medals[i] || '';
           const portrait = PORTRAITS[r.name] || '';
-          const portraitHtml = portrait ? `<img src="${portrait}" style="width:28px;height:36px;object-fit:cover;object-position:top;border-radius:2px;flex-shrink:0;border:1px solid var(--border2)" onerror="this.style.display='none'">` : '';
+          const portraitHtml = portrait ? `<img src="${portrait}" style="width:28px;height:36px;object-fit:cover;object-position:top;border-radius:2px;flex-shrink:0;border:1px solid var(--border2)" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : '';
           return `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px">
             ${portraitHtml}
             <div style="flex:1;min-width:0">
@@ -4640,7 +4652,7 @@ function generateSummary() {
 
   function hero(name) {
     const portrait = PORTRAITS[name] || '';
-    const icon = portrait ? `<img src="${portrait}" style="width:14px;height:18px;object-fit:cover;object-position:top center;vertical-align:middle;margin-right:3px;border-radius:2px;border:1px solid var(--border2)" onerror="this.style.display='none'">` : '';
+    const icon = portrait ? `<img src="${portrait}" style="width:14px;height:18px;object-fit:cover;object-position:top center;vertical-align:middle;margin-right:3px;border-radius:2px;border:1px solid var(--border2)" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : '';
     return `${icon}<strong>${name}</strong>`;
   }
   function item(name) { return `<strong>${name}</strong>`; }
@@ -4681,7 +4693,7 @@ function generateSummary() {
       const cat = getCat(name);
       const color = cat === 'weapon' ? 'var(--weapon)' : cat === 'vitality' ? 'var(--vitality)' : cat === 'spirit' ? 'var(--spirit)' : 'var(--text2)';
       const iconUrl = cat ? itemIconUrl(name, cat) : '';
-      const icon = iconUrl ? `<img src="${iconUrl}" style="width:16px;height:20px;object-fit:contain;vertical-align:middle;margin-right:3px;border-radius:2px;opacity:0.9" onerror="this.style.display='none'">` : '';
+      const icon = iconUrl ? `<img src="${iconUrl}" style="width:16px;height:20px;object-fit:contain;vertical-align:middle;margin-right:3px;border-radius:2px;opacity:0.9" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">` : '';
       return `${icon}<span style="color:${color};font-weight:700">${name}</span>`;
     }
 
@@ -4902,15 +4914,23 @@ function pickCategory(rng) {
 const MS_LABELS = {"6.2":"B1 — slowest","6.3":"B2","6.4":"B3","6.5":"B4","6.7":"B5","6.8":"B6","6.9":"B7","7.0":"B8","7.2":"B9","7.9":"B10","8.0":"B11","8.2":"B12 — fastest"};
 const SP_LABELS = {"1.1":"B1 — very low","1.5":"B2 — low","1.6":"B3 — standard","1.8":"B4","2.1":"B5","2.2":"B6","2.4":"B7","3.5":"B8 — high","4.0":"B9 — very high"};
 
-function generateQuestion(rng, usedQ) {
-  const cat = pickCategory(rng);
+function generateQuestion(rng, usedQ, slot) {
+  // If slot is forced, pick from appropriate categories
+  let cat;
+  if (slot === 'item') {
+    cat = 'item_tier';
+  } else if (slot === 'recognition') {
+    cat = pick(['ability_name', 'weapon_type', 'hero_tag'], rng);
+  } else {
+    cat = pickCategory(rng);
+  }
   const heroPool = HEROES.filter(h => ADVANCED_STATS[h.name]);
   const hero = pick(heroPool, rng);
   const adv = ADVANCED_STATS[hero.name];
 
   if (cat === 'ability_name') {
     const ab = pick(hero.abilities, rng);
-    const wrongs = shuffle(heroPool.filter(h => h.name !== hero.name), rng).slice(0,3);
+    const wrongs = shuffle(heroPool.filter(h => h.name !== hero.name), rng).slice(0,2);
     return {
       q: `Which hero has an ability called "${ab.name}"?`,
       a: hero.name, opts: shuffle([hero.name, ...wrongs.map(h=>h.name)], rng),
@@ -4920,7 +4940,7 @@ function generateQuestion(rng, usedQ) {
     };
   }
   if (cat === 'weapon_type') {
-    const wrongs = shuffle(heroPool.filter(h=>h.name!==hero.name&&h.weapon!==hero.weapon), rng).slice(0,3);
+    const wrongs = shuffle(heroPool.filter(h=>h.name!==hero.name&&h.weapon!==hero.weapon), rng).slice(0,2);
     return {
       q: `What weapon does ${hero.name} use?`,
       a: hero.weapon, opts: shuffle([hero.weapon, ...wrongs.map(h=>h.weapon)], rng),
@@ -4932,7 +4952,7 @@ function generateQuestion(rng, usedQ) {
   if (cat === 'hero_tag') {
     if (!hero.tags?.length) return generateQuestion(rng, usedQ);
     const tag = pick(hero.tags, rng);
-    const wrongs = shuffle(heroPool.filter(h=>h.name!==hero.name&&!(h.tags||[]).includes(tag)), rng).slice(0,3);
+    const wrongs = shuffle(heroPool.filter(h=>h.name!==hero.name&&!(h.tags||[]).includes(tag)), rng).slice(0,2);
     const others = heroPool.filter(h=>h.name!==hero.name&&(h.tags||[]).includes(tag)).map(h=>h.name);
     return {
       q: `Which hero is tagged as "${tag}"?`,
@@ -4952,7 +4972,7 @@ function generateQuestion(rng, usedQ) {
     const wrongTiers = [1,2,3,4].filter(t => t !== tier);
     return {
       q: `What tier is ${item.name}?`,
-      a: `Tier ${tier}`, opts: shuffle([`Tier ${tier}`, ...wrongTiers.map(t=>`Tier ${t}`)], rng),
+      a: `Tier ${tier}`, opts: shuffle([`Tier ${tier}`, ...shuffle(wrongTiers,rng).slice(0,2).map(t=>`Tier ${t}`)], rng),
       cat:'Items', diff:'Easy',
       fact: `${item.name} is a Tier ${tier} item${item.cost ? ' costing ' + item.cost + ' souls' : ''}.${item.component ? ' Upgrades: ' + item.component + '.' : ''}`,
       subject: { type:'item', item, category: cat2 }
@@ -4972,7 +4992,7 @@ function generateQuestion(rng, usedQ) {
   if (cat === 'move_bucket') {
     const ms = parseFloat(hero.stats.ms);
     const allMS = [...new Set(heroPool.map(h=>parseFloat(h.stats.ms)))].sort((a,b)=>a-b);
-    const wrongMS = shuffle(allMS.filter(v=>v!==ms), rng).slice(0,3);
+    const wrongMS = shuffle(allMS.filter(v=>v!==ms), rng).slice(0,2);
     const fmt = v => `${v} m/s · ${MS_LABELS[String(v)]||v}`;
     const peers = heroPool.filter(h=>parseFloat(h.stats.ms)===ms&&h.name!==hero.name).map(h=>h.name);
     return {
@@ -4986,7 +5006,7 @@ function generateQuestion(rng, usedQ) {
   if (cat === 'sprint_bucket') {
     const sp = adv.sprintSpd;
     const allSP = [...new Set(Object.values(ADVANCED_STATS).map(a=>a.sprintSpd).filter(Boolean))];
-    const wrongSP = shuffle(allSP.filter(v=>v!==sp), rng).slice(0,3);
+    const wrongSP = shuffle(allSP.filter(v=>v!==sp), rng).slice(0,2);
     const fmt = v => `+${v} m/s · ${SP_LABELS[v]||v}`;
     const peers = heroPool.filter(h=>ADVANCED_STATS[h.name]?.sprintSpd===sp&&h.name!==hero.name).map(h=>h.name);
     return {
@@ -5001,7 +5021,7 @@ function generateQuestion(rng, usedQ) {
     const wrongCDs = ['4.2s','4.5s','5.0s','5.5s'].filter(x=>x!==adv.stamCD);
     return {
       q: `What is ${hero.name}'s stamina cooldown?`,
-      a: adv.stamCD, opts: shuffle([adv.stamCD, ...shuffle(wrongCDs,rng).slice(0,3)], rng),
+      a: adv.stamCD, opts: shuffle([adv.stamCD, ...shuffle(wrongCDs,rng).slice(0,2)], rng),
       cat:'Movement', diff:'Medium',
       fact: `${hero.name}'s stamina cooldown is ${adv.stamCD} with ${adv.stamina} charges.`,
       subject: { type:'hero', hero }
@@ -5012,7 +5032,7 @@ function generateQuestion(rng, usedQ) {
     if (!validAbs.length) return generateQuestion(rng, usedQ);
     const ab = pick(validAbs, rng);
     const num = parseFloat(ab.cd);
-    const wrongs = shuffle([num-5,num+5,num+10,num-10].filter(x=>x>0&&x!==num), rng).slice(0,3);
+    const wrongs = shuffle([num-5,num+5,num+10,num-10].filter(x=>x>0&&x!==num), rng).slice(0,2);
     return {
       q: `What is the base cooldown of ${hero.name}'s ${ab.name}?`,
       a: ab.cd, opts: shuffle([ab.cd, ...wrongs.map(x=>x+'s')], rng),
@@ -5024,7 +5044,7 @@ function generateQuestion(rng, usedQ) {
   if (cat === 'bullet_velocity') {
     if (!adv.bv) return generateQuestion(rng, usedQ);
     const allBVs = [...new Set(Object.values(ADVANCED_STATS).map(a=>a.bv).filter(Boolean))];
-    const wrongs = shuffle(allBVs.filter(v=>v!==adv.bv), rng).slice(0,3);
+    const wrongs = shuffle(allBVs.filter(v=>v!==adv.bv), rng).slice(0,2);
     return {
       q: `What is ${hero.name}'s bullet velocity?`,
       a: adv.bv+' m/s', opts: shuffle([adv.bv+' m/s', ...wrongs.map(v=>v+' m/s')], rng),
@@ -5037,7 +5057,7 @@ function generateQuestion(rng, usedQ) {
     if (!adv.reload) return generateQuestion(rng, usedQ);
     const heroesWithReload = heroPool.filter(h=>ADVANCED_STATS[h.name]?.reload);
     const allReloads = [...new Set(heroesWithReload.map(h=>ADVANCED_STATS[h.name].reload))];
-    const wrongs = shuffle(allReloads.filter(v=>v!==adv.reload), rng).slice(0,3);
+    const wrongs = shuffle(allReloads.filter(v=>v!==adv.reload), rng).slice(0,2);
     return {
       q: `What is ${hero.name}'s reload time?`,
       a: adv.reload, opts: shuffle([adv.reload, ...wrongs], rng),
@@ -5055,11 +5075,23 @@ function generateDailyQuestions() {
   const used = new Set();
   const questions = [];
   let attempts = 0;
-  while (questions.length < 3 && attempts < 100) {
-    attempts++;
-    const q = generateQuestion(rng, used);
-    if (!used.has(q.q)) { used.add(q.q); questions.push(q); }
+
+  // Force at least 1 item question and 1 recognition question
+  const slots = shuffle(['item', 'recognition', 'any', 'any', 'any'], rng);
+
+  for (const slot of slots) {
+    let q = null;
+    let slotAttempts = 0;
+    while (!q && slotAttempts < 30) {
+      slotAttempts++;
+      const candidate = generateQuestion(rng, used, slot);
+      if (!used.has(candidate.q)) {
+        q = candidate;
+      }
+    }
+    if (q) { used.add(q.q); questions.push(q); }
   }
+
   return questions;
 }
 
@@ -5092,7 +5124,7 @@ let quizState = null;
 
 function initQuiz() {
   const seed = getDaySeed();
-  const saved = JSON.parse(localStorage.getItem('dl_quiz_v4_' + seed) || 'null');
+  const saved = JSON.parse(localStorage.getItem('dl_quiz_v5_' + seed) || 'null');
   quizState = {
     questions: generateDailyQuestions(),
     current: saved ? saved.current : 0,
@@ -5106,7 +5138,7 @@ function initQuiz() {
 
 function saveQuiz() {
   if (!quizState) return;
-  localStorage.setItem('dl_quiz_v4_' + quizState.seed, JSON.stringify({
+  localStorage.setItem('dl_quiz_v5_' + quizState.seed, JSON.stringify({
     current: quizState.current,
     score: quizState.score,
     answered: quizState.answered,
@@ -5142,7 +5174,7 @@ function renderQuiz() {
       <div style="text-align:center;padding:32px 0 24px">
         <div style="font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#6a8a9a;margin-bottom:6px">Daily Quiz</div>
         <div style="font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;color:var(--accent);line-height:1">3</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#8ab0c0;margin-top:4px">questions · resets at midnight</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#8ab0c0;margin-top:4px">5 questions · resets at midnight</div>
         ${streak > 0 ? `<div style="margin-top:16px;font-family:'Rajdhani',sans-serif;font-size:16px;color:#e8c96e">🔥 ${streak} day streak</div>` : ''}
         <div style="margin-top:8px;font-family:'Rajdhani',sans-serif;font-size:12px;color:#6a8a9a">Recognition · Movement · Abilities · Items</div>
       </div>
@@ -5211,11 +5243,11 @@ function renderQuiz() {
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
       ${q.subject?.type === 'hero' && !q.subject.hidePortrait ? `
         <div style="flex-shrink:0;width:64px;height:78px;border-radius:4px;overflow:hidden;border:1px solid var(--border2);background:var(--bg4)">
-          <img src="${PORTRAITS[q.subject.hero.name]||''}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">
+          <img src="${PORTRAITS[q.subject.hero.name]||''}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">
         </div>` : q.subject?.type === 'item' ? `
         <div style="flex-shrink:0;width:64px;height:64px;border-radius:4px;overflow:hidden;border:1px solid var(--border2);background:var(--bg4);position:relative">
-          <img src="${backerUrl(q.subject.category, q.subject.item.tier)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
-          <img src="${itemIconUrl(q.subject.item.name, q.subject.category)}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:80%;object-fit:contain" onerror="this.style.display='none'">
+          <img src="${backerUrl(q.subject.category, q.subject.item.tier)}" style="width:100%;height:100%;object-fit:cover" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">
+          <img src="${itemIconUrl(q.subject.item.name, q.subject.category)}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:80%;object-fit:contain" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">
         </div>` : ''}
       <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:600;color:#e0e8f0;line-height:1.4">${q.q}</div>
     </div>
@@ -5228,7 +5260,7 @@ function renderQuiz() {
           color:#c5cdd4;cursor:pointer;display:flex;align-items:center;gap:14px;width:100%"
           onmouseover="if(!this.dataset.done)this.style.borderColor='var(--accent)'"
           onmouseout="if(!this.dataset.done)this.style.borderColor='var(--border2)'">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#6a8a9a;flex-shrink:0;width:16px">${['A','B','C','D'][i]}</span>${opt}
+          <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#6a8a9a;flex-shrink:0;width:16px">${['A','B','C'][i]}</span>${opt}
         </button>`).join('')}
     </div>
     <div id="quiz-feedback" style="margin-top:16px;min-height:24px"></div>`;
@@ -5271,7 +5303,7 @@ function answerQuiz(idx) {
     const portraitHtml = subj.hidePortrait ? `
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
         <div style="width:40px;height:48px;border-radius:3px;overflow:hidden;flex-shrink:0;border:1px solid var(--border2)">
-          <img src="${PORTRAITS[subj.hero.name]||''}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.style.display='none'">
+          <img src="${PORTRAITS[subj.hero.name]||''}" style="width:100%;height:140%;object-fit:cover;object-position:top center" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">
         </div>
         <span style="font-family:'Rajdhani',sans-serif;font-size:14px;color:#8ab0c0">${subj.hero.name}</span>
       </div>` : '';
@@ -5297,8 +5329,8 @@ function answerQuiz(idx) {
       <div style="margin-top:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;border-left:2px solid ${catColor}">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
           <div style="width:40px;height:40px;border-radius:3px;overflow:hidden;position:relative;flex-shrink:0">
-            <img src="${backU}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
-            <img src="${iconU}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:80%;object-fit:contain" onerror="this.style.display='none'">
+            <img src="${backU}" style="width:100%;height:100%;object-fit:cover" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">
+            <img src="${iconU}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:80%;object-fit:contain" onerror="this.src=this.src.replace('game.deadlock.coach','cdn.deadlock-api.com');this.onerror=function(){this.style.display='none'}">
           </div>
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#e0e8f0">${item.name}</div>
